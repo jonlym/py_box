@@ -683,8 +683,8 @@ help_dict = {
     'precfock': 'Controls the FFT grid for the exact exchange (Hartree-Fock) routines.',
     
     #Special parameters
-    'lreal': {True: 'Projection will be done in real space.',
-              False: 'Projection done in reciprocal space.',
+    'lreal': {True: 'Projection will be done in reciprocal space.',
+              False: 'Projection done in real space.',
               'auto': 'Projection done in real space. Fully automatic optimization of projection operators. No user interference required.',
               'on': 'Projection done in real space. Projection operators are re-optimized.'},
     
