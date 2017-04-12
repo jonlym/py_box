@@ -119,7 +119,7 @@ def set_dimer_calc_ZnOCu(atoms_obj,
                          potim = 0,
                          ichain = 2,
                          drotmax = 6,
-                         istart = istart):
+                         istart = 0):
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
     Default parameters may need to be adjusted for other systems.
@@ -178,7 +178,7 @@ def set_dimer_calc_In2O3(atoms_obj,
                          potim = 0,
                          ichain = 2,
                          drotmax = 6,
-                         istart = istart):
+                         istart = 0):
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
     Default parameters may need to be adjusted for other systems.
@@ -238,7 +238,7 @@ def set_neb_calc_ZnOCu(atoms_obj,
                        potim = 0,
                        spring = -5,
                        lclimb = False,
-                       istart = istart):
+                       istart = 0):
     from ase.calculators.vasp_neb import Vasp as Vasp_neb
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
@@ -300,7 +300,7 @@ def set_neb_calc_In2O3(atoms_obj,
                        potim = 0,
                        spring = -5,
                        lclimb = False,
-                       istart = istart):
+                       istart = 0):
     from ase.calculators.vasp_neb import Vasp as Vasp_neb
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
@@ -357,7 +357,7 @@ def set_calc_In2O3(atoms_obj,
                    ispin = 2,
                    magmom = 0,
                    gamma = True,
-                   istart = istart):
+                   istart = 0):
     """
     Takes an atoms object and sets the calculator. These parameters were originally used for Jonathan Lym's In2O3 runs.
     Default parameters may need to be adjusted for other systems.
