@@ -5,12 +5,14 @@ Created on Wed Nov 23 14:57:39 2016
 @author: Jonathan Lym
 """
 
+from scipy.stats import variation
 import re
 import numpy as np
-import constants as c
 import ase.thermochemistry
 import xlwt
 import matplotlib.pyplot as plt
+import py_box.constants as c
+
 
 class NASA(object):
     """
@@ -195,31 +197,26 @@ class NASA(object):
         """
         Fits parameters a1 - a6 using dimensionless heat capacity and temperature.
         """        
-        max_R2 = -1
-        R2 = np.zeros(len(T))
-        for i, T_mid in enumerate(T):
-            #Need at least 5 points to fit the polynomial
-            if i > 5 and i < (len(T)-6):
-                #Separate the temperature and heat capacities into low and high range
-                (R2[i], a_low, a_high) = self._get_CpoR_R2(T, CpoR, i)                
-        max_R2 = max(R2)
-        max_i = np.where(max_R2 == R2)[0][0]
-        (max_R2, a_low_rev, a_high_rev) = self._get_CpoR_R2(T, CpoR, max_i)
-        
-                
-#        mid_index = np.where(T >= T_mid)[0][0]
-#        T_low = T[:mid_index]
-#        CpoR_low = CpoR[:mid_index]
-        
-#        T_high = T[mid_index:]    
-#        CpoR_high = CpoR[mid_index:]
-        
-#        a_low_rev = np.polyfit(x = T_low, y = CpoR_low, deg = 4)
-#        a_high_rev = np.polyfit(x = T_high, y = CpoR_high, deg = 4)
-        empty_arr = np.array([0.]*2)
-        self.T_mid = T[max_i]
-        self.a_low = np.concatenate((a_low_rev[::-1], empty_arr))
-        self.a_high = np.concatenate((a_high_rev[::-1], empty_arr))
+        #If the Cp/R does not vary with temperature (occurs when no vibrational frequencies are listed)
+        if (np.mean(CpoR) < 1e-6 and np.isnan(variation(CpoR))) or variation(CpoR) < 1e-3:
+           self.T_mid = T[len(T)/2]
+           self.a_low = np.array(7*[0.])
+           self.a_high = np.array(7*[0.])
+        else:
+            max_R2 = -1
+            R2 = np.zeros(len(T))
+            for i, T_mid in enumerate(T):
+                #Need at least 5 points to fit the polynomial
+                if i > 5 and i < (len(T)-6):
+                    #Separate the temperature and heat capacities into low and high range
+                    (R2[i], a_low, a_high) = self._get_CpoR_R2(T, CpoR, i)                
+            max_R2 = max(R2)
+            max_i = np.where(max_R2 == R2)[0][0]
+            (max_R2, a_low_rev, a_high_rev) = self._get_CpoR_R2(T, CpoR, max_i)
+            empty_arr = np.array([0.]*2)
+            self.T_mid = T[max_i]
+            self.a_low = np.concatenate((a_low_rev[::-1], empty_arr))
+            self.a_high = np.concatenate((a_high_rev[::-1], empty_arr))
 
     def _get_CpoR_R2(self, T, CpoR, i_mid):
         T_low = T[:i_mid]
@@ -603,7 +600,7 @@ class thermdats(object):
         line = ''
         for i in range(5):
             a = species.nasa.a_high[i]
-            if a > 0:
+            if a >= 0:
                 line += ' '            
             line += float_string % a
         line += '    2\n'
@@ -619,7 +616,7 @@ class thermdats(object):
                 a = species.nasa.a_high[i+5]
             else:
                 a = species.nasa.a_low[i-2]
-            if a > 0:
+            if a >= 0:
                 line += ' '
             line += float_string % a
         line += '    3\n'
@@ -632,7 +629,7 @@ class thermdats(object):
         line = ''
         for i in range(3,7):
             a = species.nasa.a_low[i]
-            if a > 0:
+            if a >= 0:
                 line += ' '
             line += float_string % a
         line += '                   4\n'

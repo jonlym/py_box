@@ -22,6 +22,11 @@ def run_testRun(atoms_obj):
         view(atoms_obj)
         
 def find_coordination_number(atoms_obj, max_len = 2.5):
+    """
+    Determines the coordination number based on the max_len constraint. Note 
+    that ASE has a neighbors class (ase.neighborlist), which may be more useful
+    than this script
+    """
     n_atoms = len(atoms_obj)
     #Duplicate the atoms object so that it is surrounded to get an accurate CN
     atoms_ext = atoms_obj.copy()
