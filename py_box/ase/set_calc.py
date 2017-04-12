@@ -23,7 +23,8 @@ def set_geo_calc_ZnOCu(atoms_obj,
                        algo = 'fast',
                        lreal = 'auto',
                        ispin = 2,
-                       magmom = 0):
+                       magmom = 0,
+                       istart  = 0):
     """
     Takes an atoms object and sets the calculator with spin. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
     Default parameters may need to be adjusted for other systems.
@@ -42,8 +43,11 @@ def set_geo_calc_ZnOCu(atoms_obj,
                 npar = npar,
                 algo = algo,
                 lreal = lreal,
-                ispin = ispin,
-                magmom = [magmom]*len(atoms_obj))
+                ispin = ispin)
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
     print_vasp_param(calc)
     atoms_obj.set_calculator(calc)
     return calc
@@ -65,7 +69,8 @@ def set_bader_calc(atoms_obj,
                    lreal = 'auto',
                    ispin = 2,
                    magmom = 0,
-                   laechg = True):
+                   laechg = True,
+                   istart = 0):
     calc = Vasp(xc = xc, 
             kpts = kpts, 
             encut = encut,
@@ -81,8 +86,11 @@ def set_bader_calc(atoms_obj,
             algo = algo,
             lreal = lreal,
             ispin = ispin,
-            laechg = laechg,
-            magmom = [magmom]*len(atoms_obj))
+            laechg = laechg)
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
     print_vasp_param(calc)
     atoms_obj.set_calculator(calc)
     return calc
@@ -110,7 +118,8 @@ def set_dimer_calc_ZnOCu(atoms_obj,
                          ibrion = 3,
                          potim = 0,
                          ichain = 2,
-                         drotmax = 6):
+                         drotmax = 6,
+                         istart = istart):
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
     Default parameters may need to be adjusted for other systems.
@@ -129,7 +138,6 @@ def set_dimer_calc_ZnOCu(atoms_obj,
                 algo = algo,
                 lreal = lreal,
                 ispin = ispin,
-                magmom = [magmom]*len(atoms_obj),
                 nsw = nsw,
                 ediffg = ediffg,
                 iopt = iopt,
@@ -137,7 +145,10 @@ def set_dimer_calc_ZnOCu(atoms_obj,
                 potim = potim,
                 drotmax = drotmax,
                 ichain = ichain)
-
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
     atoms_obj.set_calculator(calc)
     print_vasp_param(calc)
     return calc
@@ -166,7 +177,8 @@ def set_dimer_calc_In2O3(atoms_obj,
                          ibrion = 3,
                          potim = 0,
                          ichain = 2,
-                         drotmax = 6):
+                         drotmax = 6,
+                         istart = istart):
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
     Default parameters may need to be adjusted for other systems.
@@ -185,7 +197,6 @@ def set_dimer_calc_In2O3(atoms_obj,
                 algo = algo,
                 lreal = lreal,
                 ispin = ispin,
-                magmom = [magmom]*len(atoms_obj),
                 gamma = gamma,
                 nsw = nsw,
                 ediffg = ediffg,
@@ -194,7 +205,10 @@ def set_dimer_calc_In2O3(atoms_obj,
                 potim = potim,
                 drotmax = drotmax,
                 ichain = ichain)
-
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
     atoms_obj.set_calculator(calc)
     print_vasp_param(calc)
     return calc
@@ -223,7 +237,8 @@ def set_neb_calc_ZnOCu(atoms_obj,
                        ibrion = 3,
                        potim = 0,
                        spring = -5,
-                       lclimb = False):
+                       lclimb = False,
+                       istart = istart):
     from ase.calculators.vasp_neb import Vasp as Vasp_neb
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
@@ -243,7 +258,6 @@ def set_neb_calc_ZnOCu(atoms_obj,
                     algo = algo,
                     lreal = lreal,
                     ispin = ispin,
-                    magmom = [magmom]*len(atoms_obj),
                     neb = True,
                     nsw = nsw,
                     ediffg = ediffg,
@@ -253,6 +267,10 @@ def set_neb_calc_ZnOCu(atoms_obj,
                     spring = spring,
                     images = NIMAGES,
                     lclimb = lclimb)
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
 
     atoms_obj.set_calculator(calc)
     print_vasp_param(calc)
@@ -281,7 +299,8 @@ def set_neb_calc_In2O3(atoms_obj,
                        ibrion = 3,
                        potim = 0,
                        spring = -5,
-                       lclimb = False):
+                       lclimb = False,
+                       istart = istart):
     from ase.calculators.vasp_neb import Vasp as Vasp_neb
     """
     Takes an atoms object and sets up parameters for NEB calculations. These parameters were originally used for Jonathan Lym's Inverse Metal Oxide (ZnO/Cu(111)) runs.
@@ -301,7 +320,6 @@ def set_neb_calc_In2O3(atoms_obj,
             algo = algo,
             lreal = lreal,
             ispin = ispin,
-            magmom = [magmom]*len(atoms_obj),
             neb = True,
             nsw = nsw,
             ediffg = ediffg,
@@ -311,6 +329,10 @@ def set_neb_calc_In2O3(atoms_obj,
             spring = spring,
             images = NIMAGES,
             lclimb = lclimb)
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
 
     atoms_obj.set_calculator(calc)
     print_vasp_param(calc)
@@ -334,7 +356,8 @@ def set_calc_In2O3(atoms_obj,
                    lreal = 'auto',
                    ispin = 2,
                    magmom = 0,
-                   gamma = True):
+                   gamma = True,
+                   istart = istart):
     """
     Takes an atoms object and sets the calculator. These parameters were originally used for Jonathan Lym's In2O3 runs.
     Default parameters may need to be adjusted for other systems.
@@ -355,6 +378,10 @@ def set_calc_In2O3(atoms_obj,
             lreal = lreal,
             ispin = ispin,
             gamma = gamma)
+    if istart == 0:
+        calc.set(magmom = [magmom]*len(atoms_obj))
+    else:
+        calc.set(istart = istart)
     atoms_obj.set_calculator(calc)
     print_vasp_param(calc)
     return calc
