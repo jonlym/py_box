@@ -12,6 +12,7 @@ import ase.thermochemistry
 import xlwt
 import matplotlib.pyplot as plt
 import py_box.constants as c
+import warnings
 
 
 class NASA(object):
@@ -54,12 +55,12 @@ class NASA(object):
         """Calculates the heat capacity at constant pressure (i.e. Cp/R) for a single temperature."""
         T_arr = np.array([1., T, T ** 2, T ** 3, T ** 4, 0., 0.])
         if T < self.T_mid:
-            if T < self.T_low and self.verbose:
-                print "Warning. Input temperature (%f) lower than T_low (%f)" % (T, self.T_low)
+            if T < self.T_low:
+                warnings.warn("Input temperature (%f) lower than T_low (%f)" % (T, self.T_low))
             return np.dot(T_arr, self.a_low)
         else:
-            if T > self.T_high and self.verbose:
-                print "Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high)
+            if T > self.T_high:
+                warnings.warn("Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high))
             return np.dot(T_arr, self.a_high)
 
         
@@ -81,12 +82,12 @@ class NASA(object):
         """Calculates the dimensionless enthalpy (i.e. H/RT) given a single temperature."""
         T_arr = np.array([1., T/2., T ** 2 / 3., T ** 3 / 4., T ** 4 / 5., 1. / T, 0.])
         if T < self.T_mid:
-            if T < self.T_low and self.verbose:
-                print "Warning. Input temperature (%f) lower than T_low (%f)" % (T, self.T_low)
+            if T < self.T_low:
+                warnings.warn("Input temperature (%f) lower than T_low (%f)" % (T, self.T_low))
             return np.dot(T_arr, self.a_low)
         else:
-            if T > self.T_high and self.verbose:
-                print "Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high)
+            if T > self.T_high:
+                warnings.warn("Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high))
         return np.dot(T_arr, self.a_high)
 
     def get_HoRT(self, T):
@@ -108,12 +109,12 @@ class NASA(object):
         """Calculates the dimensionless entropy (i.e. S/R) given a temperature."""
         T_arr = np.array([np.log(T), T, T ** 2 / 2., T ** 3 / 3., T ** 4 / 4., 0., 1.])
         if T < self.T_mid:
-            if T < self.T_low and self.verbose:
-                print "Warning. Input temperature (%f) lower than T_low (%f)" % (T, self.T_low)
+            if T < self.T_low:
+                warnings.warn("Input temperature (%f) lower than T_low (%f)" % (T, self.T_low))
             return np.dot(T_arr, self.a_low)
         else:
-            if T > self.T_high and self.verbose:
-                print "Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high)
+            if T > self.T_high:
+                warnings.warn("Warning. Input temperature (%f) higher than T_high (%f)" % (T, self.T_high))
             return np.dot(T_arr, self.a_high)
 
     def get_SoR(self, T):
@@ -296,6 +297,7 @@ class thermdat(object):
                If you've been given frequencies in Hz, divide by speed of 
                light in cm/s (29979245800) before passing.
     CHON - List that holds the number of C, H, O and N in that order
+    aux_element - String that contains the element name if not C, N, O or H.
     nasa - NASA object that holds temperature ranges and NASA polynomials.
     geometry - String only required for gas species. Options include:
                 monatomic                   
@@ -330,7 +332,8 @@ class thermdat(object):
                  symbol, 
                  is_gas, 
                  vib_freq = None, 
-                 CHON = None, 
+                 CHON = None,
+                 aux_element = None,
                  nasa = None, 
                  geometry = None,
                  H0 = 0.,
@@ -347,8 +350,7 @@ class thermdat(object):
         if not self.is_gas:
             self.site_type = site_type
         if vib_freq is None:
-            if self.verbose:
-                print "Warning: %s was not assigned any vibrational frequencies. This is needed for full functionality for thermochemistry." % symbol
+            warnings.warn("%s was not assigned any vibrational frequencies. This is needed for full functionality for thermochemistry." % symbol)
             vib_freq = np.array([0.])
         self._vib_freq = vib_freq
         vib_energies = self.__get_vib_energies()
@@ -356,12 +358,10 @@ class thermdat(object):
         if is_gas:
             if geometry is None:
                 geometry = 'monatomic'
-                if self.verbose:
-                    print "Warning: %s is a gas species but a geometry was not assigned. \nAssigning the default geometry, %s" % (symbol, geometry)
+                warnings.warn("%s is a gas species but a geometry was not assigned. \nAssigning the default geometry, %s" % (symbol, geometry))
             if symmetrynumber is None:
                 symmetrynumber = 1
-                if self.verbose:
-                    print "Warning: %s is a gas species but a symmetry number was not assigned. \nAssigning a default symmetry number, %d" % (symbol, symmetrynumber)            
+                warnings.warn("%s is a gas species but a symmetry number was not assigned. \nAssigning a default symmetry number, %d" % (symbol, symmetrynumber))
             elif type(symmetrynumber) is str:
                 sym_dict = {
                     'C1': 1,
@@ -380,15 +380,12 @@ class thermdat(object):
                 }
                 if sym_dict.get(symmetrynumber) is None:
                     symmetrynumber = 1
-                    if self.verbose:
-                        print "Warning: Point group not found. Using default symmetry number of %d" % symmetrynumber
+                    warnings.warn("Point group not found. Using default symmetry number of %d" % symmetrynumber)
             if atoms is None:
-                if self.verbose:
-                    print "Warning: %s is a gas species but an ASE atoms object was not assigned." % symbol
+                warnings.warn("%s is a gas species but an ASE atoms object was not assigned." % symbol)
             if spin is None:
                 spin = 0
-                if self.verbose:
-                    print "Warning: %s is a gas species but a spin was not assigned. \nAssigning a default value of %d" % (symbol, spin)
+                warnings.warn("%s is a gas species but a spin was not assigned. \nAssigning a default value of %d" % (symbol, spin))
             self.IdealGasThermo = ase.thermochemistry.IdealGasThermo(vib_energies = vib_energies, 
                                                                 geometry = geometry, 
                                                                 potentialenergy = potentialenergy,
@@ -400,6 +397,7 @@ class thermdat(object):
                                                                      potentialenergy = potentialenergy)                                                                
         if CHON is None:
             CHON = 4*[0]
+            self.aux_element = aux_element
         self.CHON = CHON
         if nasa is None:
             nasa = NASA(symbol = symbol)
@@ -438,8 +436,7 @@ class thermdat(object):
             elif self.IdealGasThermo.geometry == 'nonlinear':
                 CpoR = 3.
             else:
-                if self.verbose:                
-                    print "Warning. Gas phase species with invalid geometry. Returning 0."
+                warnings.warn("Gas phase species with invalid geometry. Returning 0.")
                 return 0                
             #Correction between Cv and Cp
             CpoR += 1
@@ -825,7 +822,7 @@ class thermdats(object):
             else:
                 break
         else:
-            print "Warning. Arrow not found!"
+            warnings.warn("Arrow not found!")
             
         #Go through the groups to determine the species and their stoichiometric coefficients
         for i, reaction_group in enumerate(reaction_groups):
@@ -846,7 +843,7 @@ class thermdats(object):
                         species = reaction_group[j:]
                         break
                 else:
-                    print "Warning. Reaction group %s made of only numbers." % reaction_group
+                    warnings.warn("Reaction group %s made of only numbers." % reaction_group)
                 if coeff_str != '':
                     coeff_num = int(float(coeff_str))
                 
@@ -856,7 +853,7 @@ class thermdats(object):
                         stoich_vector[j] += coeff_num*side
                         break
                 else:
-                    print "Warning. Could not find the species %s." % species
+                    warnings.warn("Could not find the species %s." % species)
         return stoich_vector
 
 
@@ -891,8 +888,7 @@ def read_thermdat(thermdat_path, verbose = True):
                     try:
                         phase = re.search("(G|S)", buf).group(0)
                     except AttributeError:
-                        if verbose:
-                            print "Phase not found. Assuming surface phase."
+                        warnings.warn("Phase not found. Assuming surface phase.")
                         is_gas = False
                     else:
                         if 'G' in phase:
@@ -937,8 +933,7 @@ def _get_CHON_value(string, symbol, atom, verbose = True):
     try:
         buf = re.search(pattern, string).group(0)
     except AttributeError:
-        if verbose:
-            print "Warning: Unable to find %s atom in species %s. Returning 0." % (atom, symbol)
+        warnings.warn("Unable to find %s atom in species %s. Returning 0." % (atom, symbol))
         return 0
     buf = re.search('\d+', buf).group(0)
     return int(float(buf))
