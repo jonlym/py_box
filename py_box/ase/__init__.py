@@ -55,5 +55,4 @@ def print_magmom(atoms_obj):
     atoms_obj.set_calculator(calc)
     print 'Atom Index\tAtom Type\tMagmom'
     for atom in atoms_obj:
-        '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
-    
+         print '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
