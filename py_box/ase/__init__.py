@@ -9,15 +9,16 @@ import numpy as np
 from platform import system
 from pprint import pprint
 from ase.visualize import view
+from ase.calculators.vasp import Vasp
 
 def run_testRun(atoms_obj):
     print 'Test Run'
     os_name = system()
-    if type(atoms_obj) is list:        
-        for i in range(len(atoms_obj)):    
-            pprint(vars(atoms_obj[i]))
-    else:
-        pprint(vars(atoms_obj))
+#    if type(atoms_obj) is list:        
+#        for i in range(len(atoms_obj)):    
+#            pprint(vars(atoms_obj[i]))
+#    else:
+#        pprint(vars(atoms_obj))
     if os_name.lower() == 'linux':
         view(atoms_obj)
         
@@ -45,3 +46,14 @@ def find_coordination_number(atoms_obj, max_len = 2.5):
                     print '\t%s [%d]\t %f' % (atoms_obj[k].symbol, k, bond_len)
                     CN += 1
         print '\t Coordination Number: %d' % CN
+
+def print_magmom(atoms_obj):
+    """
+    Prints the magnetic moment associated with each atom.
+    """
+    calc = Vasp(istart = 1)
+    atoms_obj.set_calculator(calc)
+    print 'Atom Index\tAtom Type\tMagmom'
+    for atom in atoms_obj:
+        '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
+    
