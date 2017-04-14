@@ -6,6 +6,7 @@ Created on Mon Sep 26 16:38:29 2016
 """
 
 import numpy as np
+from datetime import datetime, timedelta
 from platform import system
 from pprint import pprint
 from ase.visualize import view
@@ -56,3 +57,28 @@ def print_magmom(atoms_obj):
     print 'Atom Index\tAtom Type\tMagmom'
     for atom in atoms_obj:
          print '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
+
+def print_avg_step_time(out_file):
+    times = []
+    diff_times = []
+    i = 0
+    with open(out_file, 'r') as out_ptr:
+        for line in out_ptr:
+            if 'LBFGS' in line:
+                times.append(datetime.strptime(line[12:20], '%H:%M:%S'))
+                i += 1
+    print 'Number of steps: %d' % (i+1)
+    diff_times_sec = np.zeros(len(times)-1)
+    for i in range(len(times)-1):
+        diff_times.append(times[i+1] - times[i])
+        if diff_times[i].days < 0:
+            diff_times[i] += timedelta(days = 1)
+        diff_times_sec[i] = diff_times[i].total_seconds()
+
+    mean_sec = np.mean(diff_times_sec)
+    if mean_sec > 3600.:
+        print 'Mean time per step: %f hours' % (mean_sec/3600.)
+    elif mean_sec > 60.:
+        print 'Mean time per step: %f minutes' % (mean_sec/60.)
+    else:
+        print 'Mean time per step: %f seconds' % mean_sec
