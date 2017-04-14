@@ -58,7 +58,7 @@ def print_magmom(atoms_obj):
     for atom in atoms_obj:
          print '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
 
-def print_avg_step_time(out_file):
+def print_run_time(out_file):
     times = []
     diff_times = []
     i = 0
@@ -82,3 +82,14 @@ def print_avg_step_time(out_file):
         print 'Mean time per step: %f minutes' % (mean_sec/60.)
     else:
         print 'Mean time per step: %f seconds' % mean_sec
+        
+    tot_sec = np.sum(diff_times_sec)
+    if tot_sec > 86400.:
+        print 'Total time: %f days' % (tot_sec/86400.)        
+    if tot_sec > 3600.:
+        print 'Total time: %f hours' % (tot_sec/3600.)
+    elif tot_sec > 60.:
+        print 'Total time: %f minutes' % (tot_sec/60.)
+    else:
+        print 'Total time: %f seconds' % tot_sec
+        
