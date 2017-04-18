@@ -10,8 +10,9 @@ import re
 from ase.io import read, write
 from ase.visualize import view
 from ase.neb import interpolate
+from shutil import copy, copytree
 from os import chdir, getcwd, system, makedirs, walk
-from os.path import relpath, expanduser, exists, join
+from os.path import relpath, expanduser, exists, join, is_file
 
 def check_bond_lengths(atoms_obj, change_len = False, bond_warning = False, bond_len = 0.9):
     """
@@ -233,3 +234,30 @@ def label_folder(num):
         return str(num)
     else:
         return '0'+str(num)
+
+def switch_atoms(atoms, i, j):
+    """
+    Switches the positions of two atoms. Useful for starting NEB interpolations.
+    """
+    atoms_copy = atoms.copy()
+    atoms[i].position = atoms_copy[j].position
+    atoms[j].position = atoms_copy[i].position    
+
+def initialize_NEB(location = '.'):
+    """
+    Uses the template folder (expected to be in one directory up) to initialize NEB calculation.
+    """
+    chdir(location)
+    dir_name = relpath('.', '..')
+    if exists('../template'):
+        print 'Template folder found.'
+        if is_file('../template/python_template.py'):
+            print 'Python script found. Copying to location as %s.py' % dir_name
+            copy('../template/python_template.py', './%s.py' % dir_name)
+        if exists('../template/initial'):
+            print 'Initial folder found. Copying its contents.'
+            copytree('../template/initial', './initial')
+        if exists('../template/final'):
+            print 'Final folder found. Copying its contents.'
+            copytree('../template/final', './final')
+        
