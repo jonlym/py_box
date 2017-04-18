@@ -39,7 +39,6 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                        'algo': 'fast',
                        'lreal': 'auto',
                        'ispin': 2,
-                       'magmom': 0,
                        'gamma': True,
                        'istart': 0},
              'ZnOCu_bader': {'xc': "PBE",
@@ -175,7 +174,25 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                            'spring': -5,
                            'lclimb': False,
                            'istart': 0,
-                           'gamma': True}}
+                           'gamma': True},
+             'In2O3_vib': {'xc': "PBE",
+                           'kpts': (4,3,1),
+                           'encut': 400,
+                           'ismear': 0,
+                           'sigma': 0.05,
+                           'ediff': 1e-8,
+                           'prec': 'accurate',
+                           'lcharg': False,
+                           'lwave': False,
+                           'nelmin': 4,
+                           'nelmdl': 6,
+                           'npar': 2,
+                           'algo': 'fast',
+                           'lreal': 'auto',
+                           'ispin': 2,
+                           'gamma': True,
+                           'istart': 0}
+}
 #Idea would be: 
 #calc = Vasp(**calc_dict['Type of calculation'])
 #print_vasp_param(calc)
@@ -1022,8 +1039,8 @@ help_dict = {
 
     #Input parameters
     'pp': 'Pseudopotential used.',
-    'reciprocal': {True: 'Projection operators evaluated in real space.',
-                   False: 'Projection operators evaluated in reciprocal space.'},
+    'reciprocal': {True: 'Projection operators evaluated in reciprocal space.',
+                   False: 'Projection operators evaluated in real space.'},
     #'kpts_nintersections'
     'setups': 'Different potentials used for different atoms.',
     'xc': 'Exchange functional',
@@ -1083,3 +1100,10 @@ def assign_magmom(atoms_obj, ispin = None):
         if magmom_dict.get(atom.symbol) is not None:
             magmoms[i] = magmom_dict.get(atom.symbol)
     return magmoms
+
+def handle_restart(calc, atoms):
+    """Uses the istart and ispin parameters in calc to determine whether magmom should be set. """
+    if calc.int_params['ispin'] == 2:
+        if calc.int_params['istart'] == 0:
+            magmom = [0] * len(atoms)
+            calc.set(magmom = magmom)
