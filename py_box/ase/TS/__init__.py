@@ -12,7 +12,7 @@ from ase.visualize import view
 from ase.neb import interpolate
 from shutil import copy, copytree
 from os import chdir, getcwd, system, makedirs, walk
-from os.path import relpath, expanduser, exists, join, is_file
+from os.path import relpath, expanduser, exists, join, isfile
 
 def check_bond_lengths(atoms_obj, change_len = False, bond_warning = False, bond_len = 0.9):
     """
@@ -242,6 +242,7 @@ def switch_atoms(atoms, i, j):
     atoms_copy = atoms.copy()
     atoms[i].position = atoms_copy[j].position
     atoms[j].position = atoms_copy[i].position    
+    return atoms
 
 def initialize_NEB(location = '.'):
     """
@@ -251,7 +252,7 @@ def initialize_NEB(location = '.'):
     dir_name = relpath('.', '..')
     if exists('../template'):
         print 'Template folder found.'
-        if is_file('../template/python_template.py'):
+        if isfile('../template/python_template.py'):
             print 'Python script found. Copying to location as %s.py' % dir_name
             copy('../template/python_template.py', './%s.py' % dir_name)
         if exists('../template/initial'):
