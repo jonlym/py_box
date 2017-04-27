@@ -106,7 +106,7 @@ def read_qstat(job_management):
         Job = job(job_id = job_attr[0], status = job_attr[4])
         job_management.append(Job)
         
-def read_log_file(log_path):
-    with open(log_path, 'r') as log_file:
+#def read_log_file(log_path):
+#    with open(log_path, 'r') as log_file:
         
         
