@@ -96,63 +96,63 @@ def move_atoms_by_cell(in_path, atoms_list, cell_dir_list, offset_list):
     print "Completed ase_NEB.move_atoms_by_cell"
     print "Result written to %s" % out_path
 
-def view_images(read_file = 'POSCAR', is_NEB = True):
-    """
-    Appends the images together and displays with ASE-GUI. POSCAR files will be
-    read by default. read_file can also be specified to 'CONTCAR' or 'traj'
-    """
-
-    #Setting up np.array type
-    values = []    
-    dtype = [('path', 'a40'), ('image', 'O')]
-
-    #Try reading the initial image for relative energies
-    try:
-        if is_NEB:
-            initial = read('00/POSCAR')
-        else:
-            initial = read('initial/POSCAR')
-    except (IndexError, IOError):
-        print "Initial image POSCAR not found."
-    else:
-        values.append(('00', initial))
-
-    for root, dirs, files in walk(getcwd()):
-        for directory in dirs:
-            #If the folder has the form ## but not 00
-            if re.search('([0-9][1-9]|[1-9][0-9])', directory) is not None and '-' not in directory:
-                #Check if folder is interpolated.
-                full_path = join(root, directory)
-                image_path = re.search('[0-9]{2}-[0-9]{2}.*([0-9][1-9]|[1-9][0-9])', full_path)
-                if image_path is None:
-                    image_path = directory
-                else:
-                    image_path = image_path.group(0)
-
-                try:      
-                    image = read('%s/%s' % (full_path, read_file))
-                except (IndexError, IOError):
-                    print "%s at %s not found" % (read_file, full_path)
-                else:
-                    values.append((image_path, image))
-    #Sort values and print
-    unsorted_values = np.array(values, dtype=dtype)
-    sorted_values = np.sort(unsorted_values, order = 'path')
-    print "Image #\tPath"
-    for i, values in enumerate(sorted_values):
-        if values['path'] == '00' and not is_NEB:
-            values['path'] = 'initial'
-        print "%d\t%s" % (i, values['path'])
-    images = sorted_values['image'].tolist()
-    if not is_NEB:
-        try:
-	    final = read('final/POSCAR')
-	except (IndexError, IOError):
-	    print "Final image POSCAR not found."
-	else:
-	    images.append(final)
-	    print "%d\tfinal" % (i+1)
-    view(images)
+#def view_images(read_file = 'POSCAR', is_NEB = True):
+#    """
+#    Appends the images together and displays with ASE-GUI. POSCAR files will be
+#    read by default. read_file can also be specified to 'CONTCAR' or 'traj'
+#    """
+#
+#    #Setting up np.array type
+#    values = []    
+#    dtype = [('path', 'a40'), ('image', 'O')]
+#
+#    #Try reading the initial image for relative energies
+#    try:
+#        if is_NEB:
+#            initial = read('00/POSCAR')
+#        else:
+#            initial = read('initial/POSCAR')
+#    except (IndexError, IOError):
+#        print "Initial image POSCAR not found."
+#    else:
+#        values.append(('00', initial))
+#
+#    for root, dirs, files in walk(getcwd()):
+#        for directory in dirs:
+#            #If the folder has the form ## but not 00
+#            if re.search('([0-9][1-9]|[1-9][0-9])', directory) is not None and '-' not in directory:
+#                #Check if folder is interpolated.
+#                full_path = join(root, directory)
+#                image_path = re.search('[0-9]{2}-[0-9]{2}.*([0-9][1-9]|[1-9][0-9])', full_path)
+#                if image_path is None:
+#                    image_path = directory
+#                else:
+#                    image_path = image_path.group(0)
+#
+#                try:      
+#                    image = read('%s/%s' % (full_path, read_file))
+#                except (IndexError, IOError):
+#                    print "%s at %s not found" % (read_file, full_path)
+#                else:
+#                    values.append((image_path, image))
+#    #Sort values and print
+#    unsorted_values = np.array(values, dtype=dtype)
+#    sorted_values = np.sort(unsorted_values, order = 'path')
+#    print "Image #\tPath"
+#    for i, values in enumerate(sorted_values):
+#        if values['path'] == '00' and not is_NEB:
+#            values['path'] = 'initial'
+#        print "%d\t%s" % (i, values['path'])
+#    images = sorted_values['image'].tolist()
+#    if not is_NEB:
+#        try:
+#	    final = read('final/POSCAR')
+#	except (IndexError, IOError):
+#	    print "Final image POSCAR not found."
+#	else:
+#	    images.append(final)
+#	    print "%d\tfinal" % (i+1)
+#    view(images)
 
 def print_energies():
     """
