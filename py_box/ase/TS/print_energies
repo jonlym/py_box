@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+
+import re
+import numpy as np
+from os import getcwd, walk
+from os.path import join
+from ase.io import read
+
+
+"""
+Tabulates the energies from the OUTCAR files. If print_rel_energy is set to True, the initial energy will be found in initial/OUTCAR and the table will
+have an extra field showing energies relative to this value.
+"""
+#Setting up np.array type
+values = []    
+dtype = [('path', 'a40'), ('energy', float)]
+print "nan indicates the run is not finished."
+print "inf indicates the run does not exist."
+#Try reading the initial image for relative energies
+try:
+    initial = read('initial/OUTCAR')
+except (IndexError, IOError):
+    print "Initial image not found."
+    print_rel_energy = False
+else:
+    initial_energy = initial.get_potential_energy()
+    print_rel_energy = True
+
+#Print table headings:
+if print_rel_energy:
+    print "Path\t\tEnergy(eV)\tEnergy relative to image 0 (eV)"
+    print "-"*30
+    print "initial\t\t%.5f\t%.2f" % (initial_energy, initial_energy-initial_energy)
+else:
+    print "Path\t\tEnergy(eV)"
+    print "-"*30
+    
+for root, dirs, files in walk(getcwd()):
+    for directory in dirs:
+        #If the folder has the form ## but not 00
+        if re.search('([0-9][1-9]|[1-9][0-9])', directory) is not None and '-' not in directory:
+            #Check if folder is interpolated.
+            full_path = join(root, directory)
+            image_path = re.search('[0-9]{2}-[0-9]{2}.*([0-9][1-9]|[1-9][0-9])', full_path)
+            if image_path is None:
+                image_path = directory
+            else:
+                image_path = image_path.group(0)
+
+            #Find energy                
+            try:      
+                image = read('%s/OUTCAR' % full_path)
+            except IndexError:
+                energy = np.nan
+            except IOError:
+                energy = np.inf
+            else:
+                energy = image.get_potential_energy()
+            values.append((image_path, energy))
+#Sort values and print
+unsorted_values = np.array(values, dtype=dtype)
+sorted_values = np.sort(unsorted_values, order = 'path')
+for values in sorted_values:
+    if print_rel_energy:
+        print "%s\t\t%.5f\t%.2f" % (values['path'], values['energy'], values['energy'] - initial_energy)
+    else:
+        print "%s\t\t%.5f" % (values['path'], values['energy'])
+
+try:
+    final = read('final/OUTCAR')
+except (IndexError, IOError):
+    print "Final image not found"
+else:
+    if print_rel_energy:
+        final_energy = final.get_potential_energy()
+        print "final\t\t%.5f\t%.2f" % (final_energy, final_energy-initial_energy)
+    else:
+        final_energy = final.get_potential_energy()
+        print "final\t\t%.5f" % final_energy
+
