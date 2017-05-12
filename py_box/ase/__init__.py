@@ -12,7 +12,6 @@ from platform import system
 from pprint import pprint
 from ase.visualize import view
 from ase.calculators.vasp import Vasp
-from pandas import read_excel
 
 def run_testRun(atoms_obj):
     print 'Test Run'
