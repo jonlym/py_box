@@ -5,6 +5,7 @@ Created on Wed Nov 23 21:10:42 2016
 @author: Jon Lym
 """
 import numpy as np
+from warnings import warn
 
 def R(units = None):
     """
@@ -43,9 +44,9 @@ def R(units = None):
         None: 8.3144598
     }
     if units is None:
-        print "Warning. Unit type not for R specified. Using default unit set J/mol/K"
+        warn("Unit type not for R specified. Using default unit set J/mol/K")
     if R_dict.get(units) == None:
-        print "Warning: Unit type %r for R not found. Using default unit set J/mol/K" % units
+        warn("Unit type %r for R not found. Using default unit set J/mol/K" % units)
         units = 'J/mol/K'
     return R_dict[units]
     
@@ -64,9 +65,9 @@ def h(units = None, bar = False):
         None: 6.626070040e-34
     }
     if units is None:
-        print "Warning. Unit type for h not specified. Using default unit set J s"
+        warn("Unit type for h not specified. Using default unit set J s")
     if h_dict.get(units) is None:
-        print "Warning: Unit type %r for h not found. Using default unit set J s" % units
+        warn("Unit type %r for h not found. Using default unit set J s" % units)
         units = 'J s'
     if bar:
         return h_dict[units]/(2*np.pi)
@@ -91,9 +92,9 @@ def kb(units = None):
         None: 6.626070040e-34
     }
     if units is None:
-        print "Warning. Unit type not kb specified. Using default unit set J/K"
+        warn("Unit type not kb specified. Using default unit set J/K")
     if kb_dict.get(units) is None:
-        print "Warning: Unit type %r for kb not found. Using default unit set J/K" % units
+        warn("Unit type %r for kb not found. Using default unit set J/K" % units)
         units = 'J/K'
     return kb_dict[units]
 
@@ -110,9 +111,9 @@ def c(units = None):
         None: 299792458
     }
     if units is None:
-        print "Warning. Unit type not c specified. Using default unit set m/s"
+        warn("Unit type not c specified. Using default unit set m/s")
     if c_dict.get(units) is None:
-        print "Warning: Unit type %r for c not found. Using default unit set m/s" % units
+        warn("Unit type %r for c not found. Using default unit set m/s" % units)
         units = 'm/s'
     return c_dict[units]
 
@@ -129,9 +130,9 @@ def m_e(units = None):
         None: 9.10938356e-31
     }
     if units is None:
-        print "Warning. Unit type not m_e specified. Using default unit set kg"
+        warn("Unit type not m_e specified. Using default unit set kg")
     if m_e_dict.get(units) is None:
-        print "Warning: Unit type %r for m_e not found. Using default unit set kg" % units
+        warn("Unit type %r for m_e not found. Using default unit set kg" % units)
         units = 'kg'
     return m_e_dict[units]
 
@@ -148,9 +149,9 @@ def m_p(units = None):
         None: 1.6726219e-27
     }
     if units is None:
-        print "Warning. Unit type not m_p specified. Using default unit set kg"
+        warn("Unit type not m_p specified. Using default unit set kg")
     if m_p_dict.get(units) is None:
-        print "Warning: Unit type %r for m_p not found. Using default unit set kg" % units
+        warn("Unit type %r for m_p not found. Using default unit set kg" % units)
         units = 'kg'
     return m_p_dict[units]
 
@@ -179,9 +180,9 @@ def P0(units = None):
         None: 1
     }
     if units is None:
-        print "Warning. Unit type not c specified. Using default unit set bar"
+        warn("Unit type not c specified. Using default unit set bar")
     if P0_dict.get(units) is None:
-        print "Warning: Unit type %r for c not found. Using default unit set m/s" % units
+        warn("Warning: Unit type %r for c not found. Using default unit set m/s" % units)
         units = 'bar'
     return P0_dict[units]
 
@@ -195,7 +196,7 @@ def convert_unit(num = 1, from_ = None, to = None):
     Converts num with units 'from_' to num with units 'to'.
     Supported Units:
     -----------------------------------    
-    Type    | Symbol | Unit
+    Type    | Symbol    | Unit
     -----------------------------------
     Energy  |J          | Joules
             |kJ         | KiloJoules
@@ -332,14 +333,14 @@ def convert_unit(num = 1, from_ = None, to = None):
 
     #Check if the entry exists    
     if type_dict.get(from_) is None:
-        print "Error: %r not a supported unit." % from_
+        raise ValueError("%r not a supported unit." % from_)
     if type_dict.get(to) is None:
-        print "Error: %r not a supported unit." % to
+        raise ValueError("%r not a supported unit." % to)
     #Check that the unit types are the same
     from_type = type_dict[from_]
     to_type = type_dict[to]
     if from_type != to_type:
-        print "Error: '%r' [Type '%r'] not compatible with '%r' [Type '%r']" % (from_, from_type, to, to_type)
+        raise ValueError("%r [Type %r] not compatible with %r [Type %r]" % (from_, from_type, to, to_type))
     elif from_type == 'temp':
         return num + unit_dict[to] - unit_dict[from_]
     else:
