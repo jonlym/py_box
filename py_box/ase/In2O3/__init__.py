@@ -6,6 +6,7 @@ Created on Wed Apr 12 17:12:09 2017
 """
 
 import heapq
+import numpy as np
 
 index_dict = {'In1': [26, 27],
               'In2': [24, 25],
@@ -31,3 +32,28 @@ def find_closest_H(atoms, i, n = 1):
     for dist in H_low_dist:
         H_low_indices.append(all_H_indices[all_H_dist.index(dist)])
     return H_low_indices
+
+def get_new_index(atoms_indices, vacancy_indices, start_index = 0):
+    """
+    Returns the adjusted indices given the vacancies already created on the surface.
+    start_index = 1 should be used when the indices are not 0 indexed.
+    """
+    out_atom_indices = []
+
+    if type(atoms_indices) is int:
+        atom_indices = [atoms_indices]
+
+    if type(vacancy_indices) is int:
+        vacancy_indices = [vacancy_indices]
+
+    for atom_index in atom_indices:
+        if atom_index in vacancy_indices:
+            out_atom_indices.append(np.nan)
+        else:
+            offset = start_index - sum([1 for vacancy_index in vacancy_indices if vacancy_index < atom_index])
+            out_atom_indices.append(atom_index + offset)
+
+    if len(out_atom_indices) == 1:
+        return out_atom_indices[0]
+    else:
+        return out_atom_indices
