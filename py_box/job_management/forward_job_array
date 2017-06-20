@@ -12,10 +12,10 @@ from os.path import isdir, exists
 
 #Parse arguments
 parser = argparse.ArgumentParser(description = "Checks the paths in specified by job_in and folder_in and writes the unfinished jobs to job_out and folder_out.")
-parser.add_argument("job_in", default = './joblist.txt', help = "File that holds the input jobs.")
-parser.add_argument("folder_in", default = './folderlist.txt', help = "File that contains paths to input jobs.")
-parser.add_argument("job_out", default = './joblist_out.txt', help = "File that uncompleted jobs will be written to.")
-parser.add_argument("folder_out", default = './folderlist_out.txt', help = "File that paths to incomplete jobs will be written to.")
+parser.add_argument("job_in", nargs='?', default = './joblist.txt', help = "File that holds the input jobs.")
+parser.add_argument("folder_in", nargs='?', default = './folderlist.txt', help = "File that contains paths to input jobs.")
+parser.add_argument("job_out", nargs='?', default = './joblist_out.txt', help = "File that uncompleted jobs will be written to.")
+parser.add_argument("folder_out", nargs='?', default = './folderlist_out.txt', help = "File that paths to incomplete jobs will be written to.")
 parser.add_argument("-a", "-all", action='store_true', help = "If specified, jobs that have not run as yet will be written to the output files.")
 args = parser.parse_args()
 job_in = args.job_in
