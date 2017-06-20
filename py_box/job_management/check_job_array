@@ -12,8 +12,8 @@ from os.path import isdir, exists
 
 #Parse arguments
 parser = argparse.ArgumentParser(description = "Checks the paths in joblist.txt and folderlist.txt to ensure they exist for Job Array Submission.")
-parser.add_argument("job_file", default = './joblist.txt', help = "File that contains job names.")
-parser.add_argument("folder_file", default = './folderlist.txt', help = "File that contains paths to jobs.")
+parser.add_argument("job_file", nargs='?', default = './joblist.txt', help = "File that contains job names.")
+parser.add_argument("folder_file", nargs='?', default = './folderlist.txt', help = "File that contains paths to jobs.")
 args = parser.parse_args()
 job_file = args.job_file
 folder_file = args.folder_file
