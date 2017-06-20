@@ -147,6 +147,7 @@ class vacancy_clusters(object):
         print '-'*10
         print 'Vacancy formation energy of site {}'.format(site)
         print '-'*10
+        print 'Vacancies Before | Vacancies After: Energy (eV)'
         for VC in self:
             if (site in VC.vacancy_sites) or (get_parity(site) in VC.vacancy_sites):
                 prior_sites = VC.vacancy_sites - set([site])
@@ -162,7 +163,7 @@ class vacancy_clusters(object):
                     else:
                         buf = site
                     prior_site_name = '_'.join(self[i].vacancy_sites)
-                    print '{} | {}: {:.2f} eV'.format(buf, prior_site_name, VC.energy + E_ref - self[i].energy)
+                    print '{} | {}: {:.2f} eV'.format(prior_site_name, VC.name, VC.energy + E_ref - self[i].energy)
 
 def get_parity(sites):
     if type(sites) is str:

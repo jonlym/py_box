@@ -120,7 +120,20 @@ class GCN(object):
             worksheet.write(i+1, 3, GCN)
             for j, neighbor in enumerate(neighbors):
                 worksheet.write(i+1, j+4, '%s%d' % (self.atoms[neighbor].symbol, neighbor))
-                
+
+    def get_generalized_property(self, index, property):
+        """
+        Given a list corresponding to the indices in the atoms object, calculates the generalized property of the neighbors.
+        index: Integer containing the index of the atom.
+        property: List containing the properties of the atom (indices aligned with the self.atoms object
+        returns: Float of the generalized property
+        """
+        neighbor_properties = np.zeros(shape = len(self.neighbors[index]))
+        for i, neighbor in enumerate(self.neighbors[index]):
+            neighbor_properties[i] = property[neighbor]
+        return np.sum(neighbor_properties)/np.max(neighbor_properties)
+
+
 def get_unique_list(data):
     """
     Given a list, returns a unique list.
@@ -129,4 +142,3 @@ def get_unique_list(data):
     for item in data:
         keys[item] = 1
     return keys.keys()
-    
