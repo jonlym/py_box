@@ -13,7 +13,7 @@ from os.path import isdir, exists, splitext, basename
 #Parse arguments
 parser = argparse.ArgumentParser(description = "Takes the path to the output folder and removes useful lines.")
 parser.add_argument("in_path", help = "Holds the path to the input file that will be cleaned.")
-parser.add_argument("out_path", nargs='?', default = None, description = "Name of the path where the formatted output will be saved. If nothing is specified, the output file will take the format '[in_file_name]_cleaned.[in_extension]")
+parser.add_argument("out_path", nargs='?', default = None, help = "Name of the path where the formatted output will be saved. If nothing is specified, the output file will take the format '[in_file_name]_cleaned.[in_extension]")
 args = parser.parse_args()
 in_path = args.in_path
 out_path = args.out_path
@@ -32,8 +32,8 @@ for del_line in del_lines:
     print '\t{}'.format(del_line)
 
 if out_path is None:
-    in_name, in_extension = os.path.splitext(os.path.basename(in_path))
-    out_path = '{}_out.{}'.format(in_name, in_extension)
+    in_name, in_extension = splitext(basename(in_path))
+    out_path = '{}_cleaned{}'.format(in_name, in_extension)
 
 i = 0
 with open(in_path, 'r') as in_file, open(out_path, 'w') as out_file:
