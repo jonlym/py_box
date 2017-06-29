@@ -22,15 +22,21 @@ class GCN(object):
                      Copper cannot be coordinated to hydrogen or oxygen.
     """
     
-    def __init__(self, atoms, atom_radii = {}, scale = 1., exceptions = {}):
+    def __init__(self, atoms, scale = 1., exceptions = {}, source_dict = None):
         self.atoms = atoms
         self.CNs = np.zeros(len(atoms))
         self.neighbors = [[] for i in range(len(self.atoms))]
         self.GCNs = np.zeros(len(atoms))
-        self.atom_radii = atom_radii
         self.scale = scale
         self.exceptions = exceptions
-        
+        self.atom_radii = {}
+        if source_dict is not None:
+            self.import_atom_radii(source_dict)
+
+        #If the exception and atom_radii dictionaries are not empty, find the coordination numbers
+        if any(self.exceptions) and any(self.atom_radii):
+            self.calc_GCNs()
+
     def import_atom_radii(self, source_dict):
         """
         Assigns the radius in Anstroms to the self.atom_radii. 
@@ -102,7 +108,7 @@ class GCN(object):
                 for j, k in enumerate(self.neighbors[i]):
                     neighbors_CNs[j] = self.CNs[k]
                 self.GCNs[i] = np.sum(neighbors_CNs)/np.max(neighbors_CNs)
-    
+
     def write_to_excel(self, file_name = 'gcn.xlsx'):
         """
         Writes an excel file containing all the data in GCN.
@@ -133,6 +139,29 @@ class GCN(object):
             neighbor_properties[i] = property[neighbor]
         return np.sum(neighbor_properties)/np.max(neighbor_properties)
 
+    def get_neighbors_sum_property(self, index, property):
+        """
+        Given a list corresponding to the indices in the atoms object, calculates the summed property of the neighbors.
+        index: Integer containing the index of the atom.
+        property: List containing the properties of the atom (indices aligned with the self.atoms object
+        returns: Float of the generalized property
+        """
+        neighbor_properties = np.zeros(shape = len(self.neighbors[index]))
+        for i, neighbor in enumerate(self.neighbors[index]):
+            neighbor_properties[i] = property[neighbor]
+        return np.sum(neighbor_properties)
+
+    def get_neighbors_average_property(self, index, property):
+        """
+        Given a list corresponding to the indices in the atoms object, calculates the averaged property of the neighbors.
+        index: Integer containing the index of the atom.
+        property: List containing the properties of the atom (indices aligned with the self.atoms object
+        returns: Float of the generalized property
+        """
+        neighbor_properties = np.zeros(shape = len(self.neighbors[index]))
+        for i, neighbor in enumerate(self.neighbors[index]):
+            neighbor_properties[i] = property[neighbor]
+        return np.average(neighbor_properties)
 
 def get_unique_list(data):
     """

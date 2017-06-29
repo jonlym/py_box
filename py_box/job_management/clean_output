@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+"""
+Created on Thu Apr 27 11:24:22 2017
+
+@author: Jonathan Lym
+"""
+
+import argparse
+from warnings import warn
+from os import getcwd, chdir
+from os.path import isdir, exists, splitext, basename
+
+#Parse arguments
+parser = argparse.ArgumentParser(description = "Takes the path to the output folder and removes useful lines.")
+parser.add_argument("in_path", help = "Holds the path to the input file that will be cleaned.")
+parser.add_argument("out_path", nargs='?', default = None, description = "Name of the path where the formatted output will be saved. If nothing is specified, the output file will take the format '[in_file_name]_cleaned.[in_extension]")
+args = parser.parse_args()
+in_path = args.in_path
+out_path = args.out_path
+
+#Lines that will be deleted
+del_lines = ['regcache incompatible with malloc',
+             'FORTRAN STOP',
+             'srun: Job step creation temporarily disabled, retrying',
+             'srun: Job step created',
+             'DASPK--  AT CURRENT T (=R1)',
+             'DASPK--  TAKEN ON THIS CALL BEFORE REACHING TOUT',
+             'In above message,  R1 =']
+
+print 'The following lines will be removed:'
+for del_line in del_lines:
+    print '\t{}'.format(del_line)
+
+if out_path is None:
+    in_name, in_extension = os.path.splitext(os.path.basename(in_path))
+    out_path = '{}_out.{}'.format(in_name, in_extension)
+
+i = 0
+with open(in_path, 'r') as in_file, open(out_path, 'w') as out_file:
+    for line in in_file:
+        #If the line does not contain any of the delete phrases
+        if not any([del_line in line for del_line in del_lines]):
+            #Write it to the output file
+            out_file.write(line)
+        else:
+            i += 1
+print 'Removed {} line(s)'.format(i)

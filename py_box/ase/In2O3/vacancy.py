@@ -187,3 +187,6 @@ def read_vacancy_file(file_name):
             energy = data['Energy'][i]
         VCs.append(vacancy_cluster(name = str(data['Site'][i]), energy = energy))
     return VCs
+
+def get_vacancies_from_name(string):
+    return set((string.split('_')))

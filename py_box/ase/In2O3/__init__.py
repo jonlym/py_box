@@ -12,12 +12,32 @@ index_dict = {'In1': [26, 27],
               'In2': [24, 25],
               'In3': [15, 14],
               'In4': [22, 23],
-              'O1': [75, 74],
-              'O2': [76, 77],
-              'O3': [46, 47],
-              'O4': [73, 72],
-              'O5': [43, 42],
-              'O6': [68, 69]}
+              'O1':  [75, 74],
+              'O2':  [76, 77],
+              'O3':  [46, 47],
+              'O4':  [73, 72],
+              'O5':  [43, 42],
+              'O6':  [68, 69],
+              'In1A': 26,
+              'In1B': 27,
+              'In2A': 24,
+              'In2B': 25,
+              'In3A': 15,
+              'In3B': 14,
+              'In4A': 22,
+              'In4B': 23,
+              'O1A':  75,
+              'O1B':  74,
+              'O2A':  76,
+              'O2B':  77,
+              'O3A':  46,
+              'O3B':  47,
+              'O4A':  73,
+              'O4B':  72,
+              'O5A':  43,
+              'O5B':  42,
+              'O6A':  68,
+              'O6B':  69}
 
 def find_closest_H(atoms, i, n = 1):
     """Finds the 'n' indices of the H atoms closest to atom 'i'."""
@@ -40,11 +60,13 @@ def get_new_index(atoms_indices, vacancy_indices, start_index = 0):
     """
     out_atom_indices = []
 
+    if vacancy_indices is None:
+        return atoms_indices
+    elif type(vacancy_indices) is int:
+        vacancy_indices = [vacancy_indices]
+
     if type(atoms_indices) is int:
         atom_indices = [atoms_indices]
-
-    if type(vacancy_indices) is int:
-        vacancy_indices = [vacancy_indices]
 
     for atom_index in atom_indices:
         if atom_index in vacancy_indices:

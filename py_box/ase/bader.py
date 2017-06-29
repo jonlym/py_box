@@ -5,12 +5,53 @@ Created on Fri Mar 24 16:11:06 2017
 @author: Jonathan Lym
 """
 
+from py_box import any_alpha
 from ase.io import read
 from ase.io.bader import attach_charges
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import constants as c
+
+class bader:
+    """Stores the bader charge"""
+    def __init__(self, charges = [], min_distances = [], atomic_volumes = [], atoms = None):
+        self.charges = charges
+        self.min_distances = min_distances
+        self.atomic_volumes = atomic_volumes
+        self.atoms = atoms
+
+    def append(self, atom, charge = np.nan, min_distance = np.nan, atomic_volume = np.nan,):
+        """Appends data. Note that an atom object must be supplied to ensure consistency."""
+        self.charges.append(charge)
+        self.min_distancs.append(min_distance)
+        self.atomic_volumes.append(atomic_volume)
+        self.atoms.append(atom)
+
+    @classmethod
+    def from_ACF_dat(cls, ACF_path = 'ACF.dat', atoms = None):
+        """Reads the bader charge from the ACF.dat file"""
+        charges = []
+        min_distances = []
+        atomic_volumes = []
+        with open(ACF_path, 'r') as ACF_file:
+            for line in ACF_file:
+                #If there are no alphabetical characters and does not contain a line
+                if (not any_alpha(line) and '--' not in line):
+                    data = [np.float(x) for x in line.split(' ') if x != '']
+                    charges.append(data[4])
+                    min_distances.append(data[5])
+                    atomic_volumes.append(data[6])
+        return cls(charges = charges, min_distances = min_distances, atomic_volumes = atomic_volumes, atoms = atoms)
+
+    def __str__(self):
+        lines = []
+        lines.append("Element[index]  Charges  Min Distance  Atomic Volume\n")
+        lines.append("----------------------------------------------------\n")
+        for atom, charge, min_distance, atomic_volume in zip(self.atoms, self.charges, self.min_distances, self.atomic_volumes):
+            atom_info = '{}[{}]'.format(atom.symbol, atom.index)
+            pad_length = len('Element[index]  ') - len(atom_info)
+            lines.append('{}{}{:7.2f}  {:12.2f}{:13.2f}\n'.format(atom_info, ' '*pad_length, charge, min_distance, atomic_volume))
+        return ''.join(lines)
 
 def print_bader(dir_path = '.', atoms_file = 'CONTCAR'):
     #Prints the bader charges using the atoms_file (usually CONTCAR) and ACF.dat
