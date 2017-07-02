@@ -9,6 +9,7 @@ import os, warnings
 import numpy as np
 import pandas as pd
 import xlsxwriter
+from py_box import get_unique_list
 
 class GCN(object):
     """
@@ -162,12 +163,3 @@ class GCN(object):
         for i, neighbor in enumerate(self.neighbors[index]):
             neighbor_properties[i] = property[neighbor]
         return np.average(neighbor_properties)
-
-def get_unique_list(data):
-    """
-    Given a list, returns a unique list.
-    """
-    keys = {}
-    for item in data:
-        keys[item] = 1
-    return keys.keys()

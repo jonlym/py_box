@@ -12,3 +12,12 @@ def any_alpha(string):
             return True
     else:
         return False
+
+def get_unique_list(data):
+    """
+    Given a list, returns a unique list.
+    """
+    keys = {}
+    for item in data:
+        keys[item] = 1
+    return keys.keys()
