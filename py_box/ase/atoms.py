@@ -1807,8 +1807,6 @@ class Atoms(object):
         for i, (atom, dos_occupancy) in enumerate(zip(self, dos_occupancies)):
             self[i].dos_occupancy = dos_occupancy
 
-
-
 def string2symbols(s):
     """Convert string to list of chemical symbols."""
     n = len(s)
