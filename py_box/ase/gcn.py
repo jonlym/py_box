@@ -9,6 +9,7 @@ import os, warnings
 import numpy as np
 import pandas as pd
 import xlsxwriter
+from ase.geometry import find_mic
 from py_box import get_unique_list
 
 class GCN(object):
@@ -16,15 +17,34 @@ class GCN(object):
     Contains parameters relating to the coordination number of the atoms.
     Parameters:
         atoms - ASE atoms object.
-        atom_radii - Dictionary containing the radii of each atom. The function import_atom_radii may be used to import from the reference file.
-        scale - A float that is used to increase (>1) or decrease (<1) the effective atomic radii.
-        exceptions - Dictionary that holds the list of elements that cannot be coordinated.
-                     e.g. exceptions = {'Cu': ['H', 'O']}
-                     Copper cannot be coordinated to hydrogen or oxygen.
+        bulk - ASE atoms object of the bulk material.
+        bulk_CN - Dict
+            Bulk coordination number for each element.
+        atom_radii - Dict
+            Radii of each atom. The function import_atom_radii may be used to import from the reference file.
+        scale - Float
+            Used to increase (>1) or decrease (<1) the effective atomic radii.
+        exceptions - Dict
+            Holds the list of elements that cannot be coordinated.
+            e.g. exceptions = {'Cu': ['H', 'O']}
+            Copper cannot be coordinated to hydrogen or oxygen.
+        source_dict - Dict
+            The key are the elements present in the atoms object and the value can be:
+                'Empirical'
+                'Calculated'
+                'van der Waals'
+                'Covalent (single bond)'
+                'Covalent (triple bond)'
+                'Metallic'
+                Custom values by entering a float
+            e.g. source_dict = {'Cu': 'Metallic',
+                                'H': 'Empirical'}
     """
     
-    def __init__(self, atoms, scale = 1., exceptions = {}, source_dict = None):
+    def __init__(self, atoms, bulk, scale = 1., exceptions = {}, source_dict = None):
         self.atoms = atoms
+        self.bulk = bulk
+        self.bulk_CN = {}
         self.CNs = np.zeros(len(atoms))
         self.neighbors = [[] for i in range(len(self.atoms))]
         self.GCNs = np.zeros(len(atoms))
@@ -77,7 +97,6 @@ class GCN(object):
         Calculates the coordination number and the list of indices that the 
         atoms are coordinated to.
         """
-
         #Duplicate the atoms object to account for periodic images
         offset = 13 * len(self.atoms)
         atoms_ext = self.atoms.copy() * (3, 3, 3)
@@ -98,17 +117,23 @@ class GCN(object):
         Calculates the generalized coordination number.
         """
         if update:
+            self.get_bulk_CN()
             self.calc_CNs()
 
         #Goes through neighbors and determines their coordination number
-        for i in range(len(self.atoms)):
-            if self.CNs[i] == 0:
-                self.GCNs[i] = 0
-            else:
-                neighbors_CNs = np.zeros(len(self.neighbors[i]))
-                for j, k in enumerate(self.neighbors[i]):
-                    neighbors_CNs[j] = self.CNs[k]
-                self.GCNs[i] = np.sum(neighbors_CNs)/np.max(neighbors_CNs)
+        for i, (atom, CN) in enumerate(zip(self.atoms, self.CNs)):
+            try:
+                self.GCNs[i] = CN/self.bulk_CN[atom.symbol]
+            except KeyError:
+                continue
+        # for i in range(len(self.atoms)):
+        #     if self.CNs[i] == 0:
+        #         self.GCNs[i] = 0
+        #     else:
+        #         neighbors_CNs = np.zeros(len(self.neighbors[i]))
+        #         for j, k in enumerate(self.neighbors[i]):
+        #             neighbors_CNs[j] = self.CNs[k]
+        #         self.GCNs[i] = np.sum(neighbors_CNs)/np.max(neighbors_CNs)
 
     def write_to_excel(self, file_name = 'gcn.xlsx'):
         """
@@ -163,3 +188,30 @@ class GCN(object):
         for i, neighbor in enumerate(self.neighbors[index]):
             neighbor_properties[i] = property[neighbor]
         return np.average(neighbor_properties)
+
+    def get_bulk_CN(self):
+        """
+        Calculates the coordination number and the list of indices that the
+        bulk atoms are coordinated to.
+        """
+
+        #Duplicate the bulk atoms object to account for periodic images
+        offset = 13 * len(self.bulk)
+        bulk_ext = self.bulk.copy() * (3, 3, 3)
+        for i in range(offset, (offset + len(self.bulk))):
+            symbol = bulk_ext[i].symbol
+
+            CN = 0
+            for j in range(len(bulk_ext)):
+                #If not the same index, radii overlap (weighted by scale) and the elements are not in the element list
+                if (i != j and
+                    bulk_ext.get_distance(i, j) <= ((self.atom_radii[bulk_ext[i].symbol] + self.atom_radii[bulk_ext[j].symbol]) * self.scale) and
+                    bulk_ext[j].symbol not in self.exceptions[bulk_ext[i].symbol]):
+                    #Add a neighbor
+                    CN += 1
+
+            #Add record to dictionary
+            if bulk_ext[i].symbol not in self.bulk_CN:
+                self.bulk_CN[symbol] = 0
+            if CN > self.bulk_CN[symbol]:
+                self.bulk_CN[symbol] = CN
