@@ -1,4 +1,4 @@
-class Configuration:
+class Configuration(object):
     """
     Holds the configuration.
         Attributes:

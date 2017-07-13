@@ -32,7 +32,7 @@ class Configurations(object):
             raise Exception('Either name or index must be specified.')
         elif name is not None:
             index = self.index(name)
-        self._configurations.pop(index)
+        del self._configurations[index]
 
     def get_DFT_energies(self):
         return np.array([configuration.E_DFT for configuration in self])

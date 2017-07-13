@@ -3,6 +3,7 @@ from py_box.cluster_expansion.cluster import Cluster
 from py_box.cluster_expansion.clusters import Clusters
 from py_box.cluster_expansion.configuration import Configuration
 from py_box.cluster_expansion.configurations import Configurations
+from sklearn.linear_model import LassoCV
 from warnings import warn
 
 def get_correlation_matrix(configurations, clusters):
@@ -40,6 +41,15 @@ def get_effective_interactions(correlation_mat, energies, clusters = None):
         for J, cluster in zip(Js, clusters):
             cluster.J = J
     return Js
+
+def get_effective_interactions_lasso(correlation_mat, energies, alpha = [0.1], clusters = None):
+    clf = LassoCV(alphas = alpha, fit_intercept=False, copy_X=True)
+    clf.fit(correlation_mat, energies)
+    Js = clf.coef_
+    if clusters is not None:
+        for J, cluster in zip(Js, clusters):
+            cluster.J = J
+    return (Js, clf.alpha_)
 
 def get_energies(correlation_mat, Js, configurations = None):
     Es = np.dot(correlation_mat, Js)

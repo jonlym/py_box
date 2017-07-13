@@ -1,4 +1,4 @@
-from py_box.cluster_expansion.cluster import Cluster, default_dict
+from py_box.cluster_expansion.cluster import Cluster
 import numpy as np
 import pandas as pd
 from copy import copy
@@ -33,7 +33,7 @@ class Clusters(object):
             raise Exception('Either name or index must be specified.')
         elif name is not None:
             index = self.index(name)
-        self._clusters.pop(index)
+        del self._clusters[index]
 
     def get_cluster_energy(self):
         return np.array([cluster.J for cluster in self])
@@ -92,5 +92,6 @@ class Clusters(object):
                                     n_cell = cluster['n_cell'],
                                     interactions = out_interactions,
                                     info = cluster['info'],
-                                    J = cluster['J']))
+                                    J = cluster['J'],
+                                    n_nodes = cluster['n_nodes']))
         return cls(clusters = clusters, info = info)
