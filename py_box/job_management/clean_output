@@ -25,7 +25,16 @@ del_lines = ['regcache incompatible with malloc',
              'srun: Job step created',
              'DASPK--  AT CURRENT T (=R1)',
              'DASPK--  TAKEN ON THIS CALL BEFORE REACHING TOUT',
-             'In above message,  R1 =']
+             'In above message,  R1 ='
+             'Error in mx_open_endpoint (error No MX device entry in /dev.)',
+             'more processes have sent help message help-mpi-btl-base.txt / btl:no-nics',
+             'Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages',
+             'Module: Myrinet/MX',
+             ' A high-performance Open MPI point-to-point messaging module',
+             'was unable to find any relevant network interfaces',
+             'Host: node',
+             'Another transport will be used instead, although this may result in',
+             'lower performance.']
 
 print 'The following lines will be removed:'
 for del_line in del_lines:
