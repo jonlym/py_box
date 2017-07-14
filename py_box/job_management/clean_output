@@ -34,7 +34,10 @@ del_lines = ['regcache incompatible with malloc',
              'was unable to find any relevant network interfaces',
              'Host: node',
              'Another transport will be used instead, although this may result in',
-             'lower performance.']
+             'lower performance.',
+             'Stack trace terminated abnormally.',
+             'forrtl: error (78): process killed (SIGTERM)',
+             'Image              PC                Routine            Line        Source']
 
 print 'The following lines will be removed:'
 for del_line in del_lines:
