@@ -58,5 +58,8 @@ def get_energies(correlation_mat, Js, configurations = None):
             configuration.E_CE = E
     return Es
 
-def get_CV(xs_data, xs_fit):
+def get_RMSE(xs_data, xs_fit):
     return np.sqrt(np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)]))
+
+def count_nonsparse(Js, eps = 1e-5):
+    return np.count_nonzero([abs(J) > eps for J in Js])

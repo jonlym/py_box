@@ -30,9 +30,10 @@ def plot_parity(x, y, decimals = 2):
     min_data = np.round(min(data*10.**decimals))/10.**decimals
     max_data = np.round(max(data*10.**decimals))/10.**decimals
     fig = plt.figure()
-    plt.plot(x, y, 'bo', np.array([min_data, max_data]), np.array([min_data, max_data]), 'k-')
+    plt.plot(np.array([min_data, max_data]), np.array([min_data, max_data]), 'k-', x, y, 'bo')
     axes = plt.gca()
     axes.set_ylim([min_data, max_data])
     axes.set_xlim([min_data, max_data])
 #    plt.plot(np.array([min_data, min_data]), np.array([max_data, max_data]), 'k-')
     return (fig, axes)
+

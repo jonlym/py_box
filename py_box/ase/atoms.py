@@ -15,8 +15,10 @@ import copy
 import numpy as np
 
 import ase.units as units
+from py_box import any_alpha, get_unique_list
 from py_box.ase.atom import Atom
-from py_box import any_alpha
+from py_box.ase.gcn import atom_radii_dict
+import xlsxwriter
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import basestring
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,
@@ -134,7 +136,8 @@ class Atoms(object):
                  cell=None, pbc=None, celldisp=None,
                  constraint=None,
                  calculator=None,
-                 info=None):
+                 info=None, bader_charges = None, atom_radii = None, dos_occupancies = None, bulk = None, bulk_CN = None,
+                 CN_exceptions = None):
 
         atoms = None
 
@@ -236,6 +239,17 @@ class Atoms(object):
             self.info = dict(info)
 
         self.set_calculator(calculator)
+
+        #Custom attributes
+        if bader_charges is not None:
+            self.set_bader_charges(bader_charges)
+        if dos_occupancies is not None:
+            self.set_dos_occupancies(dos_occupancies)
+        self.atom_radii = atom_radii
+        self.bulk = bulk
+        self.bulk_CN = bulk_CN
+        self.CN_exceptions = CN_exceptions
+
 
     def set_calculator(self, calc=None):
         """Attach calculator object."""
@@ -1726,7 +1740,7 @@ class Atoms(object):
         self.set_tags(edited_atoms.get_tags())
         return
 
-    """Added functionality"""
+    """ADDED FUNCTIONALITY"""
     @classmethod
     def convert(cls, atoms):
         """Converts an ASE atoms object to the modified atoms object."""
@@ -1751,6 +1765,7 @@ class Atoms(object):
         kwargs['info'] = atoms.info
         return cls(**kwargs)
 
+    #Bader Charge Functions
     def get_bader_charges(self):
         """Returns the bader charges of the atoms as a list."""
         return [atom.bader_charge for atom in self]
@@ -1760,7 +1775,7 @@ class Atoms(object):
         for i, (atom, bader_charge) in enumerate(zip(self, bader_charges)):
             self[i].bader_charge = bader_charge
 
-    def import_bader_charge(self, ACF_path = 'ACF.dat'):
+    def read_bader_charge(self, ACF_path = 'ACF.dat'):
         """Reads the bader charge from the ACF.dat file"""
         charges = []
         with open(ACF_path, 'r') as ACF_file:
@@ -1771,41 +1786,174 @@ class Atoms(object):
                     charges.append(data[4])
         self.set_bader_charges(charges)
 
+    #Coordination Number Functions
     def get_CNs(self):
-        """Returns the coordination numbers as a list."""
-        return [atom.cn for atom in self]
+        """Returns the coordination numbers as a dictionary."""
+        cn_dict = {}
+        for atom in self:
+            cn_dict[atom.index] = atom.cn
+        return cn_dict
 
     def set_CNs(self, CNs):
         """Sets the coordination numbers of the atoms."""
-        for i, (atom, CN) in enumerate(zip(self, CNs)):
-            self[i].cn = CN
+        if isinstance(CNs, list):
+            for i, (atom, CN) in enumerate(zip(self, CNs)):
+                #self[i].cn = CN
+                print 'Before assignment:'
+                print self[i].cn
+                self[i].cn = 0
+                print 'After assignment:'
+                print self[i].cn
+        elif isinstance(CNs, dict):
+            for (i, CN) in dict.items():
+                self[i].cn = CN
+        else:
+            print 'Unsupported format: type(CNs) = {}.'.format(type(CNs))
+
+    def calc_CNs(self, scale = 1.):
+        """
+        Calculates the coordination number and the list of indices that the
+        atoms are coordinated to.
+        """
+        #Reset the coordination numbers
+        self.set_CNs(CNs = [0]*len(self))
+        print self.get_CNs()
+        #Duplicate the atoms object to account for periodic images
+        offset = 13 * len(self)
+        atoms_ext = self.copy() * (3, 3, 3)
+        for i in range(offset, (offset + len(self))):
+            neighbors = []
+            for j in range(len(atoms_ext)):
+                #If not the same index, radii overlap (weighted by scale) and the elements are not in the element list
+                if (i != j
+                    and atoms_ext.get_distance(i, j) <= ((self.atom_radii[atoms_ext[i].symbol] + self.atom_radii[atoms_ext[j].symbol]) * scale)
+                    and atoms_ext[j].symbol not in self.CN_exceptions[atoms_ext[i].symbol]):
+                    #Add a neighbor
+                    self[i % len(self)].cn += 1
+                    neighbors.append(j % len(self.atoms))
+            self[i % len(self)].neighbors = set(get_unique_list(neighbors))
+
+    def import_atom_radii(self, source_dict):
+        """
+        Assigns the radius in Anstroms to self.atom_radii dictionary.
+        source_dict is a dictionary where the key corresponds to the element and the
+        value can be one of the following:
+            'Empirical'
+            'Calculated'
+            'van der Waals'
+            'Covalent (single bond)'
+            'Covalent (triple bond)'
+            'Metallic'
+            Custom values can be specified by entering a float.
+        """
+        if self.atom_radii is None:
+            self.atom_radii = {}
+        #Assign radius
+        for symbol, r_source in source_dict.iteritems():
+            #Custom value
+            if type(r_source) is float:
+                if r_source < 0:
+                    warnings.warn('Element %s assigned a negative atomic radius: %f A.' % (symbol, r_source))
+                self.atom_radii[symbol] = r_source
+            #Value to be imported
+            elif r_source in ['Empirical', 'Calculated', 'van der Waals', 'Covalent (single bond)', 'Covalent (triple bond)', 'Metallic']:
+                if atom_radii_dict[symbol][r_source] is None:
+                    warnings.warn('Radius type %s for element %s not available in reference table.' % (r_source, symbol))
+                    self.atom_radii[symbol] = -1
+                else:
+                    self.atom_radii[symbol] = atom_radii_dict[symbol][r_source]
+            else:
+                warnings.warn('Invalid radius type %s for element %s.' % (r_source, symbol))
+
+    def calc_bulk_CN(self, scale = 1.):
+        """
+        Calculates the bulk coordination number to find the generalized coordination numbers
+        """
+        self.bulk.atom_radii = self.atom_radii
+        self.bulk_CN = self.bulk.calc_CNs(scale = scale)
 
     def get_GCNs(self):
         """Returns the generalized coordination numbers as a list."""
-        return [atom.gcn for atom in self]
+        gcn_dict = {}
+        for atom in self:
+            gcn_dict[atom.index] = atom.gcn
+        return gcn_dict
 
     def set_GCNs(self, GCNs):
         """Sets the generalized coordination numbers of the atoms."""
-        for i, (atom, GCN) in enumerate(zip(self, GCNs)):
-            self[i].gcn = GCN
+        if isinstance(GCNs, list):
+            for i, (atom, GCN) in enumerate(zip(self, GCNs)):
+                self[i].gcn = GCN
+        elif isinstance(GCNs, dict):
+            for (i, GCN) in dict.items():
+                self[i].gcn = GCN
+
+    def calc_GCNs(self, update = True, scale = 1.):
+        """
+        Calculates the generalized coordination number.
+        """
+        if update:
+            self.calc_bulk_CN(scale = scale)
+            self.calc_CNs(scale = scale)
+
+        #Goes through neighbors and determines their coordination number
+        for i, atom in enumerate(self):
+            try:
+                self[i].gcn = atom.cn/self.bulk_CN[atom.symbol]
+            except KeyError:
+                continue
 
     def get_neighbors(self):
-        """"Gets the indices of the neighboring atoms as a list of sets"""
-        return [atom.neighbors for atom in self]
+        """"Gets the indices of the neighboring atoms as a dictionary of sets"""
+        neighbors_dict = {}
+        for atom in self:
+            neighbors_dict[atom.index] = atom.neighbors
+        return neighbors_dict
 
     def set_neighbors(self, neighbors):
         """Sets the indices of the neighboring atoms. Neighbors is expected to be a list of sets or a list of lists."""
-        for i, (atom, neighbor) in enumerate(zip(self, neighbors)):
-            self[i].neighbors = set(neighbor)
+        if isinstance(neighbors, list):
+            for i, (atom, neighbors) in enumerate(zip(self, neighbors)):
+                self[i].neighbors = set(neighbors)
+        elif isinstance(neighbors, dict):
+            for (i, neighbors) in dict.items():
+                self[i].neighbors = set(neighbors)
 
+    def write_gcn_to_excel(self, file_name = 'gcn.xlsx'):
+        """
+        Writes an excel file containing all the data in GCN.
+        """
+        workbook = xlsxwriter.Workbook(file_name)
+        worksheet = workbook.add_worksheet()
+        headers = ['Index', 'Symbol', 'CN', 'GCN', 'Neighbors']
+        for j, header in enumerate(headers):
+            worksheet.write(0, j, header)
+
+        for i, atom in enumerate(self):
+            worksheet.write(i+1, 0, atom.index)
+            worksheet.write(i+1, 1, atom.symbol)
+            worksheet.write(i+1, 2, atom.cn)
+            worksheet.write(i+1, 3, atom.gcn)
+            for j, neighbor in enumerate(atom.neighbors):
+                worksheet.write(i+1, j+4, '%s%d' % (self[neighbor].symbol, neighbor))
+
+    #DOS Occupancies Functions
     def get_dos_occupancies(self):
-        """Returns the dos occupancies as a list of dictionaries."""
-        return [atom.dos_occupancy for atom in self]
+        """Returns the dos occupancies as a dictionary of dictionaries."""
+        dos_occupancy_dict = {}
+        for atom in self:
+            dos_occupancy_dict[atom.index] = atom.dos_occupancy
+        return dos_occupancy_dict
 
     def set_dos_occupancies(self, dos_occupancies):
         """Sets the dos occupancies as a list of dictionaries"""
-        for i, (atom, dos_occupancy) in enumerate(zip(self, dos_occupancies)):
-            self[i].dos_occupancy = dos_occupancy
+        if isinstance(dos_occupancies, list):
+            for i, (atom, dos_occupancy) in enumerate(zip(self, dos_occupancies)):
+                self[i].dos_occupancy = dos_occupancy
+        elif isinstance(dos_occupancies, dict):
+            for (i, dos_occupancy) in dict.items():
+                self[i].dos_occupancy = dos_occupancy
+
 
 def string2symbols(s):
     """Convert string to list of chemical symbols."""

@@ -37,8 +37,16 @@ class Configurations(object):
     def get_DFT_energies(self):
         return np.array([configuration.E_DFT for configuration in self])
 
+    def set_DFT_energies(self, DFT_Es):
+        for DFT_E, configuration in zip(DFT_Es, self):
+            configuration.E_DFT = DFT_E
+
     def get_CE_energies(self):
         return np.array([configuration.E_CE for configuration in self])
+
+    def set_CE_energies(self, CE_Es):
+        for CE_E, configuration in zip(CE_Es, self):
+            configuration.E_CE = CE_E
 
     def get_copy(self, indices = []):
         """Creates a new Clusters object that will contain the indices requested.
@@ -51,6 +59,9 @@ class Configurations(object):
         for i in indices:
             configurations.append(copy(self[i]))
         return Configurations(configurations = configurations)
+
+    def get_n_vacancies(self):
+        return np.array([configuration.n_vacancies for configuration in self])
 
     def __len__(self):
         return len(self._configurations)
@@ -76,5 +87,6 @@ class Configurations(object):
             configurations.append(Configuration(name = configuration['name'],
                                                 sigma = sigma,
                                                 E_CE = configuration['E_CE'],
-                                                E_DFT = configuration['E_DFT']))
+                                                E_DFT = configuration['E_DFT'],
+                                                n_vacancies=configuration['n_vacancies']))
         return cls(configurations = configurations, info = info)

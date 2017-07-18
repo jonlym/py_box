@@ -5,6 +5,8 @@ Created on Mon Sep 26 16:38:29 2016
 @author: Jonathan Lym
 """
 
+from py_box.ase.atom import Atom
+from py_box.ase.atoms import Atoms
 import numpy as np
 import warnings
 from datetime import datetime, timedelta

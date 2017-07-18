@@ -50,6 +50,22 @@ class Clusters(object):
             clusters.append(copy(self[i]))
         return Clusters(clusters = clusters)
 
+    def set_Js(self, Js):
+        """Assigns Js to the clusters."""
+        for J, cluster in zip(Js, self):
+            cluster.J = J
+
+    def print_nonsparse(self):
+        """Prints the non-sparse interaction terms."""
+        for cluster in self:
+            if cluster.J != 0.:
+                print '{}\t{}'.format(cluster.name, cluster.J)
+
+    def print_sparse(self):
+        for cluster in self:
+            if cluster.J == 0.:
+                print '{}\t{}'.format(cluster.name, cluster.J)
+
 
     def __len__(self):
         return len(self._clusters)
