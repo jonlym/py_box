@@ -18,6 +18,8 @@ import ase.units as units
 from py_box import any_alpha, get_unique_list
 from py_box.ase.atom import Atom
 from py_box.ase.gcn import atom_radii_dict
+from py_box.ase.site import Site
+import jenkspy
 import xlsxwriter
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import basestring
@@ -1768,12 +1770,22 @@ class Atoms(object):
     #Bader Charge Functions
     def get_bader_charges(self):
         """Returns the bader charges of the atoms as a list."""
-        return [atom.bader_charge for atom in self]
+        return self.bader_charges
 
     def set_bader_charges(self, bader_charges):
         """Sets the bader charges of the atoms"""
-        for i, (atom, bader_charge) in enumerate(zip(self, bader_charges)):
-            self[i].bader_charge = bader_charge
+        try:
+            self.get_bader_charges()
+        except AttributeError:
+            self.bader_charges = {}
+        if isinstance(bader_charges, list) or isinstance(bader_charges, tuple) or isinstance(bader_charges, np.ndarray):
+            for i, bader_charge in enumerate(bader_charges):
+                self.bader_charges[i] = bader_charge
+        elif isinstance(bader_charges, dict):
+            for i, bader_charge in bader_charges.iteritems():
+                self.bader_charges[i] = bader_charge
+        else:
+            warnings.warn('Unsupported data type: {}'.format(type(bader_charges)))
 
     def read_bader_charge(self, ACF_path = 'ACF.dat'):
         """Reads the bader charge from the ACF.dat file"""
@@ -1789,35 +1801,68 @@ class Atoms(object):
     #Coordination Number Functions
     def get_CNs(self):
         """Returns the coordination numbers as a dictionary."""
-        cn_dict = {}
-        for atom in self:
-            cn_dict[atom.index] = atom.cn
-        return cn_dict
+        return self.CNs
 
     def set_CNs(self, CNs):
         """Sets the coordination numbers of the atoms."""
-        if isinstance(CNs, list):
-            for i, (atom, CN) in enumerate(zip(self, CNs)):
-                #self[i].cn = CN
-                print 'Before assignment:'
-                print self[i].cn
-                self[i].cn = 0
-                print 'After assignment:'
-                print self[i].cn
+        try:
+            self.get_CNs()
+        except AttributeError:
+            self.CNs = {}
+        if isinstance(CNs, list) or isinstance(CNs, tuple) or isinstance(CNs, np.ndarray):
+            for i, CN in enumerate(CNs):
+                self.CNs[i] = CN
         elif isinstance(CNs, dict):
-            for (i, CN) in dict.items():
-                self[i].cn = CN
+            for i, CN in CNs.iteritems():
+                self.CNs[i] = CN
         else:
-            print 'Unsupported format: type(CNs) = {}.'.format(type(CNs))
+            warnings.warn('Unsupported data type: {}'.format(type(CNs)))
+
+    def get_neighbors(self, i = None):
+        """Returns the neighbors. If i is None, return the whole dictionary. Otherwise, return a set of atom i's neighbors."""
+        if i is None:
+            return self.neighbors
+        else:
+            return self.neighbors[i]
+
+    def set_neighbors(self, neighbors):
+        """Sets the coordination numbers of the atoms."""
+        try:
+            self.get_neighbors()
+        except AttributeError:
+            self.neighbors = {}
+        if isinstance(neighbors, list) or isinstance(neighbors, tuple):
+            for i, neighbor in enumerate(neighbors):
+                self.neighbors[i] = set(neighbor)
+        elif isinstance(neighbors, dict):
+            for i, neighbor in neighbors.iteritems():
+                self.neighbors[i] = set(neighbor)
+        else:
+            warnings.warn('Unsupported data type: {}'.format(type(neighbors)))
+
+    def set_CNs(self, CNs):
+        """Sets the coordination numbers of the atoms."""
+        try:
+            self.get_CNs()
+        except AttributeError:
+            self.CNs = {}
+        if isinstance(CNs, list) or isinstance(CNs, tuple) or isinstance(CNs, np.ndarray):
+            for i, CN in enumerate(CNs):
+                self.CNs[i] = CN
+        elif isinstance(CNs, dict):
+            for i, CN in CNs.iteritems():
+                self.CNs[i] = CN
+        else:
+            warnings.warn('Unsupported data type: {}'.format(type(CNs)))
 
     def calc_CNs(self, scale = 1.):
         """
         Calculates the coordination number and the list of indices that the
         atoms are coordinated to.
         """
-        #Reset the coordination numbers
+        #Reset the coordination numbers and neighbors
         self.set_CNs(CNs = [0]*len(self))
-        print self.get_CNs()
+        self.neighbors = {}
         #Duplicate the atoms object to account for periodic images
         offset = 13 * len(self)
         atoms_ext = self.copy() * (3, 3, 3)
@@ -1829,9 +1874,9 @@ class Atoms(object):
                     and atoms_ext.get_distance(i, j) <= ((self.atom_radii[atoms_ext[i].symbol] + self.atom_radii[atoms_ext[j].symbol]) * scale)
                     and atoms_ext[j].symbol not in self.CN_exceptions[atoms_ext[i].symbol]):
                     #Add a neighbor
-                    self[i % len(self)].cn += 1
-                    neighbors.append(j % len(self.atoms))
-            self[i % len(self)].neighbors = set(get_unique_list(neighbors))
+                    self.CNs[i % len(self)] += 1
+                    neighbors.append(j % len(self))
+            self.neighbors[i % len(self)] = set(get_unique_list(neighbors))
 
     def import_atom_radii(self, source_dict):
         """
@@ -1874,19 +1919,22 @@ class Atoms(object):
 
     def get_GCNs(self):
         """Returns the generalized coordination numbers as a list."""
-        gcn_dict = {}
-        for atom in self:
-            gcn_dict[atom.index] = atom.gcn
-        return gcn_dict
+        return self.GCNs
 
     def set_GCNs(self, GCNs):
         """Sets the generalized coordination numbers of the atoms."""
-        if isinstance(GCNs, list):
-            for i, (atom, GCN) in enumerate(zip(self, GCNs)):
-                self[i].gcn = GCN
+        try:
+            self.get_GCNs()
+        except AttributeError:
+            self.GCNs = {}
+        if isinstance(GCNs, list) or isinstance(GCNs, tuple) or isinstance(GCNs, np.ndarray):
+            for i, GCN in enumerate(GCNs):
+                self.GCNs[i] = GCN
         elif isinstance(GCNs, dict):
-            for (i, GCN) in dict.items():
-                self[i].gcn = GCN
+            for i, GCN in GCNs.iteritems():
+                self.GCNs[i] = GCN
+        else:
+            warnings.warn('Unsupported data type: {}'.format(type(GCNs)))
 
     def calc_GCNs(self, update = True, scale = 1.):
         """
@@ -1897,27 +1945,11 @@ class Atoms(object):
             self.calc_CNs(scale = scale)
 
         #Goes through neighbors and determines their coordination number
-        for i, atom in enumerate(self):
+        for i in xrange(len(self)):
             try:
-                self[i].gcn = atom.cn/self.bulk_CN[atom.symbol]
+                self.GCNs[i] = self.CNs[i]/self.bulk_CN[self[i].symbol]
             except KeyError:
                 continue
-
-    def get_neighbors(self):
-        """"Gets the indices of the neighboring atoms as a dictionary of sets"""
-        neighbors_dict = {}
-        for atom in self:
-            neighbors_dict[atom.index] = atom.neighbors
-        return neighbors_dict
-
-    def set_neighbors(self, neighbors):
-        """Sets the indices of the neighboring atoms. Neighbors is expected to be a list of sets or a list of lists."""
-        if isinstance(neighbors, list):
-            for i, (atom, neighbors) in enumerate(zip(self, neighbors)):
-                self[i].neighbors = set(neighbors)
-        elif isinstance(neighbors, dict):
-            for (i, neighbors) in dict.items():
-                self[i].neighbors = set(neighbors)
 
     def write_gcn_to_excel(self, file_name = 'gcn.xlsx'):
         """
@@ -1932,27 +1964,106 @@ class Atoms(object):
         for i, atom in enumerate(self):
             worksheet.write(i+1, 0, atom.index)
             worksheet.write(i+1, 1, atom.symbol)
-            worksheet.write(i+1, 2, atom.cn)
-            worksheet.write(i+1, 3, atom.gcn)
+            worksheet.write(i+1, 2, self.CNs[i])
+            worksheet.write(i+1, 3, self.GCNs[i])
             for j, neighbor in enumerate(atom.neighbors):
-                worksheet.write(i+1, j+4, '%s%d' % (self[neighbor].symbol, neighbor))
+                worksheet.write(i+1, j+4, '{}{}'.format(self[neighbor].symbol, neighbor))
+
+    def find_sites(self, site_type, n_layers, atom_type = None, reset = False, offset = 0.):
+        """
+        Finds the type of sites on the surface.
+        site_type - str
+            Supported options: 'top', 'bridge', '3-fold hollow', '4-fold hollow'
+        n_layers - int
+            Number of layers in the slab. Used to identify the top layer.
+        atom_type - list
+            Elements around site.
+            If site_type = 'top', sites exist on those atoms.
+                           'bridge', sites exist between the two atoms.
+                           '3-fold hollow', sites exist between the three atoms.
+                           '4-fold hollow', sites exist between the four atoms.
+        offset - float
+            Change in z coordinate for site.
+        """
+        position_offset = np.array([0., 0., offset])
+
+        if atom_type is None:
+            atom_type = get_unique_list(self.get_chemical_symbols())
+        try:
+            self.sites
+        except AttributeError:
+            self.sites = []
+        else:
+            if reset:
+                self.sites = []
+        self.find_surface_indices(n_layers = n_layers)
+
+        for i in self.surface_indices:
+            atom_type_copy = copy.copy(atom_type)
+            if self[i].symbol in atom_type:
+                if site_type == 'top':
+                    self.sites.append(Site(position = self[i].position + position_offset, neighbors = set([i]), info = 'top site on atom {}{}'.format(self[i].symbol, i)))
+                else:
+                    atom_type_copy.remove(self[i].symbol)
+                    for j in self.neighbors[i]:
+                        if self[j].symbol in atom_type_copy and j in self.surface_indices:
+                            atom_type_copy.remove(self[j].symbol)
+                            if site_type == 'bridge':
+                                if not self._is_duplicate_site(set([i, j])):
+                                    position = np.mean([self[i].position, self[j].position], axis = 0)
+                                    self.sites.append(Site(position = position + position_offset, neighbors = set([i, j]), info = 'bridge site on atoms {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j)))
+                            elif site_type == '3-fold hollow':
+                                for k in self.neighbors[i].intersection(self.neighbors[j]):
+                                    if self[k].symbol in atom_type_copy and k in self.surface_indices:
+                                        if not self._is_duplicate_site(set([i, j, k])):
+                                            position = np.mean([self[i].position, self[j].position, self[k].position], axis = 0)
+                                            self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
+                            elif site_type == '4-fold hollow':
+                                #More complicated than other sites. The following atoms have to be coordinated:
+                                #i - j
+                                #|   |
+                                #k - l
+                                #TODO: Current code thinks that atoms in a line are 4-fold coordinated
+                                # print 'i = {}'.format(i)
+                                # print 'i neighbors = {}'.format(self.neighbors[i])
+                                for k in self.neighbors[i]:
+                                    if j != k and self[k].symbol in atom_type_copy and k in self.surface_indices:
+                                        atom_type_copy.remove(self[k].symbol)
+                                        for l in self.neighbors[j].intersection(self.neighbors[k]):
+                                            if l != i and self[l].symbol in atom_type_copy and l in self.surface_indices and not self._is_duplicate_site(set([i, j, k, l])):
+                                                position = np.mean([self[i].position, self[j].position, self[k].position, self[l].position], axis = 0)
+                                                self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k, l]), info = '4-fold hollow site on atoms {}{}, {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k, self[l].symbol, l)))
+
+    def _is_duplicate_site(self, site_neighbors):
+        for site in self.sites:
+            if site_neighbors == site.neighbors:
+                return True
+        else:
+            return False
+
+    def find_surface_indices(self, n_layers):
+        breaks = jenkspy.jenks_breaks([atom.z for atom in self], nb_class=n_layers)
+        self.surface_indices = [atom.index for atom in self if (atom.z > breaks[-2] and atom.z <= breaks[-1])]
 
     #DOS Occupancies Functions
     def get_dos_occupancies(self):
         """Returns the dos occupancies as a dictionary of dictionaries."""
-        dos_occupancy_dict = {}
-        for atom in self:
-            dos_occupancy_dict[atom.index] = atom.dos_occupancy
-        return dos_occupancy_dict
+        return self.dos_occupancies
 
     def set_dos_occupancies(self, dos_occupancies):
         """Sets the dos occupancies as a list of dictionaries"""
-        if isinstance(dos_occupancies, list):
-            for i, (atom, dos_occupancy) in enumerate(zip(self, dos_occupancies)):
-                self[i].dos_occupancy = dos_occupancy
+        try:
+            self.get_dos_occupancies()
+        except AttributeError:
+            self.dos_occupancies = {}
+        if isinstance(dos_occupancies, list) or isinstance(dos_occupancies, tuple) or isinstance(dos_occupancies, np.ndarray):
+            for i, dos_occupancy in enumerate(dos_occupancies):
+                self.dos_occupancies[i] = dos_occupancy
         elif isinstance(dos_occupancies, dict):
-            for (i, dos_occupancy) in dict.items():
-                self[i].dos_occupancy = dos_occupancy
+            for i, dos_occupancy in dos_occupancies.iteritems():
+                self.dos_occupancies[i] = dos_occupancy
+        else:
+            warnings.warn('Unsupported data type: {}'.format(type(dos_occupancies)))
 
 
 def string2symbols(s):
