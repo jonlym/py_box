@@ -26,7 +26,7 @@ from ase.gui.save import save_dialog
 from ase.gui.settings import Settings
 from ase.gui.status import Status
 from ase.gui.surfaceslab import SetupSurfaceSlab
-from ase.gui.view import View
+from py_box.ase.gui.view import View
 
 
 class GUI(View, Status):

@@ -6,6 +6,7 @@ import numpy as np
 
 from ase.data import chemical_symbols
 from ase.data.colors import jmol_colors
+from ase.data.colors import cpk_colors
 from ase.geometry import complete_cell
 from ase.gui.repeat import Repeat
 from ase.gui.rotate import Rotate
@@ -87,13 +88,13 @@ class View:
             self.draw()
 
     def set_colors(self):
-        self.colormode = 'jmol'
+        self.colormode = 'cpk'
         self.colors = {}
         for z in np.unique(self.images.Z):
-            rgb = jmol_colors[z]
+            #rgb = jmol_colors[z]
+            rgb = cpk_colors[z]
             self.colors[z] = ('#{0:02X}{1:02X}{2:02X}'
                               .format(*(int(x * 255) for x in rgb)))
-        print self.colors
 
     def make_box(self):
         if not self.window['toggle-show-unit-cell']:
