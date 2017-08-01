@@ -16,7 +16,8 @@ import numpy as np
 
 import ase.units as units
 from py_box import any_alpha, get_unique_list
-from py_box.ase.atom import Atom
+#from py_box.ase.atom import Atom
+from ase import Atom
 from py_box.ase.gcn import atom_radii_dict
 from py_box.ase.site import Site
 import jenkspy
@@ -1863,11 +1864,14 @@ class Atoms(object):
         #Reset the coordination numbers and neighbors
         self.set_CNs(CNs = [0]*len(self))
         self.neighbors = {}
+        self._neighbors_direction = {} #Keeps track of direction of mirror image that is coordinated to the atom.
+
         #Duplicate the atoms object to account for periodic images
         offset = 13 * len(self)
         atoms_ext = self.copy() * (3, 3, 3)
         for i in range(offset, (offset + len(self))):
             neighbors = []
+            neighbors_direction = {}
             for j in range(len(atoms_ext)):
                 #If not the same index, radii overlap (weighted by scale) and the elements are not in the element list
                 if (i != j
@@ -1876,7 +1880,27 @@ class Atoms(object):
                     #Add a neighbor
                     self.CNs[i % len(self)] += 1
                     neighbors.append(j % len(self))
+                    neighbors_direction[j % len(self)] = self._find_direction(j)
             self.neighbors[i % len(self)] = set(get_unique_list(neighbors))
+            self._neighbors_direction[i % len(self)] = neighbors_direction
+
+    def _find_direction(self, i):
+        """"
+        Find direction of mirror image. Indices are duplicated in the z, then y, then x direction
+        """
+        octant = i / len(self)
+        return self._get_base3(octant) - np.ones(shape = 3)
+
+
+    def _get_base3(self, i):
+        """Converts number to base 3. Number should be smaller than 27"""
+        base3 = np.zeros(shape = 3)
+        j = len(base3)-1
+        while i > 0:
+            i, r = divmod(i, 3)
+            base3[j] = r
+            j = j-1
+        return base3
 
     def import_atom_radii(self, source_dict):
         """
@@ -1999,24 +2023,27 @@ class Atoms(object):
         self.find_surface_indices(n_layers = n_layers)
 
         for i in self.surface_indices:
-            atom_type_copy = copy.copy(atom_type)
-            if self[i].symbol in atom_type:
+            atom_type_i = copy.copy(atom_type)
+            if self[i].symbol in atom_type_i:
                 if site_type == 'top':
                     self.sites.append(Site(position = self[i].position + position_offset, neighbors = set([i]), info = 'top site on atom {}{}'.format(self[i].symbol, i)))
                 else:
-                    atom_type_copy.remove(self[i].symbol)
+                    atom_type_j = copy.copy(atom_type_i)
+                    atom_type_j.remove(self[i].symbol)
+                    print 'Atom {}'.format(i)
                     for j in self.neighbors[i]:
-                        if self[j].symbol in atom_type_copy and j in self.surface_indices:
-                            atom_type_copy.remove(self[j].symbol)
+                        if self[j].symbol in atom_type_j and j in self.surface_indices:
                             if site_type == 'bridge':
                                 if not self._is_duplicate_site(set([i, j])):
-                                    position = np.mean([self[i].position, self[j].position], axis = 0)
+                                    position = np.mean([self[i].position, self[j].position + np.transpose(np.dot(self._neighbors_direction[i][j], self.get_cell()))], axis = 0)
                                     self.sites.append(Site(position = position + position_offset, neighbors = set([i, j]), info = 'bridge site on atoms {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j)))
                             elif site_type == '3-fold hollow':
+                                atom_type_k = copy.copy(atom_type_j)
+                                atom_type_k.remove(self[j].symbol)
                                 for k in self.neighbors[i].intersection(self.neighbors[j]):
-                                    if self[k].symbol in atom_type_copy and k in self.surface_indices:
+                                    if self[k].symbol in atom_type_k and k in self.surface_indices:
                                         if not self._is_duplicate_site(set([i, j, k])):
-                                            position = np.mean([self[i].position, self[j].position, self[k].position], axis = 0)
+                                            position = np.mean([self[i].position, self[j].position + np.transpose(np.dot(self._neighbors_direction[i][j], self.get_cell())), self[k].position + np.transpose(np.dot(self._neighbors_direction[i][k], self.get_cell()))], axis = 0)
                                             self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
                             elif site_type == '4-fold hollow':
                                 #More complicated than other sites. The following atoms have to be coordinated:
@@ -2024,13 +2051,15 @@ class Atoms(object):
                                 #|   |
                                 #k - l
                                 #TODO: Current code thinks that atoms in a line are 4-fold coordinated
-                                # print 'i = {}'.format(i)
-                                # print 'i neighbors = {}'.format(self.neighbors[i])
+                                atom_type_k = copy.copy(atom_type_j)
+                                atom_type_k.remove(self[j].symbol)
+
                                 for k in self.neighbors[i]:
-                                    if j != k and self[k].symbol in atom_type_copy and k in self.surface_indices:
-                                        atom_type_copy.remove(self[k].symbol)
+                                    if j != k and self[k].symbol in atom_type_k and k in self.surface_indices:
+                                        atom_type_l = copy.copy(atom_type_k)
+                                        atom_type_l.remove(self[k].symbol)
                                         for l in self.neighbors[j].intersection(self.neighbors[k]):
-                                            if l != i and self[l].symbol in atom_type_copy and l in self.surface_indices and not self._is_duplicate_site(set([i, j, k, l])):
+                                            if l != i and self[l].symbol in atom_type_k and l in self.surface_indices and not self._is_duplicate_site(set([i, j, k, l])):
                                                 position = np.mean([self[i].position, self[j].position, self[k].position, self[l].position], axis = 0)
                                                 self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k, l]), info = '4-fold hollow site on atoms {}{}, {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k, self[l].symbol, l)))
 

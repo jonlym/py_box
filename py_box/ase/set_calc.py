@@ -206,11 +206,39 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                            'ispin': 2,
                            'gamma': True,
                            'istart': 0,
-                           'lorbit': 12}
+                           'lorbit': 12},
+             'TiO2_step': {'xc': "PBE",
+                           'kpts': (3, 2, 1),
+                           'setups': {'Ti': '_sv'},
+                            #Parameters copied from RuO2 Step /home/work/ccei_biomass/users/jlym/SAC_project/RuO2/RuO2-Hs-step
+                           'lcharg': False,
+                           'lwave': False,
+                           'lvtot': False,
+                           'encut': 400,
+                           'algo': 'fast',
+                           'ismear': 0,
+                           'sigma': 0.1,
+                           'prec': 'high',
+                           'lreal': 'auto',
+                           'ropt': [2e-4, 2e-4, 2e-4],
+                           'istart': 0,
+                           'nelm': 400,
+                           'nelmdl': -10,
+                           'ediff': 1e-4,
+                           'ispin': 2,
+                           'isym': 0,
+                           'nsw': 1000,
+                           'isif': 2,
+                           'ibrion': 2,
+                           'nfree': 2,
+                           'potim': 0.35,
+                           'ediffg': -0.05,
+                           'npar': 2,
+                           'lplane': True,
+                           #'nelmin': 4,
+                           'gamma': True,
+                           }
 }
-#Idea would be: 
-#calc = Vasp(**calc_dict['Type of calculation'])
-#print_vasp_param(calc)
 
 def set_geo_calc_ZnOCu(atoms_obj,
                        xc = "PBE",
