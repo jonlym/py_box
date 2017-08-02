@@ -8,7 +8,6 @@ Created on Sun May 07 17:00:00 2017
 import os, warnings
 import numpy as np
 import pandas as pd
-import xlsxwriter
 from ase.geometry import find_mic
 from py_box import get_unique_list
 
@@ -139,6 +138,8 @@ class GCN(object):
         """
         Writes an excel file containing all the data in GCN.
         """
+        import xlsxwriter
+
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
         headers = ['Index', 'Symbol', 'CN', 'GCN', 'Neighbors']

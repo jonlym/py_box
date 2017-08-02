@@ -6,7 +6,6 @@ Created on Wed Nov 23 21:10:42 2016
 """
 
 import numpy as np
-from matplotlib import pyplot as plt
 
 def any_alpha(string):
     """Returns True if any alphabetic characters are in the string. False otherwise"""
@@ -26,6 +25,8 @@ def get_unique_list(data):
     return keys.keys()
 
 def plot_parity(x, y, decimals = 2):
+    from matplotlib import pyplot as plt
+
     data = np.concatenate((x, y), axis = 0)
     min_data = np.round(min(data*10.**decimals))/10.**decimals
     max_data = np.round(max(data*10.**decimals))/10.**decimals
