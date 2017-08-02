@@ -7,7 +7,6 @@ Created on Thu Jun 08 07:06:52 2017
 import matplotlib.pyplot as plt
 from itertools import combinations, permutations
 from energydiagram import ED
-import pandas as pd
 import numpy as np
 
 #DFT computed energies in eV
@@ -178,6 +177,8 @@ def get_parity(sites):
         return set(parity_sites)
     
 def read_vacancy_file(file_name):
+    import pandas as pd
+
     VCs = vacancy_clusters()
     data = pd.read_excel(file_name)
     for i in range(len(data)):

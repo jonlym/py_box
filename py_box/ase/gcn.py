@@ -7,7 +7,6 @@ Created on Sun May 07 17:00:00 2017
 
 import os, warnings
 import numpy as np
-import pandas as pd
 from ase.geometry import find_mic
 from py_box import get_unique_list
 
@@ -70,6 +69,8 @@ class GCN(object):
             'Metallic'
             Custom values can be specified by entering a float.
         """
+        import pandas as pd
+
         #Import reference file
         current_path = os.getcwd()
         os.chdir(os.environ['PYBOX'])

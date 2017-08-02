@@ -1,6 +1,5 @@
 from py_box.cluster_expansion.configuration import Configuration, default_dict
 import numpy as np
-import pandas as pd
 from warnings import warn
 
 class Configurations(object):
@@ -74,6 +73,8 @@ class Configurations(object):
 
     @classmethod
     def from_excel(cls, file_name = 'configurations.xlsx', skiprows = [], info = ''):
+        import pandas as pd
+
         if info == '':
             info = 'Data generated using class method, from_excel(), using file: {}. Rows skipped: {}'.format(file_name, skiprows)
         configuration_data = pd.read_excel(file_name, skiprows = skiprows, header=0)
