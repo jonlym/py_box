@@ -11,15 +11,13 @@ import numbers
 import warnings
 from math import cos, sin
 import copy
-
 import numpy as np
-
 import ase.units as units
 from py_box import any_alpha, get_unique_list
-#from py_box.ase.atom import Atom
 from ase import Atom
 from py_box.ase.gcn import atom_radii_dict
 from py_box.ase.site import Site
+<<<<<<< HEAD
 try:
     import jenkspy
 except:
@@ -30,10 +28,13 @@ try:
 except:
     pass
 
+=======
+>>>>>>> d48b65dc4d5afc38a3935194476e1be6da2cd6a0
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import basestring
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,
                           cell_to_cellpar, complete_cell, is_orthorhombic)
+
 
 
 class Atoms(object):
@@ -1987,6 +1988,8 @@ class Atoms(object):
         """
         Writes an excel file containing all the data in GCN.
         """
+        import xlsxwriter
+
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
         headers = ['Index', 'Symbol', 'CN', 'GCN', 'Neighbors']
@@ -2033,27 +2036,33 @@ class Atoms(object):
         for i in self.surface_indices:
             atom_type_i = copy.copy(atom_type)
             if self[i].symbol in atom_type_i:
-                if site_type == 'top':
+                if 'top' in site_type:
                     self.sites.append(Site(position = self[i].position + position_offset, neighbors = set([i]), info = 'top site on atom {}{}'.format(self[i].symbol, i)))
                 else:
                     atom_type_j = copy.copy(atom_type_i)
                     atom_type_j.remove(self[i].symbol)
-                    print 'Atom {}'.format(i)
                     for j in self.neighbors[i]:
                         if self[j].symbol in atom_type_j and j in self.surface_indices:
-                            if site_type == 'bridge':
+                            if 'bridge' in site_type:
                                 if not self._is_duplicate_site(set([i, j])):
                                     position = np.mean([self[i].position, self[j].position + np.transpose(np.dot(self._neighbors_direction[i][j], self.get_cell()))], axis = 0)
                                     self.sites.append(Site(position = position + position_offset, neighbors = set([i, j]), info = 'bridge site on atoms {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j)))
-                            elif site_type == '3-fold hollow':
+                            elif '3-fold hollow' in site_type:
                                 atom_type_k = copy.copy(atom_type_j)
                                 atom_type_k.remove(self[j].symbol)
                                 for k in self.neighbors[i].intersection(self.neighbors[j]):
                                     if self[k].symbol in atom_type_k and k in self.surface_indices:
                                         if not self._is_duplicate_site(set([i, j, k])):
                                             position = np.mean([self[i].position, self[j].position + np.transpose(np.dot(self._neighbors_direction[i][j], self.get_cell())), self[k].position + np.transpose(np.dot(self._neighbors_direction[i][k], self.get_cell()))], axis = 0)
-                                            self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
-                            elif site_type == '4-fold hollow':
+                                            if 'fcc' in site_type:
+                                                if self._is_fcc_site(i, j, k):
+                                                    self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold fcc hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
+                                            elif 'hcp' in site_type:
+                                                if self._is_hcp_site(i, j, k):
+                                                    self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold hcp hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
+                                            else:
+                                                self.sites.append(Site(position = position + position_offset, neighbors = set([i, j, k]), info = '3-fold fcc hollow site on atoms {}{}, {}{} and {}{}'.format(self[i].symbol, i, self[j].symbol, j, self[k].symbol, k)))
+                            elif '4-fold hollow' in site_type:
                                 #More complicated than other sites. The following atoms have to be coordinated:
                                 #i - j
                                 #|   |
@@ -2078,9 +2087,23 @@ class Atoms(object):
         else:
             return False
 
+    def _is_hcp_site(self, i, j, k):
+        bond_atoms = self.neighbors[i].intersection(self.neighbors[j].intersection(self.neighbors[k]))
+        #i, j and k are all bonded to the same atom and it is subsurface.
+        if len(bond_atoms) > 0 and all([bond_atom not in self.surface_indices for bond_atom in bond_atoms]):
+            return True
+        else:
+            return False
+
+    def _is_fcc_site(self, i, j, k):
+        """Function that returns true if i, j and k are located on a hollow site"""
+        #Looks for atoms that i, j and k are all bonded to.
+        return not self._is_hcp_site(i, j, k)
+
     def find_surface_indices(self, n_layers):
+        import jenkspy
         breaks = jenkspy.jenks_breaks([atom.z for atom in self], nb_class=n_layers)
-        self.surface_indices = [atom.index for atom in self if (atom.z > breaks[-2] and atom.z <= breaks[-1])]
+        self.surface_indices = set([atom.index for atom in self if (atom.z > breaks[-2] and atom.z <= breaks[-1])])
 
     #DOS Occupancies Functions
     def get_dos_occupancies(self):

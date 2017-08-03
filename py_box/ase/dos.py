@@ -8,7 +8,6 @@ Created on Fri Apr 14 16:02:35 2017
 import warnings
 import numpy as np
 import collections
-import matplotlib.pyplot as plt
 
 column_dict = {'Energy': 0,
                's': 1,
@@ -53,6 +52,8 @@ def read_dos_output(dos_file = 'dos_output.txt', spin = True, orbitals = ['s up'
 
 def plot_dos(dos_file = 'dos_output.txt', spin = True):
     """Plots the density of states given a dos output file in the format used by Dr. Glen Jenness' script."""
+    import matplotlib.pyplot as plt
+
     if spin:
         orbitals = ['s up', 's down', 'p up', 'p down', 'd up', 'd down', 'f up', 'f down']
         line_types = ['r-', 'r--', 'b-', 'b--', 'k-', 'k--', 'g-', 'g--']

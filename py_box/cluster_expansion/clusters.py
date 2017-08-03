@@ -1,6 +1,5 @@
 from py_box.cluster_expansion.cluster import Cluster
 import numpy as np
-import pandas as pd
 from copy import copy
 from warnings import warn
 
@@ -78,6 +77,8 @@ class Clusters(object):
 
     @classmethod
     def from_excel(cls, file_name = 'clusters.xlsx', skiprows = [], info = ''):
+        import pandas as pd
+
         if info == '':
             info = 'Data generated using class method, from_excel(), using file: {}. Rows skipped: {}'.format(file_name, skiprows)
         cluster_data = pd.read_excel(file_name, skiprows = skiprows, header=0)

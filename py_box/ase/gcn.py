@@ -77,6 +77,8 @@ class GCN(object):
             'Metallic'
             Custom values can be specified by entering a float.
         """
+        import pandas as pd
+
         #Import reference file
         current_path = os.getcwd()
         os.chdir(os.environ['PYBOX'])
@@ -145,6 +147,8 @@ class GCN(object):
         """
         Writes an excel file containing all the data in GCN.
         """
+        import xlsxwriter
+
         workbook = xlsxwriter.Workbook(file_name)
         worksheet = workbook.add_worksheet()
         headers = ['Index', 'Symbol', 'CN', 'GCN', 'Neighbors']

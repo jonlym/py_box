@@ -9,8 +9,6 @@ from py_box import any_alpha
 from ase.io import read
 from ase.io.bader import attach_charges
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
 
 class bader:
     """Stores the bader charge"""
