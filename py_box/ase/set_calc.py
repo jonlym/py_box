@@ -230,7 +230,7 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                            'nsw': 1000,
                            'isif': 2,
                            'ibrion': 2,
-                           'nfree': 2,
+                           #'nfree': 2,
                            'potim': 0.35,
                            #ediffg uses VASP's internal optimizer. To update trajectory file this should be left out. It is controlled by LBFGS.run(fmax)
                            #'ediffg': -0.05,
