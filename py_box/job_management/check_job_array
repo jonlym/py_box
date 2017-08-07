@@ -6,7 +6,7 @@ Created on Thu Apr 27 11:24:22 2017
 """
 
 import argparse
-from warnings import warn
+#from warnings import warn
 from os import getcwd, chdir
 from os.path import isdir, exists
 
@@ -19,8 +19,11 @@ job_file = args.job_file
 folder_file = args.folder_file
 
 home_dir = getcwd()
+j = 0
+k = 0
+l = 0
 with open(job_file, 'r') as job_ptr, open(folder_file, 'r') as folder_ptr:
-    for job, folder in zip(job_ptr, folder_ptr):
+    for i, (job, folder) in enumerate(zip(job_ptr, folder_ptr)):
         #Check if folder exists
         job = job.replace('\n', '')
         folder = folder.replace('\n', '')
@@ -29,11 +32,19 @@ with open(job_file, 'r') as job_ptr, open(folder_file, 'r') as folder_ptr:
             chdir(folder)
             job_exists = exists('{}.py'.format(job))
             if job_exists:
-                print 'Job {}.py at {} exists!'.format(job, folder)
                 if 'testRun = True' in open('{}.py'.format(job), 'r').read():
-                    warn('testRun = True for job {}.py at {}'.format(job, folder))
+                    print 'Line {}  testRun = True for job {}.py at {}'.format(i+1, job, folder)
+                    j += 1
             else:
-                warn('Job {}.py does not exist at {}.'.format(job, folder))
+                print 'Line {}  Job {}.py does not exist at {}.'.format(i+1, job, folder)
+                k += 1
         else:
-            warn('Warning: Folder {} does not exist.'.format(folder))
+            print 'Line {}  Folder {} does not exist.'.format(i+1, folder)
+            l += 1
         chdir(home_dir)
+print '-'*10
+print 'Summary:'
+print '\tTotal # jobs: {}'.format(i)
+print '\ttestRun = True: {}'.format(j)
+print '\tInvalid Job: {}'.format(k)
+print '\tInvalid Folder: {}'.format(l)
