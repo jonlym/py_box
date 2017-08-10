@@ -44,7 +44,7 @@ with open(job_file, 'r') as job_ptr, open(folder_file, 'r') as folder_ptr:
         chdir(home_dir)
 print '-'*10
 print 'Summary:'
-print '\tTotal # jobs: {}'.format(i)
+print '\tTotal # jobs: {}'.format(i+1)
 print '\ttestRun = True: {}'.format(j)
 print '\tInvalid Job: {}'.format(k)
 print '\tInvalid Folder: {}'.format(l)
