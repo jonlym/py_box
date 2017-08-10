@@ -27,4 +27,4 @@ with open(file_in, 'r') as file_ptr:
             lines_out.append(line)
 
 with open(file_in, 'w') as file_ptr:
-    file_ptr.write("\n".join(lines_out))
+    file_ptr.write("".join(lines_out))

@@ -17,19 +17,6 @@ from py_box import any_alpha, get_unique_list
 from ase import Atom
 from py_box.ase.gcn import atom_radii_dict
 from py_box.ase.site import Site
-<<<<<<< HEAD
-try:
-    import jenkspy
-except:
-    pass
-
-try:
-    import xlsxwriter
-except:
-    pass
-
-=======
->>>>>>> d48b65dc4d5afc38a3935194476e1be6da2cd6a0
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import basestring
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,
