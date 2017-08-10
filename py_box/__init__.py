@@ -26,10 +26,6 @@ def get_unique_list(data):
 
 def plot_parity(x, y, decimals = 2):
     from matplotlib import pyplot as plt
-<<<<<<< HEAD
-=======
-
->>>>>>> d48b65dc4d5afc38a3935194476e1be6da2cd6a0
     data = np.concatenate((x, y), axis = 0)
     min_data = np.round(min(data*10.**decimals))/10.**decimals
     max_data = np.round(max(data*10.**decimals))/10.**decimals

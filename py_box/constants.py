@@ -122,10 +122,12 @@ def m_e(units = None):
     Returns the mass of an electron. Default unit set is kg
     Acceptable unit options: 
     > kg
+    > g
     > amu   
     """
     m_e_dict = {
         'kg': 9.10938356e-31,
+        'g': 9.10938356e-28,
         'amu': 5.48579909070e-4,
         None: 9.10938356e-31
     }
@@ -145,6 +147,7 @@ def m_p(units = None):
     """
     m_p_dict = {
         'kg': 1.6726219e-27,
+        'g': 1.6726219e-24,
         'amu': 1.007276466879,
         None: 1.6726219e-27
     }
@@ -169,14 +172,14 @@ def P0(units = None):
     > Torr
     """
     P0_dict = {
-        'bar': 1,
-        'atm': 0.987,
-        'Pa': 1e5,
-        'kPa': 100.,
-        'MPa': 0.1,
-        'psi': 14.5038,
-        'mmHg': 750.06,
-        'Torr': 750.06,
+        'bar': 1.01325,
+        'atm': 1.,
+        'Pa': 101325.,
+        'kPa': 101.325,
+        'MPa': 0.101325,
+        'psi': 14.6959,
+        'mmHg': 760.,
+        'Torr': 760.,
         None: 1
     }
     if units is None:
@@ -345,5 +348,4 @@ def convert_unit(num = 1, from_ = None, to = None):
         return num + unit_dict[to] - unit_dict[from_]
     else:
         return num * unit_dict[to] / unit_dict[from_]        
-    
     
