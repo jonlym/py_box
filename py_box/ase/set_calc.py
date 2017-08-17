@@ -214,7 +214,7 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                            'istart': 0,
                            'lorbit': 12},
              'TiO2_step': {'xc': "PBE",
-                           'kpts': (3, 2, 1),
+                           'kpts': (2, 3, 1),
                            'setups': {'Ti': '_sv'},
                             #Parameters copied from RuO2 Step /home/work/ccei_biomass/users/jlym/SAC_project/RuO2/RuO2-Hs-step
                            'lcharg': False,
