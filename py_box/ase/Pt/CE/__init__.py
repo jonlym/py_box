@@ -1,6 +1,6 @@
 import numpy as np
 
-z_O = 16.872+1.5
+z_O = 18.196
 fcc_sites = {0:  np.array([1.403, 0.810, z_O]),
              1:  np.array([2.805, 3.239, z_O]),
              2:  np.array([4.208, 5.669, z_O]),
