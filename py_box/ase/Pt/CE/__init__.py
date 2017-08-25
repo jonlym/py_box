@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
 
 z_O = 18.196
 fcc_sites = {0:  np.array([1.403, 0.810, z_O]),
@@ -18,3 +20,86 @@ fcc_sites = {0:  np.array([1.403, 0.810, z_O]),
              14: np.array([12.624, 5.669, z_O]),
              15: np.array([14.027, 8.098, z_O]),
              }
+
+def get_sigma(n, size = 4):
+    return [int(i) for i in np.binary_repr(n, size**2)]
+
+def get_distance(pos_i, pos_j):
+    return np.sqrt(np.sum((i-j)**2 for i, j in zip(pos_i, pos_j)))
+
+def get_min_distance(pos_i_dict, pos_j_dict):
+    distances = []
+    for key_i, val_i in pos_i_dict.iteritems():
+        for key_j, val_j in pos_j_dict.iteritems():
+            distances.append(get_distance(val_i, val_j))
+    return min(distances)
+
+def get_big_graph(size = 4, a = 1, eps = None):
+    if eps is None:
+        eps = a/100.
+    big_graph = nx.Graph()
+    pos_draw = {}
+
+
+    #Create cell dimensions
+    x_offset = a/2.
+    y_offset = np.sqrt(3.)/2. * a
+
+    #cell = np.array([[(size+1)*a, 0.], [(size+1)*x_offset, (size+1)*y_offset]])
+    cell = np.array([[size*a, 0.], [size*x_offset, size*y_offset]])
+
+    #Create nodes
+    k = 0
+    for i in xrange(size):
+        for j in xrange(size):
+            #Position within cell
+            orig_pos = (x_offset*j + a*i, y_offset*j)
+            #Find mirror copies of images outside cell
+            positions = {}
+            for l in xrange(-1, 2):
+                for m in xrange(-1, 2):
+                    direction = np.array([[l], [m]])
+                    positions[(l, m)] = np.sum(cell * direction, axis = 0) + orig_pos
+            big_graph.add_node(k, positions = positions)
+            k = k + 1
+    #Create edges
+    for i, data_i in big_graph.nodes_iter(data = True):
+        for j, data_j in big_graph.nodes_iter(data = True):
+            if i != j:
+                min_distance = get_min_distance(data_i['positions'], data_j['positions'])
+                if min_distance - a < eps:
+                    big_graph.add_edge(i, j, min_distance = min_distance)
+    return big_graph
+
+def get_small_graph(config, size = 4, a = 1, eps = None):
+    big_graph = get_big_graph(size = size, a = a, eps = eps)
+    #Remake graph
+    graph_config = get_sigma(n = config, size = size)
+    graph = nx.Graph()
+    positions = {}
+    pos_draw = {}
+    for j, k in enumerate(graph_config):
+        if k == 1:
+            positions = nx.get_node_attributes(big_graph, 'positions')[j]
+            graph.add_node(j, positions = positions)
+            pos_draw[j] = positions[(0, 0)]
+    #Create edges in the graph
+    for (node_i, data_i) in graph.nodes_iter(data = True):
+        for (node_j, data_j) in graph.nodes_iter(data = True):
+            if node_i != node_j:
+                graph.add_edge(node_i, node_j, distance = get_min_distance(data_i['positions'], data_j['positions']))
+    return graph
+
+def draw_graph_node(config, size = 4, a = 1, eps = None):
+    big_graph = get_big_graph(size = size, a = a, eps = eps)
+    graph = get_small_graph(config, size = size, a = a, eps = eps)
+    graph_config = [int(j) for j in np.binary_repr(config, size**2)]
+
+    pos_draw = {}
+    for j, k in enumerate(graph_config):
+        if k == 1:
+            pos_draw[j] = nx.get_node_attributes(big_graph, 'positions')[j][(0, 0)]
+    plt.figure(config)
+    nx.draw(graph, pos = pos_draw, node_size = 700)
+    nx.draw_networkx_labels(graph, pos = pos_draw)
+    plt.draw()
