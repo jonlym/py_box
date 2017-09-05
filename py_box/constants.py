@@ -9,9 +9,9 @@ from warnings import warn
 
 def R(units = None):
     """
-    Returns the universal molar gas constant. Default unit set is J/mol/K
-    Acceptable unit options: 
-    > J/mol/K 
+    Returns the universal molar gas constant.
+    Supported unit options: 
+    > J/mol/K [Default]
     > kJ/mol/K
     > L kPa/mol/K
     > cm3 kPa/mol/K
@@ -52,9 +52,9 @@ def R(units = None):
     
 def h(units = None, bar = False):
     """
-    Returns the Planck's constant. Default unit set is J s. Use bar = True to return h/2π
-    Acceptable unit options: 
-    > J s
+    Returns the Planck's constant. Use bar = True to return h/2π
+    Supported unit options: 
+    > J s [Default]
     > kJ s
     > eV s
     """
@@ -76,9 +76,9 @@ def h(units = None, bar = False):
 
 def kb(units = None):
     """
-    Returns the Boltzmann constant. Default unit set is J/K
-    Acceptable unit options: 
-    > J/K
+    Returns the Boltzmann constant.
+    Supported unit options: 
+    > J/K [Default]
     > eV/K
     > cal/K
     
@@ -100,9 +100,9 @@ def kb(units = None):
 
 def c(units = None):
     """
-    Returns the speed of light. Default unit set is m/s
-    Acceptable unit options: 
-    > m/s
+    Returns the speed of light.
+    Supported unit options: 
+    > m/s [Default]
     > cm/s    
     """
     c_dict = {
@@ -119,9 +119,9 @@ def c(units = None):
 
 def m_e(units = None):
     """
-    Returns the mass of an electron. Default unit set is kg
-    Acceptable unit options: 
-    > kg
+    Returns the mass of an electron.
+    Supported unit options: 
+    > kg [Default]
     > g
     > amu   
     """
@@ -140,9 +140,9 @@ def m_e(units = None):
 
 def m_p(units = None):
     """
-    Returns the mass of a proton. Default unit set is kg
-    Acceptable unit options: 
-    > kg
+    Returns the mass of a proton.
+    Supported unit options: 
+    > kg [Default]
     > amu   
     """
     m_p_dict = {
@@ -160,9 +160,9 @@ def m_p(units = None):
 
 def P0(units = None):
     """
-    Returns the reference pressure. Default unit set is bar
-    Acceptable unit options: 
-    > bar
+    Returns the reference pressure.
+    Supported unit options: 
+    > bar [Default]
     > atm
     > Pa
     > kPa
@@ -264,7 +264,7 @@ def convert_unit(num = 1, from_ = None, to = None):
         'eV/molecule': 'energy/amount',
         's': 'time',
         'min': 'time',
-        'hr': 'hour',
+        'hr': 'time',
         'molecule': 'amount',
         'mol': 'amount',
         'C': 'temp',

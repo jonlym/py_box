@@ -21,6 +21,14 @@ fcc_sites = {0:  np.array([1.403, 0.810, z_O]),
              15: np.array([14.027, 8.098, z_O]),
              }
 
+def get_cell(size = 4, a = 1.):
+    size = float(size)
+    a = float(a)
+
+    x_offset = a/2.
+    y_offset = np.sqrt(3.)/2. * a
+    return np.array([[size*a, 0.], [size*x_offset, size*y_offset]])
+
 def get_sigma(n, size = 4):
     return [int(i) for i in np.binary_repr(n, size**2)]
 
@@ -34,7 +42,7 @@ def get_min_distance(pos_i_dict, pos_j_dict):
             distances.append(get_distance(val_i, val_j))
     return min(distances)
 
-def get_big_graph(size = 4, a = 1, eps = None):
+def get_big_graph(size = 4, a = 1, eps = None, periodic = True):
     if eps is None:
         eps = a/100.
     big_graph = nx.Graph()
@@ -45,8 +53,7 @@ def get_big_graph(size = 4, a = 1, eps = None):
     x_offset = a/2.
     y_offset = np.sqrt(3.)/2. * a
 
-    #cell = np.array([[(size+1)*a, 0.], [(size+1)*x_offset, (size+1)*y_offset]])
-    cell = np.array([[size*a, 0.], [size*x_offset, size*y_offset]])
+    cell = get_cell(size = size, a = a)
 
     #Create nodes
     k = 0
@@ -56,10 +63,13 @@ def get_big_graph(size = 4, a = 1, eps = None):
             orig_pos = (x_offset*j + a*i, y_offset*j)
             #Find mirror copies of images outside cell
             positions = {}
-            for l in xrange(-1, 2):
-                for m in xrange(-1, 2):
-                    direction = np.array([[l], [m]])
-                    positions[(l, m)] = np.sum(cell * direction, axis = 0) + orig_pos
+            if periodic:
+                for l in xrange(-1, 2):
+                    for m in xrange(-1, 2):
+                        direction = np.array([[l], [m]])
+                        positions[(l, m)] = np.sum(cell * direction, axis = 0) + orig_pos
+            else:
+                positions[(0, 0)] = orig_pos
             big_graph.add_node(k, positions = positions)
             k = k + 1
     #Create edges
@@ -71,8 +81,8 @@ def get_big_graph(size = 4, a = 1, eps = None):
                     big_graph.add_edge(i, j, min_distance = min_distance)
     return big_graph
 
-def get_small_graph(config, size = 4, a = 1, eps = None):
-    big_graph = get_big_graph(size = size, a = a, eps = eps)
+def get_small_graph(config, size = 4, a = 1, eps = None, periodic = True):
+    big_graph = get_big_graph(size = size, a = a, eps = eps, periodic = periodic)
     #Remake graph
     graph_config = get_sigma(n = config, size = size)
     graph = nx.Graph()
