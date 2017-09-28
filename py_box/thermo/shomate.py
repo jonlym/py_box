@@ -7,7 +7,7 @@ Created on Thu Dec 01 10:51:14 2016
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-import constants as const
+import py_box.constants as c
 
 class shomate(object):
     """
@@ -45,7 +45,7 @@ class shomate(object):
                 print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
             elif T > self.T_high:
                 print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
-        return np.dot(T_arr, self.a)/const.R('J/mol/K')
+        return np.dot(T_arr, self.a)/c.R('J/mol/K')
     
     def get_CpoR(self, T, verbose = True):
         """Calculates the heat capacity at constant pressure (i.e. Cp/R) given a temperature or a list of temperatures."""
@@ -73,7 +73,7 @@ class shomate(object):
                 print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
             elif T > self.T_high:
                 print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
-        return np.dot(T_arr, self.a)/(const.R('kJ/mol/K')*T)
+        return np.dot(T_arr, self.a)/(c.R('kJ/mol/K')*T)
 
     def get_HoRT(self, T, H_correction = False, verbose = True):
         """Calculates the dimensionless enthalpy at constant pressure (i.e. H/RT) given a temperature or a list of temperatures."""
@@ -98,7 +98,7 @@ class shomate(object):
                 print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
             elif T > self.T_high:
                 print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
-        return np.dot(T_arr, self.a)/const.R('J/mol/K')
+        return np.dot(T_arr, self.a)/c.R('J/mol/K')
 
     def get_SoR(self, T, verbose = True):
         """Calculates the dimensionless entropy at constant pressure (i.e. S/R) given a temperature or a list of temperatures."""
@@ -250,7 +250,7 @@ class shomates(object):
 
 
 
-    def get_HoRT_rxn(self, T = const.T0, reaction = None, stoich_vector = None, H_correction = False, verbose = False):
+    def get_HoRT_rxn(self, T = c.T0, reaction = None, stoich_vector = None, H_correction = False, verbose = False):
         """Finds the dimensionless enthalpy of reaction."""
         try:
             iter(T)
@@ -285,7 +285,7 @@ class shomates(object):
         return HoRT_rxn
     
        
-    def get_SoR_rxn(self, T = const.T0, reaction = None, stoich_vector = None, verbose = False):
+    def get_SoR_rxn(self, T = c.T0, reaction = None, stoich_vector = None, verbose = False):
         """Finds the dimensionless entropy of reaction."""
         try:
             iter(T)
@@ -369,8 +369,8 @@ def fit_shomate_species(symbol, T, Cp, H0, S0):
     a = list(a)
     a.extend([0., 0., 0.])
     shomate_instance = shomate(symbol = symbol, T_low = T_low, T_high = T_high, a = np.array(a))
-    a6 = H0 - shomate_instance.get_HoRT(const.T0)*const.R('kJ/mol/K')*const.T0
-    a7 = S0 - shomate_instance.get_SoR(const.T0)*const.R('J/mol/K')
+    a6 = H0 - shomate_instance.get_HoRT(c.T0)*c.R('kJ/mol/K')*c.T0
+    a7 = S0 - shomate_instance.get_SoR(c.T0)*c.R('J/mol/K')
     shomate_instance.a[5] = a6
     shomate_instance.a[6] = a7
     return shomate_instance
@@ -400,9 +400,9 @@ def read_fund_csv(symbol, csv_path, print_graph = False):
     shomate = fit_shomate_species(symbol, T, Cp, H0, S0)
     if print_graph:
         T_range = np.linspace(shomate.T_low, shomate.T_high)
-        Cp_fit = shomate.get_CpoR(T_range)*const.R('J/mol/K')
-        H_fit = shomate.get_HoRT(T_range)*T_range*const.R('kJ/mol/K')
-        S_fit = shomate.get_SoR(T_range)*const.R('J/mol/K')
+        Cp_fit = shomate.get_CpoR(T_range)*c.R('J/mol/K')
+        H_fit = shomate.get_HoRT(T_range)*T_range*c.R('kJ/mol/K')
+        S_fit = shomate.get_SoR(T_range)*c.R('J/mol/K')
         plt.figure()
         plt.subplot(311)
         plt.plot(T, Cp, 'ro', T_range, Cp_fit, 'b-')

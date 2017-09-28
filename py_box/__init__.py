@@ -6,6 +6,7 @@ Created on Wed Nov 23 21:10:42 2016
 """
 
 import numpy as np
+from datetime import datetime
 
 def any_alpha(string):
     """Returns True if any alphabetic characters are in the string. False otherwise"""
@@ -37,3 +38,5 @@ def plot_parity(x, y, decimals = 2):
 #    plt.plot(np.array([min_data, min_data]), np.array([max_data, max_data]), 'k-')
     return (fig, axes)
 
+def get_time():
+    return str(datetime.now())

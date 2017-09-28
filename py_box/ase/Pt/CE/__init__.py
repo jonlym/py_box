@@ -21,7 +21,7 @@ fcc_sites = {0:  np.array([1.403, 0.810, z_O]),
              15: np.array([14.027, 8.098, z_O]),
              }
 
-def get_cell(size = 4, a = 1.):
+def get_cell(size = 4., a = 1.):
     size = float(size)
     a = float(a)
 
@@ -35,12 +35,20 @@ def get_sigma(n, size = 4):
 def get_distance(pos_i, pos_j):
     return np.sqrt(np.sum((i-j)**2 for i, j in zip(pos_i, pos_j)))
 
-def get_min_distance(pos_i_dict, pos_j_dict):
-    distances = []
+def get_distances(pos_i_dict, pos_j_dict):
+    distances = {}
     for key_i, val_i in pos_i_dict.iteritems():
         for key_j, val_j in pos_j_dict.iteritems():
-            distances.append(get_distance(val_i, val_j))
-    return min(distances)
+            distances[(key_i, key_j)] = get_distance(val_i, val_j)
+    return distances
+
+def get_min_distance(pos_i_dict, pos_j_dict):
+    return min([val for key, val in get_distances(pos_i_dict, pos_j_dict).iteritems()])
+    # distances = []
+    # for key_i, val_i in pos_i_dict.iteritems():
+    #     for key_j, val_j in pos_j_dict.iteritems():
+    #         distances.append(get_distance(val_i, val_j))
+    # return min(distances)
 
 def get_big_graph(size = 4, a = 1, eps = None, periodic = True):
     if eps is None:
@@ -81,7 +89,7 @@ def get_big_graph(size = 4, a = 1, eps = None, periodic = True):
                     big_graph.add_edge(i, j, min_distance = min_distance)
     return big_graph
 
-def get_small_graph(config, size = 4, a = 1, eps = None, periodic = True):
+def get_small_graph(config, size = 4, a = 1, eps = None, periodic = True, dict_edges = False):
     big_graph = get_big_graph(size = size, a = a, eps = eps, periodic = periodic)
     #Remake graph
     graph_config = get_sigma(n = config, size = size)
@@ -97,7 +105,13 @@ def get_small_graph(config, size = 4, a = 1, eps = None, periodic = True):
     for (node_i, data_i) in graph.nodes_iter(data = True):
         for (node_j, data_j) in graph.nodes_iter(data = True):
             if node_i != node_j:
-                graph.add_edge(node_i, node_j, distance = get_min_distance(data_i['positions'], data_j['positions']))
+                if periodic:
+                    graph.add_edge(node_i, node_j, distance = get_min_distance(data_i['positions'], data_j['positions']))
+                else:
+                    graph.add_edge(node_i, node_j, distance = get_distance(data_i['positions'][(0, 0)], data_j['positions'][(0, 0)]))
+
+                if dict_edges:
+                    graph.add_edge(node_i, node_j, distances = get_distances(data_i['positions'], data_j['positions']))
     return graph
 
 def draw_graph_node(config, size = 4, a = 1, eps = None):

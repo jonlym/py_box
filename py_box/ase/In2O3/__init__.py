@@ -5,6 +5,7 @@ Created on Wed Apr 12 17:12:09 2017
 @author: Jonathan Lym
 """
 
+from ase.io import read
 import heapq
 import numpy as np
 
@@ -79,3 +80,11 @@ def get_new_index(atoms_indices, vacancy_indices, start_index = 0):
         return out_atom_indices[0]
     else:
         return out_atom_indices
+
+def get_In2O3_configuration(n = 0, width = 12):
+    indices = [75, 76, 46, 73, 43, 68, 74, 77, 47, 72, 42, 69]
+    config = [int(x) for x in ''.split(np.binary_repr(num = n, width = width))]
+    del_indices = indices[config]
+    atoms = read('/home/work/ccei_biomass/users/jlym/In2O3/unit_cell_relaxed/In2O3_110_clean')
+    del atoms[del_indices]
+    return atoms

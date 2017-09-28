@@ -1,5 +1,6 @@
 from py_box.cluster_expansion.configuration import Configuration, default_dict
 import numpy as np
+from copy import copy
 from warnings import warn
 
 class Configurations(object):

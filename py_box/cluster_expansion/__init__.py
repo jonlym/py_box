@@ -25,10 +25,7 @@ def _get_correlation(configuration, cluster):
     else:
         interactions_sum = 0
         for interaction in cluster.interactions:
-            interaction_prod = 1
-            for index in interaction:
-                interaction_prod *= configuration.sigma[index]
-            interactions_sum += interaction_prod
+            interactions_sum += np.prod([configuration.sigma[i] for i in interaction])
         return interactions_sum/(float(cluster.N) * float(cluster.m))
 
 def get_effective_interactions(correlation_mat, energies, clusters = None):

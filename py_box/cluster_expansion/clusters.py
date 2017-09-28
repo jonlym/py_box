@@ -1,3 +1,4 @@
+# coding=utf-8
 from py_box.cluster_expansion.cluster import Cluster
 import numpy as np
 from copy import copy
@@ -65,6 +66,17 @@ class Clusters(object):
             if cluster.J == 0.:
                 print '{}\t{}'.format(cluster.name, cluster.J)
 
+    def get_n_nodes(self):
+        return [cluster.n_nodes for cluster in self]
+
+    def get_domain_matrix(self, concentration):
+        """
+        Returns the domain matrix described in:
+        Mueller, T.; Ceder, G. Phys. Rev. B - Condens. Matter Mater. Phys. 2010, 82 (18), 1–6.
+        """
+        n_nodes = self.get_n_nodes()
+        n_alpha, n_beta = np.meshgrid(n_nodes, n_nodes)
+        return (2*concentration - 1)**(n_alpha + n_beta)
 
     def __len__(self):
         return len(self._clusters)
@@ -91,9 +103,15 @@ class Clusters(object):
             #Convert string into list of list
             out_interactions = []
             if cluster['interactions'] is not None:
-                interactions = cluster['interactions'].split('|')
+                if '|' in cluster['interactions']:
+                    interactions = cluster['interactions'].split('|')
+                else:
+                    interactions = [cluster['interactions']]
+
                 for interaction in interactions:
-                    if type(interaction) is float:
+                    if type(interaction) is int:
+                        out_interactions.append([interaction])
+                    elif type(interaction) is float:
                         out_interactions.append([int(interaction)])
                     elif type(interaction) is unicode:
                         interaction_indices = []
