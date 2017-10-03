@@ -2,7 +2,19 @@ from ase.thermochemistry import IdealGasThermo
 import numpy as np
 from py_box import constants as c
 
-def get_chemical_potential(atoms, freq, geometry, potentialenergy, symmetrynumber, spin, nasa_liq, H_gas, S_gas, T, x, verbose = False):
+def get_chemical_potential(atoms,
+                           freq,
+                           geometry,
+                           potentialenergy,
+                           symmetrynumber,
+                           spin,
+                           T,
+                           nasa_liq = None,
+                           H_gas = None,
+                           S_gas = None,
+                           x = None,
+                           gas_phase = False,
+                           verbose = False):
     """
     Calculates the chemical potential of the toluene-phase species
     atoms - ASE Atoms object
@@ -38,10 +50,13 @@ def get_chemical_potential(atoms, freq, geometry, potentialenergy, symmetrynumbe
                                 spin = spin)
     G_DFT = DFT_thermo.get_gibbs_energy(temperature = 298., pressure = 1.e5, verbose = verbose)
 
-    #ASPEN Liquid Data
-    G_liq = nasa_liq.get_GoRT(T = T, verbose = False) * c.kb('eV/K') * T
+    if gas_phase:
+        return np.array([DFT_thermo.get_gibbs_energy(temperature = T_i, pressure = 1.e5, verbose = verbose) for T_i in T])
+    else:
+        #ASPEN Liquid Data
+        G_liq = nasa_liq.get_GoRT(T = T, verbose = False) * c.kb('eV/K') * T
 
-    #NIST Gas Phase Data
-    G_gas = H_gas * c.convert_unit(from_ = 'kJ/mol', to = 'eV/molecule') - T * S_gas * c.convert_unit(from_ = 'J/mol', to = 'eV/molecule')
+        #NIST Gas Phase Data
+        G_gas = H_gas * c.convert_unit(from_ = 'kJ/mol', to = 'eV/molecule') - T * S_gas * c.convert_unit(from_ = 'J/mol', to = 'eV/molecule')
 
-    return G_DFT + G_liq - G_gas + c.kb('eV/K') * T * np.log(x)
+        return G_DFT + G_liq - G_gas + c.kb('eV/K') * T * np.log(x)

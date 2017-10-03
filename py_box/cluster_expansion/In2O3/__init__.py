@@ -28,9 +28,13 @@ def get_interactions_from_sites(sites, delimiter = '_'):
     return '{} | {}'.format(buf1, buf2)
 
 def get_sigma_from_sites(sites, delimiter = '_'):
+    sigma = np.ones(shape = (len(index_dict), 1))
+
+    if sites.lower() == 'clean':
+        return sigma
+
     if type(sites) is str:
         sites = sites.split(delimiter)
-    sigma = np.ones((12))
     for site in sites:
         sigma[index_dict[site]] = -1
     return sigma

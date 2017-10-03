@@ -1,10 +1,36 @@
 import numpy as np
+from py_box import get_null, get_time
 from py_box.cluster_expansion.cluster import Cluster
 from py_box.cluster_expansion.clusters import Clusters
 from py_box.cluster_expansion.configuration import Configuration
 from py_box.cluster_expansion.configurations import Configurations
+from py_box.ase.In2O3 import run_In2O3_configuration
 from sklearn.linear_model import LassoCV
+from sklearn.preprocessing import normalize
 from warnings import warn
+
+def get_configuration_difference(train_mat, new_mat):
+    null_train_mat = get_null(train_mat)
+
+    #Normalize matrices
+    norm_new_mat = normalize(new_mat, axis = 1)
+    norm_null_train_mat = normalize(null_train_mat, axis = 0)
+
+    max_dot_prod = np.amax(np.absolute(np.dot(norm_new_mat, norm_null_train_mat)), axis = 1)
+    return max_dot_prod
+
+def get_difference(big_obj, small_obj):
+    """
+    Gets the difference between a larger object and a smaller object. Uses the name to determine if the records are the
+    same. Should be compatible with any objects with the attribute name.
+    :param big_obj:
+    :param small_obj:
+    :return:
+    """
+    diff_obj = big_obj.get_copy()
+    for small_item in small_obj:
+        diff_obj.remove(name = small_item.name)
+    return diff_obj
 
 def get_correlation_matrix(configurations, clusters):
     """Calculates the correlation matrix"""
@@ -48,8 +74,8 @@ def get_effective_interactions_lasso(correlation_mat, energies, alpha = [0.1], c
             cluster.J = J
     return (Js, clf.alpha_)
 
-def get_energies(correlation_mat, Js, configurations = None):
-    Es = np.dot(correlation_mat, Js)
+def get_energies(correlation_mat, Js, configurations = None, intercept = 0.):
+    Es = np.dot(correlation_mat, Js) + intercept
     if configurations is not None:
         for E, configuration in zip(Es, configurations):
             configuration.E_CE = E
@@ -60,3 +86,72 @@ def get_RMSE(xs_data, xs_fit):
 
 def count_nonsparse(Js, eps = 1e-5):
     return np.count_nonzero([abs(J) > eps for J in Js])
+
+def get_best_structure(energies, differences, cv, cv_limit, n = 0):
+    """
+    Returns the index of the 'best' structure to add to the optimization based on the optimization of energies and differences
+    :param energies:
+    :param differences:
+    :return:
+    """
+    if cv < cv_limit:
+        return np.where(energies == sorted(energies, reverse = False)[n])[0][0]
+    else:
+        return np.where(differences == sorted(differences, reverse = True)[n])[0][0]
+
+def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True):
+    #Read cluster data
+    print 'Reading cluster data'
+    clusters = Clusters.from_excel(clusters_path)
+
+    #Read training structures
+    print 'Reading configuration training data'
+    configs_train = Configurations.from_vasp(train_path)
+    configs_train.set_E_fit()
+    #Read all training structures
+    print 'Reading all configuration data'
+    configs_all = Configurations.from_excel(configs_all_path)
+    print 'Finding difference'
+    configs_new = get_difference(configs_all, configs_train)
+
+    #Generating correlation matrices
+    print 'Generating correlation matrix for training structures'
+    pi_train = get_correlation_matrix(configurations = configs_train, clusters = clusters)
+    print 'Generating correlation matrix for new structures'
+    pi_new = get_correlation_matrix(configurations = configs_new, clusters = clusters)
+
+    #Find structures that would result in better CV score
+    print 'Calculating similarity of new configurations to training configurations'
+    configs_difference = get_configuration_difference(pi_train, pi_new)
+
+    #Run Cluster Expansion Model
+    print 'Running Lasso with Leave-One-Out Cross Validation'
+    clf = LassoCV(copy_X=True, cv = len(configs_train), fit_intercept = True)
+    print configs_train.get_E_fit()
+    clf.fit(pi_train, configs_train.get_E_fit())
+
+    #Print Model Data
+    Js = clf.coef_
+    intercept = clf.intercept_
+
+    #Calculate energies
+    print 'Calculating energies using Cluster Expansion'
+    CE_E_new = get_energies(correlation_mat = pi_new, Js = Js, intercept = intercept)
+
+    #Start DFT calculation for structure
+    for n in xrange(len(configs_new)):
+        new_index = get_best_structure(CE_E_new, configs_difference, cv = np.average(clf.mse_path_[-1]), cv_limit = 0.0025, n = n)
+        print 'Attempting to submit {}'.format(configs_new[new_index].name)
+        successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = True)
+        if successful_submit:
+            new_structure = configs_new[new_index].name
+            break
+        else:
+            print 'Failed to submit {}'.format(configs_new[new_index].name)
+    else:
+        print 'Could not find structure to submit.'
+        new_structure = 'Nan'
+
+    print 'Updating log file, {}'.format(log_path)
+    with open(log_path, 'a') as log_ptr:
+        log_ptr.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(get_time(), clf.alpha_, np.average(clf.mse_path_[-1]), count_nonsparse(Js = Js), new_structure, configs_difference[new_index], CE_E_new[new_index]))

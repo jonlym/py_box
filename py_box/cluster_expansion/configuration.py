@@ -1,3 +1,7 @@
+from ase.io import read
+import numpy as np
+import os
+
 class Configuration(object):
     """
     Holds the configuration.
@@ -7,15 +11,27 @@ class Configuration(object):
             E_DFT - float
                 Energy of the configuration obtained by DFT
             E_CE - float
-                Enregy of the configuration obtained by cluster expansion
+                Energy of the configuration obtained by cluster expansion
+            n_vacancies - int
+                Number of vacancies in cell
     """
 
-    def __init__(self, name = None, sigma = None, E_DFT = None, E_CE = None, n_vacancies = None):
+    def __init__(self, name = None, sigma = None, E_DFT = None, E_fit = None, E_CE = None, n_vacancies = None):
         self.name = name
         self.sigma = sigma
         self.E_DFT = E_DFT
+        self.E_fit = E_fit
         self.E_CE = E_CE
         self.n_vacancies = n_vacancies
+
+    @classmethod
+    def from_vasp(cls, name = None, sigma = None, n_vacancies = None, path = './'):
+        atoms = read(os.path.join(path, 'OUTCAR'))
+        try:
+            E_DFT = atoms.get_potential_energy()
+        except:
+            E_DFT = None
+        return cls(name = name, sigma = sigma, E_DFT = E_DFT, n_vacancies = n_vacancies)
 
 default_dict = {'name': str,
                 'sigma': list,

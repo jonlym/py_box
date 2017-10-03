@@ -1,7 +1,11 @@
 from py_box.cluster_expansion.configuration import Configuration, default_dict
+from py_box.cluster_expansion.In2O3 import get_sigma_from_sites
 import numpy as np
+import os
 from copy import copy
+from ase.io import read
 from warnings import warn
+import platform
 
 class Configurations(object):
     def __init__(self, configurations = None, info = None):
@@ -60,8 +64,62 @@ class Configurations(object):
             configurations.append(copy(self[i]))
         return Configurations(configurations = configurations)
 
+    def write_to_excel(self, file_name):
+        """
+        Writes the configurations object to a spreadsheet.
+        :param file_name: Name of the spreadsheet.
+        :return:
+        """
+        import pandas as pd
+        writer = pd.ExcelWriter(file_name)
+        configs_data_frame = self._get_data_frame()
+        column_order = list(configs_data_frame.columns.values)
+        #Inserting name first, sigma second
+        column_order.remove('name')
+        column_order.insert(0, 'name')
+        column_order.remove('sigma')
+        column_order.insert(1, 'sigma')
+
+        #Writing to spreadsheet
+        configs_data_frame.to_excel(writer, 'Sheet1', columns = column_order, index = False)
+        writer.save()
+
+    def _get_data_frame(self):
+        """
+        Converts the configuration to a Pandas dataframe
+        :return:
+        """
+        import pandas as pd
+        data_dict = {}
+        for key in self[0].__dict__.iterkeys():
+            print key
+            if key == 'sigma':
+                #Convert sigma to string separated by ', '
+                data_dict[key] = [', '.join(str(x) for x in config.__dict__[key]) for config in self]
+            else:
+                data_dict[key] = [config.__dict__[key] for config in self]
+        return pd.DataFrame(data=data_dict)
+
     def get_n_vacancies(self):
         return np.array([configuration.n_vacancies for configuration in self])
+
+    def set_E_fit(self):
+        n_max = 0
+        for i, configuration in enumerate(self):
+            print configuration.name
+            if configuration.n_vacancies == 0:
+                E0 = configuration.E_DFT
+
+            if configuration.n_vacancies > n_max:
+                E_max = configuration.E_DFT
+                n_max = configuration.n_vacancies
+
+        for i, configuration in enumerate(self):
+            n = configuration.n_vacancies
+            self[i].E_fit = configuration.E_DFT - (1.-float(n)/float(n_max))*E0 - float(n)/float(n_max)*E_max
+
+    def get_E_fit(self):
+        return np.array([configuration.E_fit for configuration in self])
 
     def __len__(self):
         return len(self._configurations)
@@ -91,4 +149,33 @@ class Configurations(object):
                                                 E_CE = configuration['E_CE'],
                                                 E_DFT = configuration['E_DFT'],
                                                 n_vacancies=configuration['n_vacancies']))
+        return cls(configurations = configurations, info = info)
+
+    @classmethod
+    def from_vasp(cls, path = '.', info = ''):
+        configurations = []
+        for root, folders, files in os.walk(path):
+            for file in files:
+                if 'OUTCAR' in file:
+                    try:
+                        atoms = read(os.path.join(root, file))
+                    except:
+                        continue
+                    else:
+                        full_path = os.path.join(root, file)
+                        if 'windows' in platform.system().lower():
+                            name = full_path.split('\\')[-2]
+                        else:
+                            name = full_path.split('/')[-2]
+                        E_DFT = atoms.get_potential_energy()
+                        if 'clean' in name:
+                            n_vacancies = 0
+                        else:
+                            n_vacancies = len(name.split('_'))
+                        sigma = get_sigma_from_sites(name)
+
+                        configurations.append(Configuration(name = name,
+                                                            sigma = sigma,
+                                                            E_DFT = E_DFT,
+                                                            n_vacancies = n_vacancies))
         return cls(configurations = configurations, info = info)

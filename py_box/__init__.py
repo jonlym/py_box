@@ -40,3 +40,8 @@ def plot_parity(x, y, decimals = 2):
 
 def get_time():
     return str(datetime.now())
+
+def get_null(mat, rtol=1e-5):
+    u, s, v = np.linalg.svd(mat)
+    rank = (s > rtol*s[0]).sum()
+    return v[rank:].T.copy()
