@@ -85,7 +85,7 @@ else:
     energy = sys.get_potential_energy()
     print "Energy: %f" % energy
 print "Finding next configuration..."
-run_cluster_expansion(train_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/train', clusters_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/cluster_vacancy.xlsx', configs_all_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/config_vacancy.xlsx', log_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/In2O3_CE.log', submit_jobs = testRun)
+run_cluster_expansion(train_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/train', clusters_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/cluster_vacancy.xlsx', configs_all_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/config_vacancy.xlsx', log_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/output.log', submit_job = testRun)
 print "Completed %s" % file_name_py"""
 
 index_dict = {'In1': [26, 27],
@@ -179,7 +179,7 @@ def get_In2O3_configuration(bitstring, width = 12):
     del atoms[del_indices]
     return atoms
 
-def run_In2O3_configuration(configuration, job_array = True, job_file = 'joblist.txt', folder_file = 'folderlist.txt', rel_path = None, submit_job = True):
+def run_In2O3_configuration(configuration, job_array = False, job_file = 'joblist.txt', folder_file = 'folderlist.txt', rel_path = None, submit_job = True):
     """
     Writes the In2O3 ASE script and adds to the Job Array files
     :param configuration:
@@ -195,15 +195,16 @@ def run_In2O3_configuration(configuration, job_array = True, job_file = 'joblist
         rel_path = './{}/'.format(configuration.name)
 
     #If the folder does not exist, make it
-    if not os.path.isdir(rel_path):
-        os.makedirs(rel_path)
+    if not os.path.isdir(os.path.join(rel_path, configuration.name)):
+        os.makedirs(os.path.join(rel_path, configuration.name))
     elif os.path.isfile(os.path.join(rel_path, '{}/POSCAR_start'.format(configuration.name))):
         return False
     #Write the configuration to a file
-    write('{}/POSCAR_start'.format(rel_path), get_In2O3_configuration(bitstring = convert_sigma_to_bitstring(configuration.sigma)))
+    write(os.path.join(rel_path, '{}/POSCAR_start'.format(configuration.name)), get_In2O3_configuration(bitstring = convert_sigma_to_bitstring(configuration.sigma)))
 
     #Write the script
-    with open(os.path.join(rel_path, '{}.py'.format(configuration.name)), 'w') as py_ptr:
+    script_name = '{}.py'.format(configuration.name)
+    with open(os.path.join(rel_path, '{}/{}'.format(configuration.name, script_name)), 'w') as py_ptr:
         py_ptr.write(configuration_template)
 
     if job_array:
@@ -213,9 +214,13 @@ def run_In2O3_configuration(configuration, job_array = True, job_file = 'joblist
         with open(folder_file, 'a') as folder_ptr:
             folder_ptr.write('{}{}'.format(rel_path, configuration.name))
     else:
-        os.chdir(path = rel_path)
+        os.chdir(os.path.join(rel_path, configuration.name))
         if submit_job:
-            os.system('qvasp_ase_log 24 {}.py -w 10:00:00 -s'.format(configuration.name))
+            cluster = os.environ['CLUSTER']
+            if 'farber' in cluster:
+                os.system('qase vasp 20 {} -s'.format(script_name))
+            elif 'edison' in cluster:
+                os.system('qvasp_ase_log 24 {} -w 10:00:00 -s'.format(script_name))
         os.chdir(home_dir)
     return True
 
