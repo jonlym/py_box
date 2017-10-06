@@ -164,7 +164,7 @@ def get_In2O3_configuration(bitstring, width = 12):
     indices = [75, 76, 46, 73, 43, 68, 74, 77, 47, 72, 42, 69]
     del_indices = []
     for i, j in enumerate(bitstring):
-        if j == 0:
+        if j == '0':
             del_indices.append(indices[i])
     cluster = os.environ['CLUSTER']
     if 'farber' in cluster:

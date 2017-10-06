@@ -99,7 +99,7 @@ def get_best_structure(energies, differences, cv, cv_limit, n = 0):
     else:
         return np.where(differences == sorted(differences, reverse = True)[n])[0][0]
 
-def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True):
+def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True, n_new = 1):
     #Read cluster data
     print 'Reading cluster data'
     clusters = Clusters.from_excel(clusters_path)
@@ -139,19 +139,26 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
     CE_E_new = get_energies(correlation_mat = pi_new, Js = Js, intercept = intercept)
 
     #Start DFT calculation for structure
+    j = 0
+    new_structures = []
+    new_indices = []
     for n in xrange(len(configs_new)):
         new_index = get_best_structure(CE_E_new, configs_difference, cv = np.average(clf.mse_path_[-1]), cv_limit = 0.0025, n = n)
         print 'Attempting to submit {}'.format(configs_new[new_index].name)
-        successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = True)
+        successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = submit_job)
         if successful_submit:
-            new_structure = configs_new[new_index].name
-            break
+            j = j + 1
+            new_structures.append(configs_new[new_index].name)
+            new_indices.append(new_index)
         else:
             print 'Failed to submit {}'.format(configs_new[new_index].name)
+
+        if j >= n_new:
+            break
     else:
         print 'Could not find structure to submit.'
-        new_structure = 'Nan'
+        new_structures = ['Nan']
 
     print 'Updating log file, {}'.format(log_path)
     with open(log_path, 'a') as log_ptr:
-        log_ptr.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(get_time(), clf.alpha_, np.average(clf.mse_path_[-1]), count_nonsparse(Js = Js), new_structure, configs_difference[new_index], CE_E_new[new_index]))
+        log_ptr.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(get_time(), clf.alpha_, np.average(clf.mse_path_[-1]), count_nonsparse(Js = Js), '\t'.join([new_structure for new_structure in new_structures]), '\t'.join([str(configs_difference[new_index]) for new_index in new_indices]), '\t'.join([str(CE_E_new[new_index]) for new_index in new_indices])))
