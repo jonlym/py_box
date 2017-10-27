@@ -7,7 +7,7 @@ Created on Wed Nov 23 14:57:39 2016
 
 from py_box.constants import T0, convert_unit
 from ase.io import read
-from py_box.mkm.chemkin.thermdat import thermdat, thermdats
+from py_box.thermo.thermdat import thermdat, thermdats
 import numpy as np
 
 def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
@@ -53,7 +53,7 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
                 if data[10] == '':
                     spin = None
                 else:
-                    spin = int(data[10])
+                    spin = float(data[10])
                 #atoms
                 if data[11] == '':
                     atoms = None

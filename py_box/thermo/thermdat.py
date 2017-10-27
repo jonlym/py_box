@@ -660,7 +660,8 @@ def read_thermdat(thermdat_path, verbose = True, warn = True):
                                 T_high = T_range[1], 
                                 a_low = np.array(a_low), 
                                 a_high = np.array(a_high),
-                                verbose = verbose)
+                                verbose = verbose,
+                                symbol = symbol)
                     thermdats_obj.append(thermdat(symbol = symbol, 
                                                  CHON = CHON, 
                                                  is_gas = is_gas, 

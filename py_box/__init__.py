@@ -45,3 +45,6 @@ def get_null(mat, rtol=1e-5):
     u, s, v = np.linalg.svd(mat)
     rank = (s > rtol*s[0]).sum()
     return v[rank:].T.copy()
+
+def get_RMSE(xs_data, xs_fit):
+    return np.sqrt(np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)]))

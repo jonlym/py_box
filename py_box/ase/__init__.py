@@ -112,6 +112,14 @@ def check_bond_lengths(atoms_obj, change_len = False, bond_warning = False, bond
     if bond_warning == False:
         print "All distances are farther than %f" % bond_len
 
+DFT_E_gas = {
+    'H2': -6.759196,
+    'H2O': -14.219543,
+    'FAL': -79.56456956,
+    'MF': -73.257932
+
+}
+
 # def insert_atom(atoms, atom, index):
 #     """
 #     Inserts an atom into the atoms object and shifts all the indices.
