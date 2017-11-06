@@ -11,11 +11,7 @@ from itertools import permutations
 
 class Configurations(object):
     def __init__(self, configurations = None, info = None, del_E_gas = 0.):
-        self._configurations = []
-        if configurations is not None:
-            for configuration in configurations:
-                self._configurations.append(configuration)
-
+        self._configurations = list(configurations)
         self.info = info
         self.del_E_gas = del_E_gas
 

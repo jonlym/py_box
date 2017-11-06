@@ -7,10 +7,7 @@ from warnings import warn
 class Clusters(object):
 
     def __init__(self, clusters, info = ''):
-        self._clusters = []
-        for cluster in clusters:
-            self._clusters.append(cluster)
-
+        self._clusters = list(clusters)
         self.info = info
 
     def append(self, cluster):

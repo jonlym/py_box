@@ -210,10 +210,8 @@ class thermdats(object):
     An object that stores a list of thermdat objects.
     """    
     def __init__(self, thermdats = [], verbose = True):
-        self._thermdats = []
+        self._thermdats = list(thermdats)
         self.verbose = verbose
-        for thermdat in thermdats:
-            self.append(thermdat)
             
     def append(self, thermdat):
         self._thermdats.append(thermdat)
