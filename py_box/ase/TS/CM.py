@@ -59,7 +59,7 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
         
     elif 'edison' in content.lower():
         cluster = 'edison'
-        qase_start = 'qvasp_ase'
+        qase_start = 'qvasp_ase_log'
         qase_options = '%s -w %s -p %s' % (qase_options, wall_time, version)
         if submit_jobs:
             qase_options = '%s -s' % qase_options
