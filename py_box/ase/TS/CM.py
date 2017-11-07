@@ -6,12 +6,14 @@ Created on Mon Nov 21 08:54:32 2016
 """
 
 import numpy as np
+import shutil as sh
 import re
 from ase.io import read, write
 from ase.visualize import view
 from ase.neb import interpolate
 from os import chdir, getcwd, system, makedirs, walk
 from os.path import relpath, expanduser, exists, join
+from py_box.ase.TS import label_folder, compare_initial_final
 
 def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', queue = None, submit_jobs = True):
     """
@@ -107,7 +109,7 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
         chdir('..')
     print "Completed submit_NEB"
 
-def initialize_CM(n_images = 6, nest = 1, write_POSCAR = True, write_python = True):
+def initialize_CM(n_images = 8, nest = 1, write_POSCAR = True, write_python = True, python_template = 'template.py'):
     """
     Initializes the NEB calculation.
     Parameters supported:
@@ -120,8 +122,8 @@ def initialize_CM(n_images = 6, nest = 1, write_POSCAR = True, write_python = Tr
     file_base = relpath('.', '../'*nest).replace('/', '_')
     
     #Read initial and final state
-    initial = read('./initial/POSCAR')
-    final = read('./final/POSCAR')
+    initial = read('./initial/CONTCAR')
+    final = read('./final/CONTCAR')
     
     #Generating the interpolated images
     images = [initial]
@@ -130,24 +132,24 @@ def initialize_CM(n_images = 6, nest = 1, write_POSCAR = True, write_python = Tr
     images.append(final)
     interpolate(images)
     
-    for i in range(1, n_images+1):
-        print 'Checking bond lengths for image %d' % i
-        check_bond_lengths(images[i], False)
+    #for i in range(1, n_images+1):
+    #    print 'Checking bond lengths for image %d' % i
+    #    check_bond_lengths(images[i], False)
     
     compare_initial_final(initial, final)
     
-    for i in range(1, n_images+1):
+    for i in range(0, n_images+2):
         print 'Processing image %d' % i
-        dir = label_folder(i)
-        if not exists(dir):
-            makedirs(dir)
+        folder = label_folder(i)
+        if not exists(folder):
+            makedirs(folder)
         if write_POSCAR:
-            POSCAR_path = '%s/POSCAR_start' % dir
+            POSCAR_path = join(folder, 'POSCAR_start')
             print 'Writing image %d to %s' % (i, POSCAR_path)
             write(POSCAR_path, images[i])
         if write_python:
-            python_path = '%s/%s%s.py' % (dir, file_base, dir)
+            python_path = join(folder, '{}{}.py'.format(file_base, folder))
             print 'Copying template.py to %s' % python_path
-            system('cp template.py %s' % (python_path))
+            sh.copyfile(python_template, python_path)
     print 'Completed initialize_NEB'
 

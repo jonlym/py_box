@@ -1,5 +1,4 @@
 import numpy as np
-from copy import copy
 
 class Reactions(object):
     def __init__(self, reactions = None, info = None):
@@ -27,3 +26,24 @@ class Reactions(object):
         elif name is not None:
             index = self.index(name)
         del self._reactions[index]
+
+    @classmethod
+    def from_surf(self, file_name):
+        with open(file_name, 'r') as file_ptr:
+            read_reactions = False
+            for line in file_ptr:
+                if line[0] == '!' or line[0] == '\n':
+                    continue
+
+                if 'REACTIONS' in line:
+                    read_reactions = True
+                    continue
+
+                if read_reactions:
+                    buf = line.split('  ')
+                    name = buf[0]
+                    A = buf[1]
+                    beta = buf[2]
+                    Ea = buf[3]
+
+                    

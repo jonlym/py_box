@@ -181,14 +181,14 @@ class thermdat(object):
                 CpoR = 3.
             else:
                 warnings.warn("Gas phase species with invalid geometry. Returning 0.")
-                return 0                
+                return 0.                
             #Correction between Cv and Cp
-            CpoR += 1
+            CpoR += 1.
         else:
-            CpoR = 0
+            CpoR = 0.
         for vib_f in self.vib_freq:               
             vib_T = vib_f*c.c('cm/s')*c.h('J s')/c.kb('J/K')
-            CpoR += (vib_T / ( 2 * T ))**2 * 1/(np.sinh(vib_T / ( 2 * T )))**2
+            CpoR += (vib_T / ( 2. * T ))**2 * 1./(np.sinh(vib_T / ( 2. * T )))**2
         return CpoR
 
     def get_CpoR(self, T):
