@@ -6,9 +6,12 @@ from copy import copy
 from ase.io import read
 from warnings import warn
 import platform
-import networkx as nx
 from itertools import permutations
-
+try:
+    import networkx as nx
+except:
+    pass
+    
 class Configurations(object):
     def __init__(self, configurations = None, info = None, del_E_gas = 0.):
         self._configurations = list(configurations)

@@ -2,7 +2,7 @@ import numpy as np
 from py_box.thermo.shomate import Shomate
 from py_box import constants as c
 
-class shomates(object):
+class Shomates(object):
     """
     An object that stores a list of shomate objects.
     """    
@@ -244,6 +244,19 @@ class shomates(object):
     def from_csv(file_name, verbose = True):
         shomates = []
         with open(file_name, 'r') as shomate_file:
+            for line in shomate_file:
+                #If the line is not a comment
+                if line[0] != '!':
+                    data = line.split(',')
+                    if verbose:
+                        print "Importing %s" % data[0]
+                    shomates.append(shomate(symbol = data[0], T_low = float(data[1]), T_high = float(data[2]), a = np.array([float(i) for i in data[3:] if i != '' and i != '\n'])))
+        return cls(shomates = shomates)
+
+    @classmethod
+    def read_shomate(shomate_path, verbose = True):
+        shomates = []
+        with open(shomate_path, 'r') as shomate_file:
             for line in shomate_file:
                 #If the line is not a comment
                 if line[0] != '!':
