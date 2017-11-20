@@ -13,6 +13,19 @@ index_dict = {'O1A': 0,
               'O5B': 10,
               'O6B': 11}
 
+pos_dict = {0: 75,
+            1: 76,
+            2: 46,
+            3: 72,
+            4: 43,
+            5: 68,
+            6: 74,
+            7: 77,
+            8: 47,
+            9: 72,
+            10: 42,
+            11: 69}
+
 def get_interactions_from_sites(sites, delimiter = '_'):
     if type(sites) is str:
         sites = sites.split(delimiter)
@@ -38,6 +51,10 @@ def get_sigma_from_sites(sites, delimiter = '_'):
     for site in sites:
         sigma[index_dict[site]] = -1
     return sigma
+
+def get_vacancy_indices_from_sigma(sigma):
+  return [pos_dict[i] for i, x in enumerate(sigma) if x == -1]
+
 
 def get_parity(site):
     #If site is a name

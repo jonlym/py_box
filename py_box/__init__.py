@@ -57,3 +57,6 @@ def spherical_to_xyz(r = 1., theta = 0., psi = 0., degrees = True):
     y = r * np.sin(theta) * np.sin(psi)
     z = r * np.cos(psi)
     return np.array([x, y, z])
+
+def get_n_blanks(n):
+    return ' '*n
