@@ -106,19 +106,30 @@ class GCN(object):
         atoms are coordinated to.
         """
         #Duplicate the atoms object to account for periodic images
-        offset = 13 * len(self.atoms)
-        atoms_ext = self.atoms.copy() * (3, 3, 3)
-        for i in range(offset, (offset + len(self.atoms))):
-            neighbors = []
-            for j in range(len(atoms_ext)):
-                #If not the same index, radii overlap (weighted by scale) and the elements are not in the element list
-                if (i != j and 
-                    atoms_ext.get_distance(i, j) <= ((self.atom_radii[atoms_ext[i].symbol] + self.atom_radii[atoms_ext[j].symbol]) * self.scale) and
-                    atoms_ext[j].symbol not in self.exceptions[atoms_ext[i].symbol]):
-                    #Add a neighbor
-                    self.CNs[i % len(self.atoms)] += 1
-                    neighbors.append(j % len(self.atoms))
-            self.neighbors[i % len(self.atoms)] = get_unique_list(neighbors)
+        # offset = 13 * len(self.atoms)
+        # atoms_ext = self.atoms.copy() * (3, 3, 3)
+        # for i in range(offset, (offset + len(self.atoms))):
+        #     neighbors = []
+        #     for j in range(len(atoms_ext)):
+        #         #If not the same index, radii overlap (weighted by scale) and the elements are not in the element list
+        #         if (i != j and 
+        #             atoms_ext.get_distance(i, j) <= ((self.atom_radii[atoms_ext[i].symbol] + self.atom_radii[atoms_ext[j].symbol]) * self.scale) and
+        #             atoms_ext[j].symbol not in self.exceptions[atoms_ext[i].symbol]):
+        #             #Add a neighbor
+        #             self.CNs[i % len(self.atoms)] += 1
+        #             neighbors.append(j % len(self.atoms))
+        #     self.neighbors[i % len(self.atoms)] = get_unique_list(neighbors)
+
+        for i, atom1 in enumerate(self.atoms):
+          neighbors = []
+          for j, atom2 in enumerate(self.atoms):
+            if i == j:
+              continue
+
+            if (self.atoms.get_distance(i, j, mic = True) <= ((self.atom_radii[atom1.symbol] + self.atom_radii[atom2.symbol])*self.scale) and atom2.symbol not in self.exceptions[atom1.symbol]):
+              self.CNs[i] += 1
+              neighbors.append(j)
+          self.neighbors[i] = get_unique_list(neighbors)
             
     def calc_GCNs(self, update = True):
         """

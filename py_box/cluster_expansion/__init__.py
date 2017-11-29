@@ -6,14 +6,15 @@ from py_box.cluster_expansion.configuration import Configuration
 from py_box.cluster_expansion.configurations import Configurations
 from py_box.ase.In2O3 import run_In2O3_configuration
 from warnings import warn
+
 try:
     from sklearn.preprocessing import normalize
-else:
+except:
     pass
 
 try:
     from sklearn.linear_model import LassoCV
-else:
+except:
     pass
 
 def get_configuration_difference(train_mat, new_mat):
