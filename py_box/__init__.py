@@ -49,13 +49,13 @@ def get_null(mat, rtol=1e-5):
 def get_RMSE(xs_data, xs_fit):
     return np.sqrt(np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)]))
 
-def spherical_to_xyz(r = 1., theta = 0., psi = 0., degrees = True):
+def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
     if degrees:
         theta = np.radians(theta)
-        psi = np.radians(psi)
-    x = r * np.cos(theta) * np.sin(psi)
-    y = r * np.sin(theta) * np.sin(psi)
-    z = r * np.cos(psi)
+        psi = np.radians(phi)
+    x = r * np.cos(theta) * np.sin(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(phi)
     return np.array([x, y, z])
 
 def get_n_blanks(n):
