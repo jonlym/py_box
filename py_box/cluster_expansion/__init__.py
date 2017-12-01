@@ -115,7 +115,7 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
     #Read training structures
     print 'Reading configuration training data'
     configs_train = Configurations.from_vasp(train_path)
-    configs_train.set_E_fit()
+    configs_train.calc_E_fit()
     #Read all training structures
     print 'Reading all configuration data'
     configs_all = Configurations.from_excel(configs_all_path)
@@ -150,6 +150,7 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
         cv = np.average(clf.mse_path_[-1])
     else:
         cv = 1.
+        CE_E_new = np.zeros(len(configs_difference))
     #Start DFT calculation for structure
     j = 0
     new_structures = []

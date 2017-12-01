@@ -210,9 +210,9 @@ def run_In2O3_configuration(configuration, job_array = False, job_file = 'joblis
     if job_array:
         #Add the file to the job array
         with open(job_file, 'a') as job_ptr:
-            job_ptr.write(configuration.name)
+            job_ptr.write('{}\n'.format(configuration.name))
         with open(folder_file, 'a') as folder_ptr:
-            folder_ptr.write('{}{}'.format(rel_path, configuration.name))
+            folder_ptr.write('{}{}\n'.format(rel_path, configuration.name))
     else:
         os.chdir(os.path.join(rel_path, configuration.name))
         if submit_job:
