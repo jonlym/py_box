@@ -13,10 +13,13 @@ except:
     pass
     
 class Configurations(object):
-    def __init__(self, configurations = None, info = None, del_E_gas = 0.):
+    def __init__(self, configurations = None, info = None, del_E_gas = 0., E_min = None, E_max = None, n_max = None):
         self._configurations = list(configurations)
         self.info = info
         self.del_E_gas = del_E_gas
+        self.E_min = E_min
+        self.E_max = E_max
+        self.n_max = n_max
 
     def append(self, configuration):
         self._configurations.append(configuration)
@@ -76,7 +79,7 @@ class Configurations(object):
 
         for i in indices:
             configurations.append(copy(self[i]))
-        return Configurations(configurations = configurations)
+        return Configurations(configurations = configurations, E_min = self.E_min, E_max = self.E_max, n_max = self.n_max)
 
     def write_to_excel(self, file_name):
         """
@@ -258,7 +261,8 @@ class Configurations(object):
                         configurations.append(Configuration(name = name,
                                                             sigma = sigma,
                                                             E_DFT = E_DFT,
-                                                            n_nodes = n_nodes))
+                                                            n_nodes = n_nodes,
+                                                            atoms = atoms))
         return cls(configurations = configurations, info = info, del_E_gas = del_E_gas)
 
 def convert_CE_to_DFT(n, n_max, E, E_min, E_max):

@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+import argparse
+import numpy as np
+import re
+from ase.io import read
+from ase.visualize import view
+from os import getcwd, walk
+from os.path import exists, join
+
+
+parser = argparse.ArgumentParser(description = "Displays the images of the transition state calculation in the current folder. Requires folders to be of the format ##.")
+parser.add_argument("read_file", default = 'POSCAR', help = "File that contains the image. Default is 'POSCAR'.")
+args = parser.parse_args()
+read_file = args.read_file
+
+#Setting up np.array type
+values = []    
+dtype = [('path', 'a40'), ('image', 'O')]
+
+#Try reading the initial image for relative energies
+if exists('00/POSCAR'):
+    initial = read('00/POSCAR')
+    values.append(('00', initial))
+elif exists('intitial/POSCAR'):
+    initial = read('initial/POSCAR')
+    values.append(('00', initial))
+else:
+    print "Initial image POSCAR not found."
+
+for root, dirs, files in walk(getcwd()):
+    for directory in dirs:
+        #If the folder has the form ## but not 00
+        if re.search('([0-9][1-9]|[1-9][0-9])', directory) is not None and '-' not in directory:
+            #Check if folder is interpolated.
+            full_path = join(root, directory)
+            image_path = re.search('[0-9]{2}-[0-9]{2}.*([0-9][1-9]|[1-9][0-9])', full_path)
+            if image_path is None:
+                image_path = directory
+            else:
+                image_path = image_path.group(0)
+
+            try:      
+                image = read('%s/%s' % (full_path, read_file))
+            except (IndexError, IOError):
+                print "%s at %s not found" % (read_file, full_path)
+            else:
+                values.append((image_path, image))
+#Sort values and print
+unsorted_values = np.array(values, dtype=dtype)
+sorted_values = np.sort(unsorted_values, order = 'path')
+print "Image #\tPath"
+for i, values in enumerate(sorted_values):
+    if values['path'] == '00':
+        values['path'] = 'initial'
+    print "%d\t%s" % (i, values['path'])
+images = sorted_values['image'].tolist()
+if exists('final/POSCAR'):
+    final = read('final/POSCAR')
+    images.append(final)
+    print "%d\tfinal" % (i+1)
+view(images)

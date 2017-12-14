@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+"""
+Created on Thu Apr 27 11:24:22 2017
+
+@author: Jonathan Lym
+"""
+
+import argparse
+#from warnings import warn
+from os import getcwd, chdir
+from os.path import isdir, exists
+
+#Parse arguments
+parser = argparse.ArgumentParser(description = "Checks the paths in joblist.txt and folderlist.txt to ensure they exist for Job Array Submission.")
+parser.add_argument("job_file", nargs='?', default = './joblist.txt', help = "File that contains job names.")
+parser.add_argument("folder_file", nargs='?', default = './folderlist.txt', help = "File that contains paths to jobs.")
+args = parser.parse_args()
+job_file = args.job_file
+folder_file = args.folder_file
+
+home_dir = getcwd()
+with open(job_file, 'r') as job_ptr, open(folder_file, 'r') as folder_ptr:
+    for i, (job, folder) in enumerate(zip(job_ptr, folder_ptr)):
+        #Check if folder exists
+        job = job.replace('\n', '')
+        folder = folder.replace('\n', '')
+        chdir(folder)
+        if 'Completed {}.py'.format(job) in open('{}.py'.format(job), 'r').read():
+            print '{}  {}.py Complete'.format(i, job)
+        else:
+            print '{}  {}.py Incomplete'.format(i, job)
+        chdir(home_dir)
