@@ -396,3 +396,4 @@ def read_ref(path, verbose = True):
     H0_rxn = H0_exp - np.dot(ref_species_from_fund, H0_fund) #Since H0_fund = 0, this is H0_exp
     energies_fund = np.linalg.solve(ref_species_from_fund, (H0_dft-H0_rxn)) #Energy of fundamental species. Used as correction factor
     return (energies_fund, fund_species_CHON, rm_list)
+    

@@ -3,27 +3,13 @@
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description='Submits a Chemkin job to the queueing system on Squidward')
-parser.add_argument('path', nargs = '?', type = str, default = '.', help = 'Location in which INP.d file is located. Default is the current directory')
-parser.add_argument('name', nargs = '?' type = str, default = None, help = 'Name of job. Default is the name of the folder it is in.')
-parser.add_argument('-v', '--version', nargs = '?', type = str, default ='113', help = 'Version of Chemkin to use. Default is 113')
-parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command.')
-parser.add_argument('-n', 'n_cores', nargs = '?', type = str, default = '1', help = 'Number of cores. Default is 1.')
-
-args = parser.parse_args()
-path = args.path
-name = args.name
-version = args.version
-submit = args.submit
-n_cores = args.n_cores
-email = os.environ['EMAIL']
-
-template = """#!/bin/bash
+qchemkin_template = """#!/bin/bash
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
 #$ -pe openmpi-mx __n_cores
 #$ -q *@@3rd_gen
+#$ -o __name.stdout
 #$ -m beas
 #$ -M __email
 #  This script is designed to copy input and output files into a unique
@@ -37,10 +23,13 @@ template = """#!/bin/bash
 #+ University of Delaware, 2012/08/23.
 #+ Last updated: 2013/11/26.
 
+#Import packages
+vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc
+
 #  Define the path to the binary. For testing, this will be the local directory,
 #+ but for production runs, this will be the location of the compiled binary
 #+ on the server/cluster.
-CKPATH='/opt/shared/home/vlachos/hezgi/chemkin/__version'
+CKPATH='/opt/shared/home/vlachos/hezgi/chemkin/versions/__version'
 
 #Convert all tabs to spaces in the input directory files
 cd INP.d
@@ -87,10 +76,26 @@ echo 'Running model'
 echo 'Done running model'
 """
 
+parser = argparse.ArgumentParser(description='Submits a Chemkin job to the queueing system on Squidward')
+parser.add_argument('path', nargs = '?', type = str, default = '.', help = 'Location in which INP.d file is located. Default is the current directory')
+parser.add_argument('name', nargs = '?', type = str, default = None, help = 'Name of job. Default is the name of the folder it is in.')
+parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', help = 'Version of Chemkin to use. Default is 116')
+parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command.')
+parser.add_argument('-n', '--n_cores', nargs = '?', type = str, default = '1', help = 'Number of cores. Default is 1.')
+
+args = parser.parse_args()
+path = args.path
+name = args.name
+version = args.version
+submit = args.submit
+n_cores = args.n_cores
+email = os.environ['EMAIL']
+
 abs_path = os.path.abspath(path)
 if name is None:
-    name = os.path.dirname(abs_path)
+    name = os.path.split(abs_path)[-1]
 qs_name = '{}.qs'.format(name)
+qs_path = os.path.join(abs_path, qs_name)
 
 print 'Writing script with options:'
 print '\tPath = {}'.format(os.path.abspath(path))
@@ -99,11 +104,11 @@ print '\tVersion = {}'.format(version)
 print '\tn_cores = {}'.format(n_cores)
 print '\tE-mail = {}'.format(email)
 
-with open(os.path.join(path, qs_name), 'w') as script_ptr:
-    script_ptr.write(template.replace('__email', email).replace('__version', version).replace('__n_cores', n_cores))
+with open(qs_path, 'w') as script_ptr:
+    script_ptr.write(qchemkin_template.replace('__email', email).replace('__version', version).replace('__n_cores', n_cores).replace('__name', name))
 
 if submit:
-    os.system('qsub {}'.format(path, qs_name))
+    os.system('qsub {}'.format(qs_path))
     print 'Successfully submitted {}'.format(qs_name)
 else:
-print 'Don\'t forget to submit using qsub {}!'.format(qs_name)
+    print 'Don\'t forget to submit using qsub {}!'.format(qs_name)
