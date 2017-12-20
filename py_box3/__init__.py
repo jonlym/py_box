@@ -40,7 +40,7 @@ def get_unique_list(data: list):
     keys = {}
     for item in data:
         keys[item] = 1
-    return keys.keys()
+    return list(keys.keys())
 
 def plot_parity(x: np.ndarray, y: np.ndarray, decimals: int = 2):
     """
