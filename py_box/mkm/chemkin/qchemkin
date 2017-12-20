@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 
 import argparse
+import getpass
 import os
 
+def get_email():
+  """
+  Returns the user's e-mail address.
+  """
+  return '{}@udel.edu'.format(getpass.getuser())
+
+ckpath = '/opt/shared/home/vlachos/hezgi/chemkin/versions/'
 qchemkin_template = """#!/bin/bash
 #$ -cwd
 #$ -j y
@@ -23,13 +31,13 @@ qchemkin_template = """#!/bin/bash
 #+ University of Delaware, 2012/08/23.
 #+ Last updated: 2013/11/26.
 
-#Import packages
+#Import packages for submission to cluster
 vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc
 
 #  Define the path to the binary. For testing, this will be the local directory,
 #+ but for production runs, this will be the location of the compiled binary
 #+ on the server/cluster.
-CKPATH='/opt/shared/home/vlachos/hezgi/chemkin/versions/__version'
+CKPATH='__ckpath'
 
 #Convert all tabs to spaces in the input directory files
 cd INP.d
@@ -76,39 +84,47 @@ echo 'Running model'
 echo 'Done running model'
 """
 
+#Receive inputs
 parser = argparse.ArgumentParser(description='Submits a Chemkin job to the queueing system on Squidward')
-parser.add_argument('path', nargs = '?', type = str, default = '.', help = 'Location in which INP.d file is located. Default is the current directory')
 parser.add_argument('name', nargs = '?', type = str, default = None, help = 'Name of job. Default is the name of the folder it is in.')
-parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', help = 'Version of Chemkin to use. Default is 116')
-parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command.')
+parser.add_argument('path', nargs = '?', type = str, default = '.', help = 'Location in which INP.d file is located. Default is the current directory.')
+parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', help = 'Version of Chemkin to use. Available versions may be found at path {}. Default is 116.'.format(ckpath))
+parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command. Overrides the -l argument.')
+parser.add_argument('-l', '--local', action = 'store_true', default = False, help = 'Runs Chemkin on the head node.')
 parser.add_argument('-n', '--n_cores', nargs = '?', type = str, default = '1', help = 'Number of cores. Default is 1.')
 
+#Parse inputs
 args = parser.parse_args()
-path = args.path
-name = args.name
-version = args.version
-submit = args.submit
-n_cores = args.n_cores
-email = os.environ['EMAIL']
+args.email = get_email()
 
-abs_path = os.path.abspath(path)
-if name is None:
-    name = os.path.split(abs_path)[-1]
-qs_name = '{}.qs'.format(name)
+#Process job name
+abs_path = os.path.abspath(args.path)
+if args.name is None:
+    args.name = os.path.split(abs_path)[-1]
+qs_name = '{}.qs'.format(args.name)
 qs_path = os.path.join(abs_path, qs_name)
 
-print 'Writing script with options:'
-print '\tPath = {}'.format(os.path.abspath(path))
-print '\tName of job = {}'.format(name)
-print '\tVersion = {}'.format(version)
-print '\tn_cores = {}'.format(n_cores)
-print '\tE-mail = {}'.format(email)
+#Process job path
 
+#Replacing fields in template script with options
+print 'Submitting job using qchemkin with the following options:'
+for key, val in vars(args).iteritems():
+    print '{}\t{}'.format(key, val)
+    if 'version' in key:
+        ckpath = os.path.join(ckpath, val)
+        qchemkin_template = qchemkin_template.replace('__ckpath', ckpath)
+    else:
+        qchemkin_template = qchemkin_template.replace('__{}'.format(key), str(val))
+
+#Writing script and changing permission to executable
 with open(qs_path, 'w') as script_ptr:
-    script_ptr.write(qchemkin_template.replace('__email', email).replace('__version', version).replace('__n_cores', n_cores).replace('__name', name))
+    script_ptr.write(qchemkin_template)
+os.system('chmod +x {}'.format(qs_path))
 
-if submit:
+#Submitting job.
+if args.submit:
     os.system('qsub {}'.format(qs_path))
-    print 'Successfully submitted {}'.format(qs_name)
+elif args.local:
+    os.system(qs_path)
 else:
     print 'Don\'t forget to submit using qsub {}!'.format(qs_name)
