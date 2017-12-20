@@ -102,8 +102,8 @@ def c(units: str):
     > cm/s    
     """
     c_dict = {
-        'm/s': 299792458,
-        'cm/s': 299792458e2,
+        'm/s': 299792458.,
+        'cm/s': 299792458.e2,
     }
     try:
         return c_dict[units]
@@ -183,8 +183,8 @@ def T0(units: str):
     > R
     > F
     """
-    T0_units = {
-    'K': 298.,
+    T0_dict = {
+    'K': 298.15,
     'C': 25.,
     'R': 533.07,
     'F': 73.4

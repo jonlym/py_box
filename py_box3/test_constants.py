@@ -11,6 +11,28 @@ class TestConstants(unittest.TestCase):
 		self.assertEqual(c.h('J s', bar = False), 6.626070040e-34)
 		self.assertEqual(c.h('J s', bar = True), 6.626070040e-34/(2.*np.pi))
 
+	def test_kb(self):
+		self.assertEqual(c.kb('J/K'), 1.38064852e-23)
+
+	def test_c(self):
+		self.assertEqual(c.c('m/s'), 299792458.)
+
+	def test_me(self):
+		self.assertEqual(c.m_e('amu'), 5.48579909070e-4)
+
+	def test_m_p(self):
+		self.assertEqual(c.m_p('amu'), 1.007276466879)
+
+	def test_m_p(self):
+		self.assertEqual(c.m_p('amu'), 1.007276466879)
+
+	def test_P0(self):
+		self.assertEqual(c.P0('atm'), 1.)
+
+	def test_T0(self):
+		self.assertEqual(c.T0('K'), 298.15)
+
+
 	def test_convert_unit(self):
 		self.assertEqual(c.convert_unit(num = 0., from_ = 'C', to = 'K'), 273.15)
 		self.assertEqual(c.convert_unit(from_ = 'm', to = 'cm'), 100.)
