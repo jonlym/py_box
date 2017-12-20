@@ -5,9 +5,9 @@ from ase.visualize import view
 
 parser = argparse.ArgumentParser(description='Takes a file and moves the atoms based on the cell.')
 parser.add_argument('path_in', type = str, help = '<Required> Location the file will be read.')
-parser.add_argument('-i', '--indices', nargs = '+', help = '<Required> List of atom indices.')
-parser.add_argument('-c', '--cell', nargs = '+', help = 'Cell dimension to use to move the atoms.')
-parser.add_argument('-o', '--offset', nargs = '+', help = 'Direction and offset for cell dimensions.')
+parser.add_argument('-i', '--indices', nargs = '+', type = int, help = '<Required> List of atom indices.', required = True)
+parser.add_argument('-c', '--cell', nargs = '+', type = int, help = 'Cell dimension to use to move the atoms.', required = True)
+parser.add_argument('-o', '--offset', nargs = '+', type = int, help = 'Direction and offset for cell dimensions.', required = True)
 
 args = parser.parse_args()
 
@@ -16,17 +16,17 @@ atoms = read(args.path_in)
 
 #Move atoms
 for (i, cell, offset) in zip(args.indices, args.cell, args.offset):
-    cell_dir = offset*atoms.get_cell()[abs(cell_i)]
-    print "Moving atom {}{} by {}}".format(atoms[i].symbol, i, np.array_str(cell_dir))
-    atoms_obj[i].position += cell_dir
+    cell_dir = float(offset)*atoms.get_cell()[cell]
+    print "Moving atom {}{} by {}".format(atoms[i].symbol, i, cell_dir)
+    atoms[i].position += cell_dir
 
 #Output
-view(atoms_obj)
-print "Overwrite {} (Y/N)?".format(in_path)
+view(atoms)
+print "Overwrite {} (Y/N)?".format(args.path_in)
 overwrite = raw_input('>>')
 if overwrite.lower() == 'y':
-    out_path = in_path
+    out_path = args.path_in
 else:
-    out_path = '{}_fix'.format(in_path)
-write(out_path, atoms_obj)
+    out_path = '{}_fix'.format(args.path_in)
+write(out_path, atoms)
 print "Completed move_atoms_by_cell."
