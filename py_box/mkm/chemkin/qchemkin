@@ -16,10 +16,10 @@ qchemkin_template = """#!/bin/bash
 #$ -j y
 #$ -S /bin/bash
 #$ -pe openmpi-mx __n_cores
-#$ -q *@@3rd_gen
 #$ -o __name.stdout
 #$ -m beas
 #$ -M __email
+__queue
 #  This script is designed to copy input and output files into a unique
 #+ directory within the parent directory in order to facilitate 
 #+ keeping track of individual job runs. This should allow a user to
@@ -92,6 +92,7 @@ parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', 
 parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command. Overrides the -l argument.')
 parser.add_argument('-l', '--local', action = 'store_true', default = False, help = 'Runs Chemkin on the head node.')
 parser.add_argument('-n', '--n_cores', nargs = '?', type = str, default = '1', help = 'Number of cores. Default is 1.')
+parser.add_argument('-q', '--queue', nargs = '?', type = str, default = '', help = 'Queue to use. Default is "". Enter "#$ -q *@@3rd_gen" for third generation.')
 
 #Parse inputs
 args = parser.parse_args()
