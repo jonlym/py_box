@@ -64,7 +64,7 @@ def get_RMSE(xs_data, xs_fit):
 def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
     if degrees:
         theta = np.radians(theta)
-        psi = np.radians(phi)
+        phi = np.radians(phi)
     x = r * np.cos(theta) * np.sin(phi)
     y = r * np.sin(theta) * np.sin(phi)
     z = r * np.cos(phi)
