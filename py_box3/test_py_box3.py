@@ -40,6 +40,17 @@ class TestConstants(unittest.TestCase):
 		
 		self.assertAlmostEqual(py_box3.get_RMSE(xs_data = xs_data, xs_fit = xs_fit), 0.052678418)
 
+	def test_spherical_to_xyz(self):
+		rs = np.array([3., 1., 1., 2.])
+		thetas = np.array([45., 90., np.pi/2., -np.pi/2.])
+		phis = np.array([45., 30., np.pi/6., -np.pi/6.])
+		degrees = [True, True, False, False]
+		results = np.array([[1.5, 1.5, 2.12132], [0., 0.5, 0.866025], [0., 0.5, 0.866025], [0., 1., 1.732051]])
+		for r, theta, phi, degree, result in zip(rs, thetas, phis, degrees, results):
+			np.testing.assert_array_almost_equal(py_box3.spherical_to_xyz(r = r, theta = theta, phi = phi, degrees = degree), result)
+
+	def test_get_n_blanks(self):
+		self.assertEqual(py_box3.get_n_blanks(n = 3), '   ')
 
 
 if __name__ == '__main__':

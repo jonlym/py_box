@@ -117,7 +117,7 @@ def main():
                         print(x, end=' ')
                     print()
         else:
-            from py_box.ase.gui.gui import GUI
+            from py_box3.ase.gui.gui import GUI
             import ase.gui.gtkexcepthook
             ase
             gui = GUI(images, opt.rotations, opt.show_unit_cell, opt.bonds)

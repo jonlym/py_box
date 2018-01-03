@@ -4,48 +4,47 @@ Created on Mon Sep 26 16:38:29 2016
 
 @author: Jonathan Lym
 """
-
-from py_box.ase.atom import Atom
-from py_box.ase.atoms import Atoms
 import numpy as np
 import warnings
 from datetime import datetime, timedelta
 from platform import system
-from pprint import pprint
 from ase.visualize import view
 from ase.calculators.vasp import Vasp
 import copy
 
-__all__ = ['Atoms', 'Atom']
-
 def get_distance(position1, position2, vector = False):
+    """
+    Provides the distance between two numpy arrays. If vector is True, a numpy array with the
+    same dimensions will be returned. Otherwise, a scalar will be returned.
+    """
     if vector:
         return position1 - position2
     else:
         return np.sqrt(np.sum([(x1-x2)**2 for x1, x2 in zip(position1, position2)]))
 
-def run_testRun(atoms_obj):
-    print 'Test Run'
+def run_testRun(atoms):
+    """
+    If running on Linux, prints the ASE Atoms object.
+    """
+    print('Test Run')
     os_name = system()
-#    if type(atoms_obj) is list:        
-#        for i in range(len(atoms_obj)):    
-#            pprint(vars(atoms_obj[i]))
-#    else:
-#        pprint(vars(atoms_obj))
     if os_name.lower() == 'linux':
-        view(atoms_obj)
+        view(atoms)
         
-def print_magmom(atoms_obj):
+def print_magmom(atoms):
     """
     Prints the magnetic moment associated with each atom.
     """
     calc = Vasp(istart = 1)
-    atoms_obj.set_calculator(calc)
-    print 'Atom Index\tAtom Type\tMagmom'
-    for atom in atoms_obj:
-         print '%d\t%s\t%f' % (atom.index, atom.symbol, atom.magmom)
+    atoms.set_calculator(calc)
+    print('Atom Index\tAtom Type\tMagmom')
+    for atom in atoms:
+         print('{}}\t{}}\t{}}'.format(atom.index, atom.symbol, atom.magmom))
 
 def print_run_time(out_file):
+    """
+    For an output file, determines the time taken for each ionic step to complete.
+    """
     times = []
     diff_times = []
     i = 0
@@ -54,7 +53,7 @@ def print_run_time(out_file):
             if 'LBFGS' in line:
                 times.append(datetime.strptime(line[12:20], '%H:%M:%S'))
                 i += 1
-    print 'Number of steps: %d' % (i+1)
+    print('Number of steps: {}'.format(i+1))
     diff_times_sec = np.zeros(len(times)-1)
     for i in range(len(times)-1):
         diff_times.append(times[i+1] - times[i])
@@ -64,21 +63,21 @@ def print_run_time(out_file):
 
     mean_sec = np.mean(diff_times_sec)
     if mean_sec > 3600.:
-        print 'Mean time per step: %f hours' % (mean_sec/3600.)
+        print('Mean time per step: {} hours'.format(mean_sec/3600.))
     elif mean_sec > 60.:
-        print 'Mean time per step: %f minutes' % (mean_sec/60.)
+        print('Mean time per step: {} minutes'.format(mean_sec/60.))
     else:
-        print 'Mean time per step: %f seconds' % mean_sec
+        print('Mean time per step: {} seconds'.format(mean_sec)
         
     tot_sec = np.sum(diff_times_sec)
     if tot_sec > 86400.:
-        print 'Total time: %f days' % (tot_sec/86400.)        
+        print('Total time: {} days'.format(tot_sec/86400.))   
     if tot_sec > 3600.:
-        print 'Total time: %f hours' % (tot_sec/3600.)
+        print('Total time: {} hours'.format(tot_sec/3600.))
     elif tot_sec > 60.:
-        print 'Total time: %f minutes' % (tot_sec/60.)
+        print('Total time: {} minutes'.format(tot_sec/60.))
     else:
-        print 'Total time: %f seconds' % tot_sec
+        print('Total time: {} seconds'.format(tot_sec))
         
 def switch_atoms(atoms, i, j):
     """
@@ -89,34 +88,32 @@ def switch_atoms(atoms, i, j):
     atoms[j].position = atoms_copy[i].position
     return atoms
 
-def check_bond_lengths(atoms_obj, change_len = False, bond_warning = False, bond_len = 0.9):
+def check_bond_lengths(atoms, change_len = False, bond_warning = False, bond_len = 0.9):
     """
     This script goes through an ASE Atoms Object and checks whether any atoms
     are too close. If it finds such a case, it will print a message and change
     the bond length to the critical value
     """
-    print "Checking Atoms object: %s for small bond lengths." % atoms_obj.get_chemical_formula()
-    for atom1 in atoms_obj:
+    print("Checking Atoms object: {} for small bond lengths.").format(atoms.get_chemical_formula())
+    for atom1 in atoms:
         i1 = atom1.index
         if atom1.symbol != 'H':
             fix = 0
         else:
             fix = 1
 
-        for atom2 in atoms_obj:
+        for atom2 in atoms:
             i2 = atom2.index
             if i1 != i2:
-                d = atoms_obj.get_distance(i1, i2)
+                d = atoms.get_distance(i1, i2)
                 if d < bond_len:
-                    print "Atoms %s(%d) and %s(%d) have a bond length of %f" % (atom1.symbol, atom1.index,
-                                                                                atom2.symbol, atom2.index,
-                                                                                d)
+                    print("Atoms {}({}) and {}({}) have a bond length of {}".format(atom1.symbol, atom1.index, atom2.symbol, atom2.index, d))
                     bond_warning = True
                     if change_len:
-                        print "Setting distance to default value of %f" % bond_len
-                        atoms_obj.set_distance(i1, i2, bond_len, fix = fix)
+                        print("Setting distance to default value of {}".format(bond_len))
+                        atoms.set_distance(i1, i2, bond_len, fix = fix)
     if bond_warning == False:
-        print "All distances are farther than %f" % bond_len
+        print("All distances are farther than {}".format(bond_len))
 
 DFT_E_gas = {
     'H2': -6.759196,
