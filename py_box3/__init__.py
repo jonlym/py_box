@@ -85,7 +85,7 @@ def spherical_to_xyz(r: float = 1., theta: float = 0., phi: float = 0., degrees:
     """
     if degrees:
         theta = np.radians(theta)
-        psi = np.radians(phi)
+        phi = np.radians(phi)
     x = r * np.cos(theta) * np.sin(phi)
     y = r * np.sin(theta) * np.sin(phi)
     z = r * np.cos(phi)
