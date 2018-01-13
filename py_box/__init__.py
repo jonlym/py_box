@@ -6,6 +6,7 @@ Created on Wed Nov 23 21:10:42 2016
 """
 
 import numpy as np
+from itertools import product, izip
 from datetime import datetime
 
 
