@@ -72,3 +72,6 @@ def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
 
 def get_n_blanks(n):
     return ' '*n
+
+def dict_product(dicts):
+    return (dict(izip(dicts, x)) for x in product(*dicts.itervalues()))

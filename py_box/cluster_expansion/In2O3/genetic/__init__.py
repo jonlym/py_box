@@ -1,9 +1,10 @@
-from py_box import get_time
+from py_box import get_time, get_RMSE
 from py_box.cluster_expansion import get_correlation_matrix
 import random
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+from mpi4py import MPI
 
 def get_clusters(individual, clusters_all):
 	indices = [i for i, j in enumerate(individual) if j]
@@ -31,7 +32,7 @@ def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10
 		rmses[i] = rmse
 	return (np.mean(rmses),)
 
-def make_initial_population(COMM, toolbox):
+def make_initial_population(COMM, toolbox, n):
 	if COMM.rank == 0:
 		print '\t{}  Core {}  Building initial population'.format(get_time(), COMM.rank)
 		population = toolbox.population(n = n)
@@ -74,7 +75,7 @@ def evaluate_population(COMM, toolbox, population):
 def generate_offspring(COMM, toolbox, population, cxpb):
 	if COMM.rank == 0:
         	print '\t{}  Core {}  Generating offspring'.format(get_time(), COMM.rank)
-		offspring = toolbox.select(population, len(population))
+		offspring = toolbox.select(population)
 		offspring = [toolbox.clone(individual) for individual in offspring]
 
 		#Apply crossover and mutation on the offspring
@@ -93,9 +94,8 @@ def mutate_offspring(COMM, toolbox, population, mutpb):
     		print '\t{}  Core {}  Mutating offspring'.format(get_time(), COMM.rank)
 		#print '\tApplying mutations'
 		for mutant in population:
-			if random.random() < mutpb:
-				toolbox.mutate(mutant)
-				del mutant.fitness.values
+			toolbox.mutate(mutant)
+			del mutant.fitness.values
 	else:
 		population = None
 	return population
