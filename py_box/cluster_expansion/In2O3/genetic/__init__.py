@@ -4,7 +4,14 @@ import random
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-from mpi4py import MPI
+try:
+	from mpi4py import MPI
+except:
+	pass
+
+def individual_generator(clusters):
+    for cluster in clusters:
+        yield random.random/cluster.n_nodes > 0.5
 
 def get_clusters(individual, clusters_all):
 	indices = [i for i, j in enumerate(individual) if j]
@@ -19,13 +26,17 @@ def split_data(configs_all, E_all, pi_all, kfold):
 
 def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10):
 	clusters = get_clusters(individual, clusters_all)
+        print 'Size of individual: {}'.format(np.sum([1 for x in individual if x]))
+        print 'Size of clusters: {}'.format(len(clusters))
+        for cluster in clusters:
+		print cluster.name
 	E_all = configs_all.get_E_fit(update = True)
 	pi_all = get_correlation_matrix(configurations = configs_all, clusters = clusters)
 
 	rmses = np.zeros(shape = (n_repeats, 1))
 	for i in xrange(n_repeats):
 		(configs_test, pi_train, pi_test, E_train, E_test) = split_data(configs_all = configs_all, E_all = E_all, pi_all = pi_all, kfold = kfold)
-		regr = linear_model.LinearRegression(fit_intercept = True, n_jobs = -1)
+		regr = linear_model.LinearRegression(fit_intercept = False, n_jobs = -1)
 		regr.fit(pi_train, E_train)
 		E_test = regr.predict(pi_test)
 		rmse = get_RMSE(configs_test.get_E_fit(), E_test)
@@ -89,7 +100,7 @@ def generate_offspring(COMM, toolbox, population, cxpb):
 		offspring = None
 	return offspring
 
-def mutate_offspring(COMM, toolbox, population, mutpb):
+def mutate_offspring(COMM, toolbox, population):
 	if COMM.rank == 0:
     		print '\t{}  Core {}  Mutating offspring'.format(get_time(), COMM.rank)
 		#print '\tApplying mutations'
