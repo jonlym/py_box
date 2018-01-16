@@ -9,14 +9,17 @@ try:
 except:
 	pass
 
-def individual_generator(clusters):
-	while True:
-	    for cluster in clusters:
-	    	#Always include the empty cluster
+def individual_generator(clusters, n = 0.5):
+	for cluster in clusters:
+		#Always include the empty cluster
 	    	if cluster.n_nodes == 0:
 	    		yield True
 	    	else:
-		        yield random.random()/cluster.n_nodes > 0.5
+			rnd_num = random.random()
+		        yield (rnd_num/cluster.n_nodes > n)
+
+def get_ID(individual):
+	pass
 
 def get_clusters(individual, clusters_all):
 	indices = [i for i, j in enumerate(individual) if j]
@@ -31,10 +34,6 @@ def split_data(configs_all, E_all, pi_all, kfold):
 
 def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10):
 	clusters = get_clusters(individual, clusters_all)
-        print 'Size of individual: {}'.format(np.sum([1 for x in individual if x]))
-        print 'Size of clusters: {}'.format(len(clusters))
-        for cluster in clusters:
-		print cluster.name
 	E_all = configs_all.get_E_fit(update = True)
 	pi_all = get_correlation_matrix(configurations = configs_all, clusters = clusters)
 
