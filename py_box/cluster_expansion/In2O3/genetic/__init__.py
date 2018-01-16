@@ -9,14 +9,13 @@ try:
 except:
 	pass
 
-def individual_generator(clusters):
-	while True:
-	    for cluster in clusters:
-	    	#Always include the empty cluster
-	    	if cluster.n_nodes == 0:
-	    		yield True
-	    	else:
-		        yield random.random()/cluster.n_nodes > 0.5
+def individual_generator(clusters, n = 0.5):
+    for cluster in clusters:
+    	#Always include the empty cluster
+    	if cluster.n_nodes == 0:
+    		yield True
+    	else:
+	        yield random.random()/cluster.n_nodes > n
 
 def get_clusters(individual, clusters_all):
 	indices = [i for i, j in enumerate(individual) if j]
