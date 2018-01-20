@@ -9,17 +9,47 @@ import numpy as np
 from itertools import product, izip
 from datetime import datetime
 
+hex_to_bin_dict = {'0': '0000',
+                   '1': '0001',
+                   '2': '0010',
+                   '3': '0011',
+                   '4': '0100',
+                   '5': '0101',
+                   '6': '0110',
+                   '7': '0111',
+                   '8': '1000',
+                   '9': '1001',
+                   'a': '1010',
+                   'b': '1011',
+                   'c': '1100',
+                   'd': '1101',
+                   'e': '1110',
+                   'f': '1111'}
 
-def base10_to_base3(n, width):
-    nums = np.zeros(shape = (width, ))
-    if n == 0:
-        return nums
+def convert_hex_to_bin(hex_string, n):
+    out = '0'*(n - 4*len(hex_string))
+    hex_string = hex_string.replace('0x', '')
+    for val in hex_string:
+        out = '{}{}'.format(out, hex_to_bin_dict[val])
+    return out
+
+def basen_to_base10(num, n):
+    out = 0
+    length = len(num)
+    for i, val in enumerate(num):
+        out += int(val) * (n**(length - i - 1))
+    return out
+
+def base10_to_basen(num, n, width):
+    out = np.zeros(shape = (width, ))
+    if num == 0:
+        return out
     i = 0
-    while n:
-        n, r = divmod(n, 3)
-        nums[i] = r
+    while num:
+        num, r = divmod(num, n)
+        out[i] = r
         i += 1
-    return nums[::-1]
+    return out[::-1]
 
 def any_alpha(string):
     """Returns True if any alphabetic characters are in the string. False otherwise"""
