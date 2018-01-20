@@ -9,6 +9,20 @@ try:
 except:
     pass
 
+def get_bit_string(individual):
+	bitstring = ''
+	for chromosome in individual:
+		if chromosome:
+			x = '1'
+		else:
+			x = '0'
+		bitstring = '{}{}'.format(bitstring, x)
+	return bitstring
+
+def get_hex_string(individual):
+	bitstring = get_bit_string(individual)
+	return hex(int(bitstring, 2))
+
 def compare_individuals(individual1, individual2):
     out = np.zeros(len(individual1))
     for i, (x1, x2) in enumerate(zip(individual1, individual2)):
@@ -181,9 +195,9 @@ def find_best_individual(COMM = None, population = None):
     if rank == 0:
         fitnesses = get_fitnesses(population)
         i = np.where(fitnesses == max(fitnesses))[0][0]
-        print 'Individual with best fitness:'
-        print 'Fitness = {} eV'.format(population[i].fitness.values[0])
-        print population[i]
+        print '\tIndividual with best fitness:'
+        print '\tFitness = {} eV'.format(population[i].fitness.values[0])
+        print '\tHex code: {}'.format(get_hex_string(population[i]))
 
 def get_fitnesses(population):
     return np.array([individual.fitness.values for individual in population])

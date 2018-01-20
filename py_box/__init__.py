@@ -106,3 +106,4 @@ def get_n_blanks(n):
 
 def dict_product(dicts):
     return (dict(izip(dicts, x)) for x in product(*dicts.itervalues()))
+
