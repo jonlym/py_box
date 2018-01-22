@@ -4,10 +4,21 @@ import random
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+import pickle
 try:
     from mpi4py import MPI
 except:
     pass
+
+def save_population(COMM = None, population = None, file_name = None):
+    if COMM is None:
+        rank = 0
+    else:
+        rank = COMM.rank
+
+    if rank == 0: 
+        with open(name, 'w') as f_ptr:
+            pickle.dump(population, f_ptr)
 
 def get_bit_string(individual):
 	bitstring = ''
