@@ -4,10 +4,21 @@ import random
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+import pickle
 try:
     from mpi4py import MPI
 except:
     pass
+
+def save_population(COMM = None, population = None, file_name = None):
+	if COMM is None:
+		rank = 0
+	else:
+		rank = COMM.rank
+
+	if rank == 0: 
+		with open(file_name, 'w') as f_ptr:
+			pickle.dump(population, f_ptr)
 
 def get_bit_string(individual):
 	bitstring = ''
@@ -120,11 +131,11 @@ def evaluate_population(COMM = None, toolbox = None, population = None):
     fitnesses_mpi = {}
     for i, individual_mpi in zip(jobs_mpi, population_mpi):
         fitnesses_mpi[i] = toolbox.evaluate(individual_mpi)
-        print '\t{}  Core {}  Finished evaluating individuals'.format(get_time(), rank)
-        if COMM is None:
-            fitnesses_list = [fitnesses_mpi]
-        else:
-            fitnesses_list = MPI.COMM_WORLD.gather(fitnesses_mpi, root = 0)
+    print '\t{}  Core {}  Finished evaluating individuals'.format(get_time(), rank)
+    if COMM is None:
+        fitnesses_list = [fitnesses_mpi]
+    else:
+        fitnesses_list = MPI.COMM_WORLD.gather(fitnesses_mpi, root = 0)
     if rank == 0:
         print '\t{}  Core {}  Assigning fitness to population.'.format(get_time(), rank)
         for fitnesses_dict in fitnesses_list:
