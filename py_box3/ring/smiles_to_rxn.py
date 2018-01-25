@@ -43,13 +43,13 @@ chem_dict = {
     '[{Cu}]O[{Cu}]': 'O(S)'
 }
 
-file_path = 'C:\Users\Jonathan Lym\Google Drive\UDel Documents\UDel Research\RING\RING_install\RING_program\Projects'
+file_path = 'C:\\Users\Jonathan Lym\Google Drive\\UDel Documents\\UDel Research\RING\RING_install\RING_program\Projects'
 #Do not put on the .txt file extension
 input_files = ['MethanolPathway', 'MethanolPathwayShort', 'CH4Pathway', 'HCOOHPathway', 'H2COHPathway', 'H2COPathway', 'CO2_Hydrogenation_All_Reactions']
 
 for input_file in input_files:
-    print "-"*15
-    print "Processing file: %s" % input_file 
+    print(("-"*15))
+    print(("Processing file: %s" % input_file)) 
     output_file = input_file+'_trans'
     f_in = open("%s\%s.txt" % (file_path, input_file), 'r')
     lines = f_in.readlines()
@@ -82,10 +82,10 @@ for input_file in input_files:
                     out_line += ' + '
         else:
             out_line = line
-        print out_line
+        print(out_line)
         f_out.write("%s\n" % out_line)
     f_out.close()
-    print 'Completed translating SMILES reactions from %s.txt.' % input_file
-    print 'Result written to:'
-    print '%s\%s.txt' % (file_path, output_file)
-print "All done translations!"
+    print(('Completed translating SMILES reactions from %s.txt.' % input_file))
+    print('Result written to:')
+    print(('%s\%s.txt' % (file_path, output_file)))
+print("All done translations!")

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import os
 import pickle
@@ -248,7 +248,7 @@ class GUI(View, Status):
         def key(item):
             return item[1][0]
 
-        for format, (description, code) in sorted(all_formats.items(),
+        for format, (description, code) in sorted(list(all_formats.items()),
                                                   key=key):
             io = get_ioformat(format)
             if io.read and description != '?':

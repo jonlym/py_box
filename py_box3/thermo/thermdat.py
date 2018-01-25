@@ -258,9 +258,9 @@ class thermdats(object):
         """
         Prints a summary of the thermdat list.
         """
-        print "Index\tSymbol"
+        print("Index\tSymbol")
         for i, thermdat in enumerate(self):
-            print "%d\t%s" % (i, thermdat.symbol)
+            print(("%d\t%s" % (i, thermdat.symbol)))
 
     def write_thermdat(self, thermdat_path, verbose = None):
         """
@@ -269,13 +269,13 @@ class thermdats(object):
         verbose = self._assign_verbose(verbose)
         with open(thermdat_path, 'w') as thermdat_file:
             if verbose:
-                print "Writing thermdat to path: %s" % thermdat_path
+                print(("Writing thermdat to path: %s" % thermdat_path))
             thermdat_file.write('THERMO ALL\n       100       500      1500\n')
             
             float_string = '%.8E'    
             for thermdat in self:
                 if verbose:
-                    print 'Writing species: %s' % thermdat.symbol
+                    print(('Writing species: %s' % thermdat.symbol))
                 self._write_line1(thermdat_file, thermdat)
                 self._write_line2(thermdat_file, thermdat, float_string)
                 self._write_line3(thermdat_file, thermdat, float_string)
@@ -400,21 +400,21 @@ class thermdats(object):
             reaction = self.print_reaction(stoich_vector = stoich_vector)
     
         if verbose and not list_calc:
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tH/RT"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tH/RT")
             
         for i, thermdat in zip(stoich_vector, self):
             if i != 0:
                 HoRT_species = thermdat.nasa.get_HoRT(T)
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f" % (thermdat.symbol, i, HoRT_species)
+                    print(("%s\t%.2f\t%.2f" % (thermdat.symbol, i, HoRT_species)))
                 HoRT_rxn += HoRT_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total H/RT\t\t%.2f" % HoRT_rxn
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total H/RT\t\t%.2f" % HoRT_rxn))
+            print(("-"*(10+len(reaction))))
         return HoRT_rxn
      
        
@@ -435,21 +435,21 @@ class thermdats(object):
             reaction = self.print_reaction(stoich_vector = stoich_vector)
     
         if verbose and not list_calc:
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tS/R"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tS/R")
     
         for i, thermdat_species in zip(stoich_vector, self):
             if i != 0:
                 SoR_species = thermdat_species.nasa.get_SoR(T)
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f" % (thermdat_species.symbol, i, SoR_species)
+                    print(("%s\t%.2f\t%.2f" % (thermdat_species.symbol, i, SoR_species)))
                 SoR_rxn += SoR_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total S/R\t\t%.2f" % SoR_rxn
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total S/R\t\t%.2f" % SoR_rxn))
+            print(("-"*(10+len(reaction))))
         return SoR_rxn
     
     def get_GoRT_rxn(self, T, reaction = None, stoich_vector = None, verbose = False):
@@ -472,10 +472,10 @@ class thermdats(object):
             HoRT_rxn = 0.
             SoR_rxn = 0.
     
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tH/RT\tS/R\tG/RT"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tH/RT\tS/R\tG/RT")
             
         for i, thermdat in zip(stoich_vector, self):
             if i != 0:
@@ -483,31 +483,31 @@ class thermdats(object):
                 SoR_species = thermdat.nasa.get_SoR(T)
                 GoRT_species = HoRT_species - SoR_species
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f\t%.2f\t%.2f" % (thermdat.symbol, i, HoRT_species, SoR_species, GoRT_species)
+                    print(("%s\t%.2f\t%.2f\t%.2f\t%.2f" % (thermdat.symbol, i, HoRT_species, SoR_species, GoRT_species)))
                     HoRT_rxn += HoRT_species*i
                     SoR_rxn += SoR_species*i
                 GoRT_rxn += GoRT_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total\t\t%.2f\t%.2f\t%.2f" % (HoRT_rxn, SoR_rxn, GoRT_rxn)
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total\t\t%.2f\t%.2f\t%.2f" % (HoRT_rxn, SoR_rxn, GoRT_rxn)))
+            print(("-"*(10+len(reaction))))
         return GoRT_rxn
         
     def write_to_excel(self, file_name = 'thermdat.xlsx'):
         """Takes a thermdat list and writes it to file_name."""
-        print "Creating %s workbook" % file_name
+        print(("Creating %s workbook" % file_name))
         book = xlwt.Workbook()
         #sh = book.get_sheet('Sheet 1')
         sh = book.add_sheet('Sheet 1')
     
-        print "Adding row headings"
+        print("Adding row headings")
         row_headings = [' ', 'T low', 'T_mid', 'T_high', 'Low Range', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', ' ', 'High Range', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7']
         col = 0
         for row, row_heading in enumerate(row_headings):
             sh.write(row, col, row_heading)
     
         for col, thermdat_species in enumerate(self):
-            print "Processing %s" % thermdat_species.symbol
+            print(("Processing %s" % thermdat_species.symbol))
             col_offset = 1
             row = 0
             sh.write(row, col+col_offset, thermdat_species.symbol)
@@ -605,7 +605,7 @@ def read_thermdat(thermdat_path, verbose = True, warn = True):
     symbols, temperature ranges and CHON fields.
     """
     if verbose:
-        print "Reading thermdat file: %s" % thermdat_path
+        print(("Reading thermdat file: %s" % thermdat_path))
     thermdats_obj = thermdats()
     #Possible atoms 
     atoms = ['C', 'H', 'O', 'N']
@@ -622,7 +622,7 @@ def read_thermdat(thermdat_path, verbose = True, warn = True):
                     symbol_index = line.find(' ')
                     symbol = line[0:symbol_index]
                     if verbose:
-                        print "Importing %s" % symbol
+                        print(("Importing %s" % symbol))
                     buf= line[symbol_index:-1]
                     CHON = []
                     for atom in atoms:
@@ -691,7 +691,7 @@ def _get_T_values(string, symbol, verbose = True):
         buf = re.search(pattern, string).group(0)
     except AttributeError:
         if verbose:
-            print "Warning: Unable to find temperature limits in species %s. Returning 0s." % (symbol)
+            print(("Warning: Unable to find temperature limits in species %s. Returning 0s." % (symbol)))
         return [0, 0, 0]
     T_limits = re.split(" +", buf)
     T_out = []
@@ -699,7 +699,7 @@ def _get_T_values(string, symbol, verbose = True):
         T_out.append(float(T))
     if len(T_out) < 3:
         if verbose:
-            print "Warning: Not all temperatures found for species %s. Returning 0s for unfound values." % symbol
+            print(("Warning: Not all temperatures found for species %s. Returning 0s for unfound values." % symbol))
         while len(T_out) < 3:
             T_out.append(0)
     return T_out

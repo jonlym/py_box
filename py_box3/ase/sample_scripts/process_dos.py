@@ -6,9 +6,9 @@ from pykit.densityofstates import dosread, dosplot
 # dosread returns a DensityOfStates object.  Pass the DOSCAR and either the
 # POSCAR or CONTCAR file
 dos = dosread('DOSCAR', posfile='CONTCAR')
-print dos.dos_data
+print((dos.dos_data))
 # Grab the occupied p energy for every single Al
-print 'E_In(d states) = %.2f\n' % dos.get_band_energy('d', atomtype='In', erange = [-30, 0])
+print(('E_In(d states) = %.2f\n' % dos.get_band_energy('d', atomtype='In', erange = [-30, 0])))
 
 # Now, here is where things get a bit weird, 'cause I apparently cannot code 
 # up an easy to use interface :) 
@@ -32,17 +32,17 @@ for atom in atoms:
     all_atoms.append('%s%i' % (atom.symbol, atom.index))
     if atom.index != 24:
         exclude.append('%s%i' % (atom.symbol, atom.index))
-print all_atoms
-print 'E_In(d states) = %.2f\n' % dos.get_band_energy('d', atomtype='In', include = all_atoms)
+print(all_atoms)
+print(('E_In(d states) = %.2f\n' % dos.get_band_energy('d', atomtype='In', include = all_atoms)))
 
 # Do the integration!  Since we want both the valence and conduction regions, we set
 # some integration limits (this will be case dependent!
-print 'E_s = %.2f' % dos.get_band_energy('s', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])
-print 'E_p = %.2f' % dos.get_band_energy('p', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])
-print 'E_d = %.2f' % dos.get_band_energy('d', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])
-print 'E^*_s = %.2f' % dos.get_band_energy('s', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])
-print 'E^*_p = %.2f' % dos.get_band_energy('p', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])
-print 'E^*_d = %.2f' % dos.get_band_energy('d', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])
+print(('E_s = %.2f' % dos.get_band_energy('s', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])))
+print(('E_p = %.2f' % dos.get_band_energy('p', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])))
+print(('E_d = %.2f' % dos.get_band_energy('d', atomtype='In', include='In24', exclude=exclude, erange=[-30, 0.])))
+print(('E^*_s = %.2f' % dos.get_band_energy('s', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])))
+print(('E^*_p = %.2f' % dos.get_band_energy('p', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])))
+print(('E^*_d = %.2f' % dos.get_band_energy('d', atomtype='In', include='In24', exclude=exclude, erange=[0, 20.])))
 
 # Compare these values to Table S3 in the SI from: J. Phys. Chem. C, 118, 12899 (2014)
 

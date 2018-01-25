@@ -48,9 +48,9 @@ class Shomates(object):
         """
         Prints a summary of the thermdat list.
         """
-        print "Index\tSymbol"
+        print("Index\tSymbol")
         for i, shomate in enumerate(self):
-            print "%d\t%s" % (i, shomate.symbol)
+            print(("%d\t%s" % (i, shomate.symbol)))
 
     def print_rxn(self, stoich_vector):
         """Converts a stoichiometric vector into a stoichiometric reaction."""
@@ -94,7 +94,7 @@ class Shomates(object):
             else:
                 break
         else:
-            print "Warning. Arrow not found!"
+            print("Warning. Arrow not found!")
             
         #Go through the groups to determine the species and their stoichiometric coefficients
         for i, reaction_group in enumerate(reaction_groups):
@@ -115,7 +115,7 @@ class Shomates(object):
                         species = reaction_group[j:]
                         break
                 else:
-                    print "Warning. Reaction group %s made of only numbers." % reaction_group
+                    print(("Warning. Reaction group %s made of only numbers." % reaction_group))
                 if coeff_str != '':
                     coeff_num = int(float(coeff_str))
                 
@@ -125,7 +125,7 @@ class Shomates(object):
                         stoich_vector[j] += coeff_num*side
                         break
                 else:
-                    print "Warning. Could not find the species %s." % species
+                    print(("Warning. Could not find the species %s." % species))
         return stoich_vector
 
 
@@ -147,21 +147,21 @@ class Shomates(object):
             reaction = self.print_rxn(stoich_vector = stoich_vector)
     
         if verbose and not list_calc:
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tH/RT"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tH/RT")
             
         for i, shomate in zip(stoich_vector, self):
             if i != 0:
                 HoRT_species = shomate.get_HoRT(T)
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f" % (shomate.symbol, i, HoRT_species)
+                    print(("%s\t%.2f\t%.2f" % (shomate.symbol, i, HoRT_species)))
                 HoRT_rxn += HoRT_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total H/RT\t\t%.2f" % HoRT_rxn
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total H/RT\t\t%.2f" % HoRT_rxn))
+            print(("-"*(10+len(reaction))))
         return HoRT_rxn
     
        
@@ -182,21 +182,21 @@ class Shomates(object):
             reaction = self.print_rxn(stoich_vector = stoich_vector)
     
         if verbose and not list_calc:
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tS/R"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tS/R")
     
         for i, shomate in zip(stoich_vector, self):
             if i != 0:
                 SoR_species = shomate.get_SoR(T)
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f" % (shomate.symbol, i, SoR_species)
+                    print(("%s\t%.2f\t%.2f" % (shomate.symbol, i, SoR_species)))
                 SoR_rxn += SoR_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total S/R\t\t%.2f" % SoR_rxn
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total S/R\t\t%.2f" % SoR_rxn))
+            print(("-"*(10+len(reaction))))
         return SoR_rxn
     
     def get_GoRT_rxn(self, T, reaction = None, stoich_vector = None, verbose = True):
@@ -219,10 +219,10 @@ class Shomates(object):
             HoRT_rxn = 0.
             SoR_rxn = 0.
     
-            print "Reaction: %s" % reaction
-            print "T = %.2f K" % T 
-            print "-"*(10+len(reaction))
-            print "Species\tv\tH/RT\tS/R\tG/RT"
+            print(("Reaction: %s" % reaction))
+            print(("T = %.2f K" % T)) 
+            print(("-"*(10+len(reaction))))
+            print("Species\tv\tH/RT\tS/R\tG/RT")
             
         for i, shomate in zip(stoich_vector, self):
             if i != 0:
@@ -230,14 +230,14 @@ class Shomates(object):
                 SoR_species = shomate.get_SoR(T)
                 GoRT_species = HoRT_species - SoR_species
                 if verbose and not list_calc:
-                    print "%s\t%.2f\t%.2f\t%.2f\t%.2f" % (shomate.symbol, i, HoRT_species, SoR_species, GoRT_species)
+                    print(("%s\t%.2f\t%.2f\t%.2f\t%.2f" % (shomate.symbol, i, HoRT_species, SoR_species, GoRT_species)))
                     HoRT_rxn += HoRT_species*i
                     SoR_rxn += SoR_species*i
                 GoRT_rxn += GoRT_species*i
         if verbose and not list_calc:
-            print "-"*(10+len(reaction))
-            print "Total\t\t%.2f\t%.2f\t%.2f" % (HoRT_rxn, SoR_rxn, GoRT_rxn)
-            print "-"*(10+len(reaction))
+            print(("-"*(10+len(reaction))))
+            print(("Total\t\t%.2f\t%.2f\t%.2f" % (HoRT_rxn, SoR_rxn, GoRT_rxn)))
+            print(("-"*(10+len(reaction))))
         return GoRT_rxn
 
     @classmethod
@@ -249,7 +249,7 @@ class Shomates(object):
                 if line[0] != '!':
                     data = line.split(',')
                     if verbose:
-                        print "Importing %s" % data[0]
+                        print(("Importing %s" % data[0]))
                     shomates.append(shomate(symbol = data[0], T_low = float(data[1]), T_high = float(data[2]), a = np.array([float(i) for i in data[3:] if i != '' and i != '\n'])))
         return cls(shomates = shomates)
 
@@ -262,6 +262,6 @@ class Shomates(object):
                 if line[0] != '!':
                     data = line.split(',')
                     if verbose:
-                        print "Importing %s" % data[0]
+                        print(("Importing %s" % data[0]))
                     shomates.append(shomate(symbol = data[0], T_low = float(data[1]), T_high = float(data[2]), a = np.array([float(i) for i in data[3:] if i != '' and i != '\n'])))
         return cls(shomates = shomates)

@@ -1,9 +1,9 @@
 from py_box import get_time, get_RMSE, basen_to_base10
 from py_box.cluster_expansion import get_correlation_matrix
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split, cross_val_score, RepeatedKFold
 import random
 import numpy as np
-from sklearn import linear_model
-from sklearn.model_selection import train_test_split
 import pickle
 try:
     from mpi4py import MPI
@@ -74,10 +74,11 @@ def get_clusters(individual, clusters_all):
 
 def split_data(configs_all, E_all, pi_all, kfold):
     indices_train, indices_test, E_train, E_test = train_test_split(range(len(configs_all)), E_all, test_size=1./kfold)
+    configs_train = configs_all.get_copy(indices = indices_train)
     configs_test = configs_all.get_copy(indices = indices_test)
     pi_train = pi_all[indices_train]
     pi_test = pi_all[indices_test]
-    return (configs_test, pi_train, pi_test, E_train, E_test)
+    return (configs_train, configs_test, pi_train, pi_test, E_train, E_test)
 
 def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10):
     clusters = get_clusters(individual, clusters_all)
@@ -85,14 +86,18 @@ def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10
     pi_all = get_correlation_matrix(configurations = configs_all, clusters = clusters)
 
     rmses = np.zeros(shape = (n_repeats, 1))
-    for i in xrange(n_repeats):
-        (configs_test, pi_train, pi_test, E_train, E_test) = split_data(configs_all = configs_all, E_all = E_all, pi_all = pi_all, kfold = kfold)
-        regr = linear_model.LinearRegression(fit_intercept = False, n_jobs = -1)
-        regr.fit(pi_train, E_train)
-        E_test = regr.predict(pi_test)
-        rmse = get_RMSE(configs_test.get_E_fit(), E_test)
-        rmses[i] = rmse
-    return (np.mean(rmses),)
+    rkf = RepeatedKFold(n_splits = kfold, n_repeats = n_repeats)
+    regr = linear_model.LinearRegression(fit_intercept = False, n_jobs = -1)
+    return (np.abs(np.mean(cross_val_score(estimator = regr, X = pi_all, y = E_all, cv = rkf, scoring = 'neg_mean_squared_error'))),)
+
+    # for i in xrange(n_repeats):
+    #     (configs_train, configs_test, pi_train, pi_test, E_train, E_test) = split_data(configs_all = configs_all, E_all = E_all, pi_all = pi_all, kfold = kfold)
+    #     regr = linear_model.LinearRegression(fit_intercept = False, n_jobs = -1)
+    #     regr.fit(pi_train, E_train)
+    #     E_test = regr.predict(pi_test)
+    #     rmse = get_RMSE(configs_test.get_E_fit(), E_test)
+    #     rmses[i] = rmse
+    # return (np.mean(rmses),)
 
 def make_initial_population(COMM = None, toolbox = None, n = None):
     rank = get_rank(COMM)
@@ -205,9 +210,10 @@ def find_best_individual(COMM = None, population = None):
     rank = get_rank(COMM)
     if rank == 0:
         fitnesses = get_fitnesses(population)
-        i = np.where(fitnesses == max(fitnesses))[0][0]
+        i = np.where(fitnesses == min(fitnesses))[0][0]
         print '\tIndividual with best fitness:'
-        print '\tFitness = {} eV'.format(population[i].fitness.values[0])
+        print '\tFitness = {} eV^2'.format(population[i].fitness.values[0])
+        print '\tCV RMSE = {} eV'.format(np.sqrt(population[i].fitness.values[0]))
         print '\tHex code: {}'.format(get_hex_string(population[i]))
 
 def get_fitnesses(population):

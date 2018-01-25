@@ -323,5 +323,5 @@ def convert_sigma_to_bitstring(sigma):
     elif type(sigma) is str:
         return sigma.replace('-1', '0').replace(',', '').replace(' ', '')
     else:
-        print type(sigma)
+        print((type(sigma)))
         raise Exception('Invalid data type when converting sigma to bitstring.')

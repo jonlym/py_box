@@ -42,9 +42,9 @@ class Shomate(object):
         T_arr = np.array([1, t, t ** 2, t ** 3, (1/t) ** 2, 0, 0, 0])
         if verbose:
             if T < self.T_low:
-                print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
+                print(("Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)))
             elif T > self.T_high:
-                print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
+                print(("Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)))
         return np.dot(T_arr, self.a)/c.R('J/mol/K')
     
     def get_CpoR(self, T, verbose = True):
@@ -70,9 +70,9 @@ class Shomate(object):
             T_arr = np.array([t, t ** 2 / 2, t ** 3 / 3, t ** 4 / 4, -1/t, 1., 0., 0.])
         if verbose:
             if T < self.T_low:
-                print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
+                print(("Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)))
             elif T > self.T_high:
-                print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
+                print(("Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)))
         return np.dot(T_arr, self.a)/(c.R('kJ/mol/K')*T)
 
     def get_HoRT(self, T, H_correction = False, verbose = True):
@@ -95,9 +95,9 @@ class Shomate(object):
         T_arr = np.array([np.log(t), t, t ** 2 / 2., t ** 3 / 3., -0.5 * ( 1 / t ) ** 2, 0., 1., 0.])
         if verbose:
             if T < self.T_low:
-                print "Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)
+                print(("Warning. Input temperature (%f) lower than T_low (%f) for species %s" % (T, self.T_low, self.symbol)))
             elif T > self.T_high:
-                print "Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)
+                print(("Warning. Input temperature (%f) higher than T_high (%f) for species %s" % (T, self.T_high, self.symbol)))
         return np.dot(T_arr, self.a)/c.R('J/mol/K')
 
     def get_SoR(self, T, verbose = True):
@@ -129,7 +129,7 @@ def read_fund_csv(symbol, csv_path, print_graph = False):
     T = []
     Cp = []
     
-    print "Reading from file: %s" % csv_path
+    print(("Reading from file: %s" % csv_path))
     with open(csv_path, 'r') as csv_file:
         for line in csv_file:
             if line[0] != '!':

@@ -21,15 +21,15 @@ mode = 'a'
 try:
     sys = Trajectory(file_traj, 'r')[-1]
 except (IOError, RuntimeError):
-    print "Importing trajectory file from: %s" % start_file
+    print(("Importing trajectory file from: %s" % start_file))
     sys = read(start_file)
     sys.center(vacuum = 5.0, axis = 2)
 else:
-    print "Importing trajectory file from: %s" % file_traj
+    print(("Importing trajectory file from: %s" % file_traj))
 
 set_calc_In2O3(sys)
-print "Constraints:"
-print "	c1: Fix bottom two layers."
+print("Constraints:")
+print("	c1: Fix bottom two layers.")
 avg_z = np.mean([atom.z for atom in sys])
 c1 = FixAtoms(mask=[atom.z < avg_z for atom in sys])
 sys.set_constraint(c1)
@@ -41,5 +41,5 @@ else:
     dyn = LBFGS(sys, trajectory = geo_traj)
     dyn.run(fmax = 0.05)
     energy = sys.get_potential_energy()
-    print "Energy: %f" % energy
-print "Completed %s" % file_name_py
+    print(("Energy: %f" % energy))
+print(("Completed %s" % file_name_py))

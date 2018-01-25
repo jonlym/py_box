@@ -41,7 +41,7 @@ class Clusters(object):
         clusters = []
         #If indices not specified, copy whole object
         if len(indices) == 0:
-            indices = range(len(self))
+            indices = list(range(len(self)))
 
         for i in indices:
             clusters.append(copy(self[i]))
@@ -56,12 +56,12 @@ class Clusters(object):
         """Prints the non-sparse interaction terms."""
         for cluster in self:
             if cluster.J != 0.:
-                print '{}\t{}'.format(cluster.name, cluster.J)
+                print(('{}\t{}'.format(cluster.name, cluster.J)))
 
     def print_sparse(self):
         for cluster in self:
             if cluster.J == 0.:
-                print '{}\t{}'.format(cluster.name, cluster.J)
+                print(('{}\t{}'.format(cluster.name, cluster.J)))
 
     def get_n_nodes(self):
         return [cluster.n_nodes for cluster in self]
@@ -110,7 +110,7 @@ class Clusters(object):
                         out_interactions.append([interaction])
                     elif type(interaction) is float:
                         out_interactions.append([int(interaction)])
-                    elif type(interaction) is unicode:
+                    elif type(interaction) is str:
                         interaction_indices = []
                         for interaction_index in interaction.split(','):
                             interaction_indices.append(int(interaction_index))

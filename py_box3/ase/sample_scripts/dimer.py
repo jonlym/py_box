@@ -15,7 +15,7 @@ import glob
 
 def find_last_modecar():
     max_val = -1
-    print glob.glob('./MODECAR*')
+    print((glob.glob('./MODECAR*')))
     for modecar in glob.glob('./MODECAR*'):
         try:
             i = int(float(modecar[9:]))
@@ -33,20 +33,20 @@ TS_vector_path = '../02/OUTCAR'
 if not restart:
     TS = read(TS_path)
     TS_vector = read(TS_vector_path)
-    print "Creating MODECAR using:"
-    print "%s as TS" % TS_path
-    print "%s as approximation for MODECAR" % TS_vector_path
+    print("Creating MODECAR using:")
+    print(("%s as TS" % TS_path))
+    print(("%s as approximation for MODECAR" % TS_vector_path))
     modecar = np.array(TS_vector.get_positions() - TS.get_positions())
     np.savetxt('MODECAR', modecar, fmt = '%17.8f')
 else:
-    print "Restarting calculation. Importing TS from CONTCAR and rewritting MODECAR with contents of NEWMODECAR."
+    print("Restarting calculation. Importing TS from CONTCAR and rewritting MODECAR with contents of NEWMODECAR.")
     TS = read('CONTCAR')
     i = find_last_modecar()
     shutil.copyfile('MODECAR', 'MODECAR%d' % (i+1))
     shutil.copyfile('NEWMODECAR', 'MODECAR')
 
-print "Constraints:"
-print "\tc1: Fixing bottom two layers"
+print("Constraints:")
+print("\tc1: Fixing bottom two layers")
 del TS.constraints
 c1 = FixAtoms(mask=[a.z < 8 for a in TS])
 TS.set_constraint(c1)
@@ -62,9 +62,9 @@ if testRun:
                 TS_vector[i].position += np.array(line)
         run_testRun(TS_vector)
 
-    print "Displaying MODECAR:"
+    print("Displaying MODECAR:")
     with open('MODECAR', 'r') as modecar_file:
-        print modecar_file.read()
+        print((modecar_file.read()))
 else:
-    print "Starting dimer calculation."
-    print TS.get_potential_energy()
+    print("Starting dimer calculation.")
+    print((TS.get_potential_energy()))

@@ -72,7 +72,7 @@ class Configurations(object):
         configurations = []
         #If indices not specified, copy whole object
         if len(indices) == 0:
-            indices = range(len(self))
+            indices = list(range(len(self)))
 
         for i in indices:
             configurations.append(copy(self[i]))
@@ -102,8 +102,8 @@ class Configurations(object):
         """
         import pandas as pd
         data_dict = {}
-        for key in self[0].__dict__.iterkeys():
-            print key
+        for key in list(self[0].__dict__.keys()):
+            print(key)
             if key == 'sigma':
                 #Convert sigma to string separated by ', '
                 data_dict[key] = [', '.join(str(x) for x in config.__dict__[key]) for config in self]
