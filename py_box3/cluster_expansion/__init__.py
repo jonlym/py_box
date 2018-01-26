@@ -109,35 +109,35 @@ def get_best_structure(energies, differences, cv, cv_limit, n = 0):
 
 def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True, n_new = 1, job_array = False):
     #Read cluster data
-    print 'Reading cluster data'
+    print('Reading cluster data')
     clusters = Clusters.from_excel(clusters_path)
 
     #Read training structures
-    print 'Reading configuration training data'
+    print('Reading configuration training data')
     configs_train = Configurations.from_vasp(train_path)
     configs_train.calc_E_fit()
     #Read all training structures
-    print 'Reading all configuration data'
+    print('Reading all configuration data')
     configs_all = Configurations.from_excel(configs_all_path)
-    print 'Finding difference'
+    print('Finding difference')
     configs_new = get_difference(configs_all, configs_train)
 
     #Generating correlation matrices
-    print 'Generating correlation matrix for training structures'
+    print('Generating correlation matrix for training structures')
     pi_train = get_correlation_matrix(configurations = configs_train, clusters = clusters)
-    print 'Generating correlation matrix for new structures'
+    print('Generating correlation matrix for new structures')
     pi_new = get_correlation_matrix(configurations = configs_new, clusters = clusters)
 
     #Find structures that would result in better CV score
-    print 'Calculating similarity of new configurations to training configurations'
+    print('Calculating similarity of new configurations to training configurations')
     configs_difference = get_configuration_difference(pi_train, pi_new)
 
     #Run Cluster Expansion Model
-    print 'Running Lasso with Leave-One-Out Cross Validation'
+    print('Running Lasso with Leave-One-Out Cross Validation')
     try:
         clf = LassoCV(copy_X=True, cv = len(configs_train), fit_intercept = True)
     except:        
-        print configs_train.get_E_fit()
+        print((configs_train.get_E_fit()))
         clf.fit(pi_train, configs_train.get_E_fit())
 
         #Print Model Data
@@ -145,7 +145,7 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
         intercept = clf.intercept_
 
         #Calculate energies
-        print 'Calculating energies using Cluster Expansion'
+        print('Calculating energies using Cluster Expansion')
         CE_E_new = get_energies(correlation_mat = pi_new, Js = Js, intercept = intercept)
         cv = np.average(clf.mse_path_[-1])
     else:
@@ -155,23 +155,23 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
     j = 0
     new_structures = []
     new_indices = []
-    for n in xrange(len(configs_new)):
+    for n in range(len(configs_new)):
         new_index = get_best_structure(CE_E_new, configs_difference, cv = cv, cv_limit = 0.0025, n = n)
-        print 'Attempting to submit {}'.format(configs_new[new_index].name)
+        print(('Attempting to submit {}'.format(configs_new[new_index].name)))
         successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = submit_job, job_array = job_array)
         if successful_submit:
             j = j + 1
             new_structures.append(configs_new[new_index].name)
             new_indices.append(new_index)
         else:
-            print 'Failed to submit {}'.format(configs_new[new_index].name)
+            print(('Failed to submit {}'.format(configs_new[new_index].name)))
 
         if j >= n_new:
             break
     else:
-        print 'Could not find structure to submit.'
+        print('Could not find structure to submit.')
         new_structures = ['Nan']
 
-    print 'Updating log file, {}'.format(log_path)
+    print(('Updating log file, {}'.format(log_path)))
     with open(log_path, 'a') as log_ptr:
         log_ptr.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(get_time(), clf.alpha_, np.average(clf.mse_path_[-1]), count_nonsparse(Js = Js), '\t'.join([new_structure for new_structure in new_structures]), '\t'.join([str(configs_difference[new_index]) for new_index in new_indices]), '\t'.join([str(CE_E_new[new_index]) for new_index in new_indices])))

@@ -31,13 +31,13 @@ def setup_vasp_environment(args, environment):
         environment += 'vpkg_require vasp/5.3.2:d3,gamma_only,intel,mpi,vtst python-numpy python-scipy,vpkg_require python-pandas/python2.7.8\n\n'
 
         if args.gamma:
-            print 'Using gamma-point version of VASP'
+            print('Using gamma-point version of VASP')
             exe = 'mpiexec -n %i %s/sw/vasp/5.3.2-intel64-openmpi+VTST+D3+GAMMA/vasp' % (args.nproc, project_home)
         elif args.collinear:
-            print 'Using non-collinear version of VASP'
+            print('Using non-collinear version of VASP')
             exe = 'mpiexec -n %i %s/programs/vasp/vasp.5.2-no-collinear/vasp' % (args.nproc, project_home)
         elif not args.gamma and not args.collinear:
-            print 'Using standard version of VASP'
+            print('Using standard version of VASP')
             exe = 'mpiexec -n %i %s/sw/vasp/5.3.2-intel64-openmpi+VTST+D3/vasp' % (args.nproc, project_home)
     elif args.version.lower() in ['5.4', '5.4_sol', '5.4_beef']:
         if '_' in args.version:
@@ -51,13 +51,13 @@ def setup_vasp_environment(args, environment):
         vasp_exe_base = 'mpiexec -n %i %s' % (args.nproc, vasp_base)
 
         if args.gamma:
-            print 'Using gamma-point version of VASP5.4 (%s)' % version
+            print(('Using gamma-point version of VASP5.4 (%s)' % version))
             exe = '%s/build/gam/vasp' % vasp_exe_base 
         elif args.collinear:
-            print 'Using non-collinear version of VASP5.4 (%s)' % version
+            print(('Using non-collinear version of VASP5.4 (%s)' % version))
             exe = '%s/build/ncl/vasp' % vasp_exe_base
         elif not args.gamma and not args.collinear:
-            print 'Using standard version of VASP5.4 (%s)' % version
+            print(('Using standard version of VASP5.4 (%s)' % version))
             exe = '%s/build/std/vasp' % vasp_exe_base
 
     if args.paw == 'old':

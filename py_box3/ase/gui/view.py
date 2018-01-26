@@ -1,4 +1,4 @@
-from __future__ import division
+
 from math import cos, sin, sqrt
 from os.path import basename
 

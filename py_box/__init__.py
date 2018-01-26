@@ -26,9 +26,14 @@ hex_to_bin_dict = {'0': '0000',
                    'e': '1110',
                    'f': '1111'}
 
-def convert_hex_to_bin(hex_string, n):
-    out = '0'*(n - 4*len(hex_string))
-    hex_string = hex_string.replace('0x', '')
+def convert_hex_to_bin(hex_string, n = None):
+    #Add initial zeros
+    if n is None:
+        out = ''
+    else:
+        out = '0'*(n - 4*len(hex_string))
+
+    hex_string = hex_string.replace('0x', '').replace('L', '')
     for val in hex_string:
         out = '{}{}'.format(out, hex_to_bin_dict[val])
     return out

@@ -29,10 +29,10 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
     """
     file_base = relpath('.', '../'*nest).replace('/', '_')
     email = 'jlym@udel.edu'
-    print '-'*20
-    print "Files to be submitted take the form: %s##.py where ## range between 01 and %s" % (file_base, label_folder(n_images))
+    print(('-'*20))
+    print(("Files to be submitted take the form: %s##.py where ## range between 01 and %s" % (file_base, label_folder(n_images))))
     if not submit_jobs:
-        print "WARNING: submit_jobs set to False. Jobs will not be submitted!"
+        print("WARNING: submit_jobs set to False. Jobs will not be submitted!")
         
     #Determines the cluster to use the appropriate submit command
     home = expanduser('~')
@@ -73,25 +73,25 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
                 n_cores = 24
 
     else:
-        print 'Warning. None of the compatible cluster types found in misc_info.txt' 
+        print('Warning. None of the compatible cluster types found in misc_info.txt') 
 
     #Information related to job
-    print 'Cluster: %s' % cluster
-    print 'Cores per job: %d' % n_cores
+    print(('Cluster: %s' % cluster))
+    print(('Cores per job: %d' % n_cores))
     if 'farber' in cluster or 'edison' in cluster:
-        print 'Using Vasp version %s' % version 
+        print(('Using Vasp version %s' % version)) 
         if 'edison' in cluster or 'cori' in cluster:
-            print 'Walltime per job: %s' % wall_time
-    print '-'*20
+            print(('Walltime per job: %s' % wall_time))
+    print(('-'*20))
 
     for i in range(1, n_images+1):
-        print "Processing %i" % i
+        print(("Processing %i" % i))
         folder = label_folder(i)
         chdir(folder)
         system('%s %d %s%s.py %s' % (qase_start, n_cores, file_base, folder, qase_options))        
         
         if 'squidward' in cluster:
-            print 'Adding e-mail notification to file'
+            print('Adding e-mail notification to file')
             qs_file = open('%s%s.qs' % (file_base, folder), 'r')
             lines = qs_file.readlines()
             qs_file.close()
@@ -107,7 +107,7 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
             if submit_jobs:           
                 system('qsub %s%s.qs' % (file_base, folder))
         chdir('..')
-    print "Completed submit_NEB"
+    print("Completed submit_NEB")
 
 def initialize_CM(n_images = 8, nest = 1, write_POSCAR = True, write_python = True, python_template = 'template.py'):
     """
@@ -139,17 +139,17 @@ def initialize_CM(n_images = 8, nest = 1, write_POSCAR = True, write_python = Tr
     compare_initial_final(initial, final)
     
     for i in range(0, n_images+2):
-        print 'Processing image %d' % i
+        print(('Processing image %d' % i))
         folder = label_folder(i)
         if not exists(folder):
             makedirs(folder)
         if write_POSCAR:
             POSCAR_path = join(folder, 'POSCAR_start')
-            print 'Writing image %d to %s' % (i, POSCAR_path)
+            print(('Writing image %d to %s' % (i, POSCAR_path)))
             write(POSCAR_path, images[i])
         if write_python:
             python_path = join(folder, '{}{}.py'.format(file_base, folder))
-            print 'Copying template.py to %s' % python_path
+            print(('Copying template.py to %s' % python_path))
             sh.copyfile(python_template, python_path)
-    print 'Completed initialize_NEB'
+    print('Completed initialize_NEB')
 

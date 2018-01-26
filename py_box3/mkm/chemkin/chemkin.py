@@ -141,7 +141,7 @@ class reaction(object):
                  thermdats = None):
         self.is_adsorption = is_adsorption
         if reaction_string is None and reaction_vector is None:
-            print "Warning! No reaction string or reaction vector specified"
+            print("Warning! No reaction string or reaction vector specified")
         else:
             if reaction_vector is not None:
                 self.reaction_vector = reaction_vector
@@ -243,9 +243,9 @@ class BEPs(object):
         """
         Prints a summary of the thermdat list.
         """
-        print "Index\tSlope\tIntercept (kcal/mol)\tDescription"
+        print("Index\tSlope\tIntercept (kcal/mol)\tDescription")
         for i, BEP in enumerate(self):
-            print "%d\t%f\t%f\t%s" % (i, BEP.m, BEP.b, BEP.description)
+            print(("%d\t%f\t%f\t%s" % (i, BEP.m, BEP.b, BEP.description)))
 
 
 
@@ -389,7 +389,7 @@ def clean_terminal_output(in_path, out_path = None, print_line_count = True):
         in_file, in_ext = splitext(in_path)
         out_path = '%s%s%s' % (in_file, '_summary', in_ext)
         
-    print "Reading from %s and writing to %s" % (in_path, out_path)
+    print(("Reading from %s and writing to %s" % (in_path, out_path)))
     input_file = open(in_path, 'r')
     output_file = open(out_path, 'w')
     for line in input_file:
@@ -414,7 +414,7 @@ def clean_terminal_output(in_path, out_path = None, print_line_count = True):
         del_line_i = False            
     input_file.close()
     output_file.close()
-    print "Completed chemkin.clean_terminal_output"
+    print("Completed chemkin.clean_terminal_output")
 
 def write_gas(thermdats, reactions, out_path = 'gas.inp', metal_site = 'CU'):
     with open(out_path, 'w') as gas:
@@ -468,7 +468,7 @@ SITE/SURFACE/      SDEN/%.5E/
                     elif '(B)' in thermdat.symbol:
                         bulk_site = thermdat.symbol
                     else:
-                        print "Warning: %s does not contain the number of C, H, O, or N" % thermdat.symbol
+                        print(("Warning: %s does not contain the number of C, H, O, or N" % thermdat.symbol))
         surf.write('  %s\n\nBULK %s/%.1f/\nEND\n' % (empty_site, bulk_site, metal_density))
         
         reaction_header = """!Reactions

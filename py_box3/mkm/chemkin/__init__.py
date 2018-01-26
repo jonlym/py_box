@@ -288,7 +288,7 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
     Symbol, is_gas, #C, #H, #O, #N, H0, potentialenergy, geometry, symmetry, frequencies
     """
     if verbose:
-        print "Reading from file: %s" % freq_file_path
+        print(("Reading from file: %s" % freq_file_path))
     thermdats_obj = thermdats()
     freq_file = open(freq_file_path, 'r')
     with open(freq_file_path, 'r') as freq_file:
@@ -333,10 +333,10 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
                 #vib_freq
                 vib_freq = np.array([float(i) for i in data[12:] if i != '' and i != '\n'])
                 if verbose:
-                    print "Ignoring frequencies below %f cm^-1" % freq_cut_off
+                    print(("Ignoring frequencies below %f cm^-1" % freq_cut_off))
                 vib_freq = vib_freq[vib_freq >= freq_cut_off]
                 if verbose:
-                    print "Importing %s" % symbol
+                    print(("Importing %s" % symbol))
                 thermdats_obj.append(thermdat(symbol = symbol,
                                               is_gas = is_gas,
                                               CHON = CHON,
@@ -381,14 +381,14 @@ def read_ref(path, verbose = True):
     for i, (element, e_sum) in reversed(list(enumerate(zip(e_list, e_sum_list)))):
         if e_sum == 0:
             if verbose:
-                print 'Element %s not needed' % element
+                print(('Element %s not needed' % element))
             species_CHON = np.delete(species_CHON, i, 1)
             fund_species_CHON = np.delete(fund_species_CHON, i, 0)
             fund_species_CHON = np.delete(fund_species_CHON, i, 1)
             rm_list.append(i)
     n_e = len(fund_species_CHON)
     if n_e != n_s and verbose:
-        print "Warning: Mismatch between number of elements (%d) and number of reference species." % (n_e, n_s)
+        print(("Warning: Mismatch between number of elements (%d) and number of reference species." % (n_e, n_s)))
                     
     #Finds the fundamental energy
     H0_fund = np.array([0.]*n_e) #Formation enthalpy for fundamental species. Usually 0

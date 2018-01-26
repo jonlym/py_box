@@ -86,7 +86,7 @@ class GCN(object):
         os.chdir(current_path)
 
         #Assign radius
-        for symbol, r_source in source_dict.iteritems():
+        for symbol, r_source in list(source_dict.items()):
             #Custom value
             if type(r_source) is float:
                 if r_source < 0:

@@ -18,7 +18,7 @@ from ase import Atom
 from py_box.ase.gcn import atom_radii_dict
 from py_box.ase.site import Site
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
-from ase.utils import basestring
+from ase.utils import str
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,
                           cell_to_cellpar, complete_cell, is_orthorhombic)
 
@@ -411,7 +411,7 @@ class Atoms(object):
         if name in self.arrays:
             raise RuntimeError
 
-        for b in self.arrays.values():
+        for b in list(self.arrays.values()):
             if len(a) != len(b):
                 raise ValueError('Array has wrong length: %d != %d.' %
                                  (len(a), len(b)))
@@ -580,7 +580,7 @@ class Atoms(object):
         the masses argument is not given or for those elements of the
         masses list that are None, standard values are set."""
 
-        if isinstance(masses, basestring) and masses == 'defaults':
+        if isinstance(masses, str) and masses == 'defaults':
             masses = atomic_masses[self.arrays['numbers']]
         elif isinstance(masses, (list, tuple)):
             newmasses = []
@@ -812,7 +812,7 @@ class Atoms(object):
         atoms = self.__class__(cell=self._cell, pbc=self._pbc, info=self.info)
 
         atoms.arrays = {}
-        for name, a in self.arrays.items():
+        for name, a in list(self.arrays.items()):
             atoms.arrays[name] = a.copy()
         atoms.constraints = copy.deepcopy(self.constraints)
         return atoms
@@ -888,7 +888,7 @@ class Atoms(object):
         n1 = len(self)
         n2 = len(other)
 
-        for name, a1 in self.arrays.items():
+        for name, a1 in list(self.arrays.items()):
             a = np.zeros((n1 + n2,) + a1.shape[1:], a1.dtype)
             a[:n1] = a1
             if name == 'masses':
@@ -899,7 +899,7 @@ class Atoms(object):
                 a[n1:] = a2
             self.arrays[name] = a
 
-        for name, a2 in other.arrays.items():
+        for name, a2 in list(other.arrays.items()):
             if name in self.arrays:
                 continue
             a = np.empty((n1 + n2,) + a2.shape[1:], a2.dtype)
@@ -950,7 +950,7 @@ class Atoms(object):
         # TODO: Do we need to shuffle indices in adsorbate_info too?
 
         atoms.arrays = {}
-        for name, a in self.arrays.items():
+        for name, a in list(self.arrays.items()):
             atoms.arrays[name] = a[i].copy()
 
         # Constraints need to be deepcopied, since we need to shuffle
@@ -993,7 +993,7 @@ class Atoms(object):
 
         mask = np.ones(len(self), bool)
         mask[i] = False
-        for name, a in self.arrays.items():
+        for name, a in list(self.arrays.items()):
             self.arrays[name] = a[mask]
 
     def pop(self, i=-1):
@@ -1016,7 +1016,7 @@ class Atoms(object):
         M = np.product(m)
         n = len(self)
 
-        for name, a in self.arrays.items():
+        for name, a in list(self.arrays.items()):
             self.arrays[name] = np.tile(a, (M,) + (1,) * (len(a.shape) - 1))
 
         positions = self.arrays['positions']
@@ -1244,7 +1244,7 @@ class Atoms(object):
             elif s > 0:
                 v /= s
 
-        if isinstance(center, basestring):
+        if isinstance(center, str):
             if center.lower() == 'com':
                 center = self.get_center_of_mass()
             elif center.lower() == 'cop':
@@ -1287,7 +1287,7 @@ class Atoms(object):
             2nd rotation around the z axis.
 
         """
-        if isinstance(center, basestring):
+        if isinstance(center, str):
             if center.lower() == 'com':
                 center = self.get_center_of_mass()
             elif center.lower() == 'cop':
@@ -1756,7 +1756,7 @@ class Atoms(object):
                   'celldisp': atoms.get_celldisp,
                   'constraint': atoms._get_constraints,
                   'calculator': atoms.get_calculator}
-        for key, fn in inputs.iteritems():
+        for key, fn in list(inputs.items()):
             try:
                 kwargs[key] = fn()
             except RuntimeError:
@@ -1779,7 +1779,7 @@ class Atoms(object):
             for i, bader_charge in enumerate(bader_charges):
                 self.bader_charges[i] = bader_charge
         elif isinstance(bader_charges, dict):
-            for i, bader_charge in bader_charges.iteritems():
+            for i, bader_charge in list(bader_charges.items()):
                 self.bader_charges[i] = bader_charge
         else:
             warnings.warn('Unsupported data type: {}'.format(type(bader_charges)))
@@ -1810,7 +1810,7 @@ class Atoms(object):
             for i, CN in enumerate(CNs):
                 self.CNs[i] = CN
         elif isinstance(CNs, dict):
-            for i, CN in CNs.iteritems():
+            for i, CN in list(CNs.items()):
                 self.CNs[i] = CN
         else:
             warnings.warn('Unsupported data type: {}'.format(type(CNs)))
@@ -1832,7 +1832,7 @@ class Atoms(object):
             for i, neighbor in enumerate(neighbors):
                 self.neighbors[i] = set(neighbor)
         elif isinstance(neighbors, dict):
-            for i, neighbor in neighbors.iteritems():
+            for i, neighbor in list(neighbors.items()):
                 self.neighbors[i] = set(neighbor)
         else:
             warnings.warn('Unsupported data type: {}'.format(type(neighbors)))
@@ -1847,7 +1847,7 @@ class Atoms(object):
             for i, CN in enumerate(CNs):
                 self.CNs[i] = CN
         elif isinstance(CNs, dict):
-            for i, CN in CNs.iteritems():
+            for i, CN in list(CNs.items()):
                 self.CNs[i] = CN
         else:
             warnings.warn('Unsupported data type: {}'.format(type(CNs)))
@@ -1914,7 +1914,7 @@ class Atoms(object):
         if self.atom_radii is None:
             self.atom_radii = {}
         #Assign radius
-        for symbol, r_source in source_dict.iteritems():
+        for symbol, r_source in list(source_dict.items()):
             #Custom value
             if type(r_source) is float:
                 if r_source < 0:
@@ -1951,7 +1951,7 @@ class Atoms(object):
             for i, GCN in enumerate(GCNs):
                 self.GCNs[i] = GCN
         elif isinstance(GCNs, dict):
-            for i, GCN in GCNs.iteritems():
+            for i, GCN in list(GCNs.items()):
                 self.GCNs[i] = GCN
         else:
             warnings.warn('Unsupported data type: {}'.format(type(GCNs)))
@@ -1965,7 +1965,7 @@ class Atoms(object):
             self.calc_CNs(scale = scale)
 
         #Goes through neighbors and determines their coordination number
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             try:
                 self.GCNs[i] = self.CNs[i]/self.bulk_CN[self[i].symbol]
             except KeyError:
@@ -2107,7 +2107,7 @@ class Atoms(object):
             for i, dos_occupancy in enumerate(dos_occupancies):
                 self.dos_occupancies[i] = dos_occupancy
         elif isinstance(dos_occupancies, dict):
-            for i, dos_occupancy in dos_occupancies.iteritems():
+            for i, dos_occupancy in list(dos_occupancies.items()):
                 self.dos_occupancies[i] = dos_occupancy
         else:
             warnings.warn('Unsupported data type: {}'.format(type(dos_occupancies)))
@@ -2163,11 +2163,11 @@ def string2symbols(s):
 
 
 def symbols2numbers(symbols):
-    if isinstance(symbols, basestring):
+    if isinstance(symbols, str):
         symbols = string2symbols(symbols)
     numbers = []
     for s in symbols:
-        if isinstance(s, basestring):
+        if isinstance(s, str):
             numbers.append(atomic_numbers[s])
         else:
             numbers.append(s)
@@ -2175,7 +2175,7 @@ def symbols2numbers(symbols):
 
 
 def string2vector(v):
-    if isinstance(v, basestring):
+    if isinstance(v, str):
         if v[0] == '-':
             return -string2vector(v[1:])
         w = np.zeros(3)

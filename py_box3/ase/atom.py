@@ -30,4 +30,4 @@ class Atom(Atom_ase):
         self.neighbors = neighbors
 
     def dos_occupancy_total(self):
-        return np.sum(self.dos_occupancy.values())
+        return np.sum(list(self.dos_occupancy.values()))

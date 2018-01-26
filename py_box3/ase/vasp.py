@@ -4,11 +4,11 @@ Created on Wed May 03 11:35:25 2017
 
 @author: Jonathan Lym
 """
-from __future__ import print_function
+
 import os, sys
 import numpy as np
 
-from ase.utils import devnull, basestring
+from ase.utils import devnull, str
 from ase.calculators.vasp import Vasp
 
 class Vasp(Vasp):
@@ -24,7 +24,7 @@ class Vasp(Vasp):
             sys.stderr = devnull
         elif p['txt'] == '-':
             pass
-        elif isinstance(p['txt'], basestring):
+        elif isinstance(p['txt'], str):
             sys.stderr = open(p['txt'], 'w')
         if 'VASP_COMMAND' in os.environ:
             vasp = os.environ['VASP_COMMAND']

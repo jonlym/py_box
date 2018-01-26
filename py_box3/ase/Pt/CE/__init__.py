@@ -37,13 +37,13 @@ def get_distance(pos_i, pos_j):
 
 def get_distances(pos_i_dict, pos_j_dict):
     distances = {}
-    for key_i, val_i in pos_i_dict.iteritems():
-        for key_j, val_j in pos_j_dict.iteritems():
+    for key_i, val_i in list(pos_i_dict.items()):
+        for key_j, val_j in list(pos_j_dict.items()):
             distances[(key_i, key_j)] = get_distance(val_i, val_j)
     return distances
 
 def get_min_distance(pos_i_dict, pos_j_dict):
-    return min([val for key, val in get_distances(pos_i_dict, pos_j_dict).iteritems()])
+    return min([val for key, val in list(get_distances(pos_i_dict, pos_j_dict).items())])
     # distances = []
     # for key_i, val_i in pos_i_dict.iteritems():
     #     for key_j, val_j in pos_j_dict.iteritems():
@@ -65,15 +65,15 @@ def get_big_graph(size = 4, a = 1, eps = None, periodic = True):
 
     #Create nodes
     k = 0
-    for i in xrange(size):
-        for j in xrange(size):
+    for i in range(size):
+        for j in range(size):
             #Position within cell
             orig_pos = (x_offset*j + a*i, y_offset*j)
             #Find mirror copies of images outside cell
             positions = {}
             if periodic:
-                for l in xrange(-1, 2):
-                    for m in xrange(-1, 2):
+                for l in range(-1, 2):
+                    for m in range(-1, 2):
                         direction = np.array([[l], [m]])
                         positions[(l, m)] = np.sum(cell * direction, axis = 0) + orig_pos
             else:

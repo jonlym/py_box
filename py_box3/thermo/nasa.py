@@ -132,10 +132,10 @@ class Nasa(object):
         The units for the plots can be specified by using R
         """
         if T_low == None:
-            print "T_low not specified. Using self.T_low attribuate."
+            print("T_low not specified. Using self.T_low attribuate.")
             T_low = self.T_low
         if T_high == None:
-            print "T_low not specified. Using self.T_high attribuate."
+            print("T_low not specified. Using self.T_high attribuate.")
             T_high = self.T_high
 
         T = np.linspace(T_low, T_high)

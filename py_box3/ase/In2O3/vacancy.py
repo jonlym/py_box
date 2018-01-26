@@ -57,11 +57,11 @@ class vacancy_clusters(object):
         min_energy = 999.
 
         if ref == 'H2O':
-            print 'Energies referenced to gas-phase H2O and H2.'
+            print('Energies referenced to gas-phase H2O and H2.')
             E_ref = E_slab + self[i].n_vacancy * E_H2
             ref_string = '+ {}H2'.format(self[i].n_vacancy)
         elif ref == 'O2':
-            print 'Energies referenced to gas-phase O2.'
+            print('Energies referenced to gas-phase O2.')
             E_ref = E_slab
             ref_string = ''
 
@@ -109,9 +109,9 @@ class vacancy_clusters(object):
 
             #Print the path
             path = path[:-3] #Truncate the last arrow
-            print path
-            print path_energies
-            print path_del_energies
+            print(path)
+            print(path_energies)
+            print(path_del_energies)
 
             #Find the optimal path
             max_step_energy = max(del_E)
@@ -122,13 +122,13 @@ class vacancy_clusters(object):
 
         #Print most optimal path
         try:             
-            print 'Min Energy Path:'
-            print '#'*10
-            print min_path
-            print min_energies_string
-            print 'Largest Energy: {:.2f} eV'.format(min_energy)
+            print('Min Energy Path:')
+            print(('#'*10))
+            print(min_path)
+            print(min_energies_string)
+            print(('Largest Energy: {:.2f} eV'.format(min_energy)))
         except:
-            print 'No complete paths!'
+            print('No complete paths!')
         #Plot the reaction coordinate diagram
         if plot:
             diagram.plot(unit_set = 'eV')
@@ -137,23 +137,23 @@ class vacancy_clusters(object):
 
     def print_vacancy_energy(self, site, ref = 'H2O'):
         if ref == 'H2O':
-            print 'Energies referenced to gas-phase H2O and H2.'
+            print('Energies referenced to gas-phase H2O and H2.')
             E_ref = E_H2O - E_H2
         elif ref == 'O2':
-            print 'Energies referenced to gas-phase O2.'
+            print('Energies referenced to gas-phase O2.')
             E_ref = 0.5 * E_O2
         
-        print '-'*10
-        print 'Vacancy formation energy of site {}'.format(site)
-        print '-'*10
-        print 'Vacancies Before | Vacancies After: Energy (eV)'
+        print(('-'*10))
+        print(('Vacancy formation energy of site {}'.format(site)))
+        print(('-'*10))
+        print('Vacancies Before | Vacancies After: Energy (eV)')
         for VC in self:
             if (site in VC.vacancy_sites) or (get_parity(site) in VC.vacancy_sites):
                 prior_sites = VC.vacancy_sites - set([site])
                 if prior_sites == VC.vacancy_sites:
                     prior_sites = VC.vacancy_sites - get_parity([site])                   
                 if len(prior_sites) == 0:
-                    print 'Clean: {:.2f} eV'.format(VC.energy + E_ref - E_slab)
+                    print(('Clean: {:.2f} eV'.format(VC.energy + E_ref - E_slab)))
                 else:
                     i = self.index(prior_sites)
                     if i is None:
@@ -162,7 +162,7 @@ class vacancy_clusters(object):
                     else:
                         buf = site
                     prior_site_name = '_'.join(self[i].vacancy_sites)
-                    print '{} | {}: {:.2f} eV'.format(prior_site_name, VC.name, VC.energy + E_ref - self[i].energy)
+                    print(('{} | {}: {:.2f} eV'.format(prior_site_name, VC.name, VC.energy + E_ref - self[i].energy)))
 
 def get_parity(sites):
     if type(sites) is str:

@@ -13,7 +13,7 @@ def get_bins(data, k = None, shuffle_data = True):
     n_element = len(data)/k
 
     bins = _return_empty_structure(data)
-    bins.extend([data_copy[i:i + n_element] for i in xrange(0, len(data), n_element)])
+    bins.extend([data_copy[i:i + n_element] for i in range(0, len(data), n_element)])
 
     #If more bins than requested, distribute elements in the last bin
     while len(bins) > k:
@@ -33,7 +33,7 @@ def separate_bins(i, data):
     #     #Otherwise, do k fold cross validation
     test_set.extend(copy(data[i]))
 
-    for j in xrange(len(data)):
+    for j in range(len(data)):
         if j != i:
             training_set.extend(copy(data[j]))
     return (training_set, test_set)

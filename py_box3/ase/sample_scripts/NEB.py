@@ -37,8 +37,8 @@ else:
 NIMAGES = 9
 
 
-print "Restart = %r" % restart
-print "NIMAGES = %d" % NIMAGES
+print(("Restart = %r" % restart))
+print(("NIMAGES = %d" % NIMAGES))
 
 #Read initial and final state
 initial = read('../In2O3_110_H_24/In2O3_110_H_24.traj')
@@ -53,38 +53,38 @@ images.append(final)
 interpolate(images)
 
 for i in range(0, (NIMAGES+2)):
-    print 'Processing image %d' % i
+    print(('Processing image %d' % i))
     dir = label_folder(i)
     if not os.path.exists(dir):
         os.makedirs(dir)
     if restart:
         if i != 0 and i != (NIMAGES+1):
-            print "Restarting calculation. Copying CONTCAR to POSCAR"
+            print("Restarting calculation. Copying CONTCAR to POSCAR")
             image = read(dir+'/CONTCAR')
         else:
             image = read(dir+'/POSCAR')
     else:
-        print "Starting calculation. Writing POSCAR from interpolation"
+        print("Starting calculation. Writing POSCAR from interpolation")
         image = images[i]
         #Place adjustments here
     calc = set_neb_calc_In2O3(atoms_obj = image, NIMAGES = NIMAGES, kpts = kpts, encut = encut, ispin = ispin, ediffg = ediffg)
-    print "Constraints:"
-    print "\tc1: Freeze 2 lower layers"
+    print("Constraints:")
+    print("\tc1: Freeze 2 lower layers")
     c1 = FixAtoms(mask = [atom.z < 8.5 for atom in image])
     image.set_constraint(c1)
     if not testRun:
         calc.initialize(image)
         write_vasp(dir+'/POSCAR', calc.atoms_sorted, symbol_count=calc.symbol_count)
         calc.write_potcar()
-print "Successfully written files"
+print("Successfully written files")
 calc = set_neb_calc_In2O3(initial, NIMAGES, kpts = kpts, encut = encut, ispin = ispin, ediffg = ediffg)
 initial.set_calculator(calc)
 if testRun:
     run_testRun(images)
 else:
-    print "Running NEB"
-    print initial.get_potential_energy()
-print "Completed %s" % basename(__file__)
+    print("Running NEB")
+    print((initial.get_potential_energy()))
+print(("Completed %s" % basename(__file__)))
 #    if restart:
 #	print "Constraints:"
 #        print "\tc1: Fixing all surface atoms"
