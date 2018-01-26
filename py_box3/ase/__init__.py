@@ -67,8 +67,7 @@ def print_run_time(out_file):
     elif mean_sec > 60.:
         print('Mean time per step: {} minutes'.format(mean_sec/60.))
     else:
-        print('Mean time per step: {} seconds'.format(mean_sec)
-        
+        print('Mean time per step: {} seconds'.format(mean_sec))
     tot_sec = np.sum(diff_times_sec)
     if tot_sec > 86400.:
         print('Total time: {} days'.format(tot_sec/86400.))   
