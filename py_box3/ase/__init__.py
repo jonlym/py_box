@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """
 Created on Mon Sep 26 16:38:29 2016
@@ -136,6 +135,3 @@ DFT_E_gas = {
 #         else:
 #             out_atoms[i+offset] = copy.copy(atoms[i])
 #     return out_atoms
-=======
-Non
->>>>>>> 84b0584b5dd5ee56cabb4b7908526f0b638c54bf
