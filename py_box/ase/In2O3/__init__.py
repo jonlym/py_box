@@ -85,7 +85,7 @@ else:
     energy = sys.get_potential_energy()
     print "Energy: %f" % energy
 print "Finding next configuration..."
-run_cluster_expansion(train_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/train', clusters_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/cluster_vacancy.xlsx', configs_all_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/config_vacancy.xlsx', log_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/output.log', submit_job = testRun)
+run_cluster_expansion(train_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/train', clusters_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/cluster_vacancy.xlsx', configs_all_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/config_vacancy.xlsx', log_path = '/project/projectdirs/m1893/jlym/In2O3/unit_cell_relaxed/cluster_expansion/output.log', submit_job = not testRun)
 print "Completed %s" % file_name_py"""
 
 index_dict = {'In1': [26, 27],
