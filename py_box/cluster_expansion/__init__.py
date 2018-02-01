@@ -5,9 +5,17 @@ from py_box.cluster_expansion.clusters import Clusters
 from py_box.cluster_expansion.configuration import Configuration
 from py_box.cluster_expansion.configurations import Configurations
 from py_box.ase.In2O3 import run_In2O3_configuration
-from sklearn.linear_model import LassoCV
-from sklearn.preprocessing import normalize
 from warnings import warn
+
+try:
+    from sklearn.preprocessing import normalize
+except:
+    pass
+
+try:
+    from sklearn.linear_model import LassoCV
+except:
+    pass
 
 def get_configuration_difference(train_mat, new_mat):
     null_train_mat = get_null(train_mat)
@@ -99,7 +107,7 @@ def get_best_structure(energies, differences, cv, cv_limit, n = 0):
     else:
         return np.where(differences == sorted(differences, reverse = True)[n])[0][0]
 
-def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True, n_new = 1):
+def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path, submit_job = True, n_new = 1, job_array = False):
     #Read cluster data
     print 'Reading cluster data'
     clusters = Clusters.from_excel(clusters_path)
@@ -107,7 +115,7 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
     #Read training structures
     print 'Reading configuration training data'
     configs_train = Configurations.from_vasp(train_path)
-    configs_train.set_E_fit()
+    configs_train.calc_E_fit()
     #Read all training structures
     print 'Reading all configuration data'
     configs_all = Configurations.from_excel(configs_all_path)
@@ -126,26 +134,31 @@ def run_cluster_expansion(train_path, clusters_path, configs_all_path, log_path,
 
     #Run Cluster Expansion Model
     print 'Running Lasso with Leave-One-Out Cross Validation'
-    clf = LassoCV(copy_X=True, cv = len(configs_train), fit_intercept = True)
-    print configs_train.get_E_fit()
-    clf.fit(pi_train, configs_train.get_E_fit())
+    try:
+        clf = LassoCV(copy_X=True, cv = len(configs_train), fit_intercept = True)
+    except:        
+        print configs_train.get_E_fit()
+        clf.fit(pi_train, configs_train.get_E_fit())
 
-    #Print Model Data
-    Js = clf.coef_
-    intercept = clf.intercept_
+        #Print Model Data
+        Js = clf.coef_
+        intercept = clf.intercept_
 
-    #Calculate energies
-    print 'Calculating energies using Cluster Expansion'
-    CE_E_new = get_energies(correlation_mat = pi_new, Js = Js, intercept = intercept)
-
+        #Calculate energies
+        print 'Calculating energies using Cluster Expansion'
+        CE_E_new = get_energies(correlation_mat = pi_new, Js = Js, intercept = intercept)
+        cv = np.average(clf.mse_path_[-1])
+    else:
+        cv = 1.
+        CE_E_new = np.zeros(len(configs_difference))
     #Start DFT calculation for structure
     j = 0
     new_structures = []
     new_indices = []
     for n in xrange(len(configs_new)):
-        new_index = get_best_structure(CE_E_new, configs_difference, cv = np.average(clf.mse_path_[-1]), cv_limit = 0.0025, n = n)
+        new_index = get_best_structure(CE_E_new, configs_difference, cv = cv, cv_limit = 0.0025, n = n)
         print 'Attempting to submit {}'.format(configs_new[new_index].name)
-        successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = submit_job)
+        successful_submit = run_In2O3_configuration(configs_new[new_index], rel_path = train_path, submit_job = submit_job, job_array = job_array)
         if successful_submit:
             j = j + 1
             new_structures.append(configs_new[new_index].name)

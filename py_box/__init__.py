@@ -6,7 +6,55 @@ Created on Wed Nov 23 21:10:42 2016
 """
 
 import numpy as np
+from itertools import product, izip
 from datetime import datetime
+
+hex_to_bin_dict = {'0': '0000',
+                   '1': '0001',
+                   '2': '0010',
+                   '3': '0011',
+                   '4': '0100',
+                   '5': '0101',
+                   '6': '0110',
+                   '7': '0111',
+                   '8': '1000',
+                   '9': '1001',
+                   'a': '1010',
+                   'b': '1011',
+                   'c': '1100',
+                   'd': '1101',
+                   'e': '1110',
+                   'f': '1111'}
+
+def convert_hex_to_bin(hex_string, n = None):
+    #Add initial zeros
+    if n is None:
+        out = ''
+    else:
+        out = '0'*(n - 4*len(hex_string))
+
+    hex_string = hex_string.replace('0x', '').replace('L', '')
+    for val in hex_string:
+        out = '{}{}'.format(out, hex_to_bin_dict[val])
+    return out
+
+def basen_to_base10(num, n):
+    out = 0
+    length = len(num)
+    for i, val in enumerate(num):
+        out += int(val) * (n**(length - i - 1))
+    return out
+
+def base10_to_basen(num, n, width):
+    out = np.zeros(shape = (width, ))
+    if num == 0:
+        return out
+    i = 0
+    while num:
+        num, r = divmod(num, n)
+        out[i] = r
+        i += 1
+    return out[::-1]
 
 def any_alpha(string):
     """Returns True if any alphabetic characters are in the string. False otherwise"""
@@ -49,11 +97,18 @@ def get_null(mat, rtol=1e-5):
 def get_RMSE(xs_data, xs_fit):
     return np.sqrt(np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)]))
 
-def spherical_to_xyz(r = 1., theta = 0., psi = 0., degrees = True):
+def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
     if degrees:
         theta = np.radians(theta)
-        psi = np.radians(psi)
-    x = r * np.cos(theta) * np.sin(psi)
-    y = r * np.sin(theta) * np.sin(psi)
-    z = r * np.cos(psi)
+        phi = np.radians(phi)
+    x = r * np.cos(theta) * np.sin(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(phi)
     return np.array([x, y, z])
+
+def get_n_blanks(n):
+    return ' '*n
+
+def dict_product(dicts):
+    return (dict(izip(dicts, x)) for x in product(*dicts.itervalues()))
+

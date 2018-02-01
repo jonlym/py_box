@@ -18,6 +18,12 @@ import copy
 
 __all__ = ['Atoms', 'Atom']
 
+def get_distance(position1, position2, vector = False):
+    if vector:
+        return position1 - position2
+    else:
+        return np.sqrt(np.sum([(x1-x2)**2 for x1, x2 in zip(position1, position2)]))
+
 def run_testRun(atoms_obj):
     print 'Test Run'
     os_name = system()

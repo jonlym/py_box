@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+"""
+Created on Tue Aug 8 11:51:22 2017
+
+@author: Jonathan Lym
+"""
+
+import argparse
+
+#Parse arguments
+parser = argparse.ArgumentParser(description = "Takes a Python path and toggles whether a test run is performed. Looks for the line 'testRun = '")
+parser.add_argument("file_in", help = "Python file name.")
+args = parser.parse_args()
+file_in = args.file_in
+
+lines_out = []
+with open(file_in, 'r') as file_ptr:
+    for line in file_ptr:
+        if 'testRun = ' in line:
+            if 'True' in line:
+                print 'testRun now set to False.'
+                lines_out.append(line.replace('True', 'False'))
+            elif 'False' in line:
+                print 'testRun now set to True.'
+                lines_out.append(line.replace('False', 'True'))
+        else:
+            lines_out.append(line)
+
+with open(file_in, 'w') as file_ptr:
+    file_ptr.write("".join(lines_out))
