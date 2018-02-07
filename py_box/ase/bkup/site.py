@@ -1,4 +1,6 @@
-import numpy as np
+import sys
+print '\n'.join(sys.path)
+#import numpy as np
 
 class Site(object):
     def __init__(self, x = None, y = None, z = None, position = None, neighbors = None, info = None):

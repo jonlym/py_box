@@ -312,6 +312,22 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                                      'idipol': 3,
                                      'dipol': [0.5, 0.5, 0.5]
                            },
+            'neb': {'images': 9,
+                    'lwave': True,
+                    'iopt': 1,
+                    'ibrion': 3,
+                    'potim': 0,
+                    'spring': -5,
+                    'lclimb': False
+                    },
+            'dimer':{'xc': "PBE",
+                     'ediffg': -0.05,
+                     'iopt': 2,
+                     'ibrion': 3,
+                     'potim': 0,
+                     'ichain': 2,
+                     'drotmax': 6
+                    },
              'Pt': {'xc': "PBE",
                        'kpts': (3,3,1),
                        'encut': 400,
@@ -330,6 +346,17 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                        'ispin': 2,
                        'istart': 0},
 }
+
+def add_neb(vasp_param):
+  for key, value in calc_dict['neb'].iteritems():
+    vasp_param[key] = value
+  return vasp_param
+
+def add_dimer(vasp_param):
+  for key, value in calc_dict['dimer'].iteritems():
+    vasp_param[key] = value
+  return vasp_param
+
 
 def set_geo_calc_ZnOCu(atoms_obj,
                        xc = "PBE",
