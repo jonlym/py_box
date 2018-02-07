@@ -114,9 +114,9 @@ class Shomate(object):
                 SoR[i] = self._get_single_SoR(T_val, verbose)   
         return SoR
 
-    def get_GoRT(self, T, verbose = True):
+    def get_GoRT(self, T, H_correction = False, verbose = True):
         """Calculates the dimensionless free energy (i.e. G/RT) given a temperature."""
-        HoRT = self.get_HoRT(T, verbose)
+        HoRT = self.get_HoRT(T, H_correction = H_correction, verbose = verbose)
         SoR = self.get_SoR(T, verbose)
         return HoRT-SoR
     
