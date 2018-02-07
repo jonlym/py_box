@@ -84,7 +84,6 @@ def evaluate(individual, clusters_all, configs_all, n_repeats = 1000, kfold = 10
     clusters = get_clusters(individual, clusters_all)
     E_all = configs_all.get_E_fit(update = True)
     pi_all = get_correlation_matrix(configurations = configs_all, clusters = clusters)
-
     rmses = np.zeros(shape = (n_repeats, 1))
     rkf = RepeatedKFold(n_splits = kfold, n_repeats = n_repeats)
     regr = linear_model.LinearRegression(fit_intercept = False, n_jobs = -1)
