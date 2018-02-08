@@ -324,6 +324,7 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                     'lclimb': False,
                     'ediffg': -0.15,
                     'ichain': 0,
+                    'ispring': 1
                     },
             'dimer':{'xc': "PBE",
                      'ediffg': -0.05,
