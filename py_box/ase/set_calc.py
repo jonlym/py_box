@@ -318,7 +318,12 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                     'ibrion': 3,
                     'potim': 0,
                     'spring': -5,
-                    'lclimb': False
+                    'spring2': -5,
+                    'spower': 1,
+                    'ltangent': True,
+                    'lclimb': False,
+                    'ediffg': -0.15,
+                    'ichain': 0,
                     },
             'dimer':{'xc': "PBE",
                      'ediffg': -0.05,
@@ -347,9 +352,14 @@ calc_dict = {'ZnOCu': {'xc': "PBE",
                        'istart': 0},
 }
 
-def add_neb(vasp_param):
+def add_neb(vasp_param, atoms_first = None, atoms_last = None):
   for key, value in calc_dict['neb'].iteritems():
     vasp_param[key] = value
+  if atoms_first is not None:
+    vasp_param['efirst'] = atoms_first.get_potential_energy()
+  if atoms_last is not None:
+    vasp_param['elast'] = atoms_last.get_potential_energy()
+
   return vasp_param
 
 def add_dimer(vasp_param):
