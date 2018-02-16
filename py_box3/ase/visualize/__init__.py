@@ -4,7 +4,7 @@ import subprocess
 
 from ase.io import write
 import ase.parallel as parallel
-from py_box.ase.gui import ag
+from py_box3.ase.gui import ag
 
 def view(atoms, data=None, viewer='ase-gui', repeat=None, block=False, colors = {}):
     # Ignore for parallel calculations:

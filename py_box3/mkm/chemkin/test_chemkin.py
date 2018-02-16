@@ -1,6 +1,6 @@
 import unittest
 import os
-from py_box.mkm.chemkin import Chemkin
+from py_box3.mkm.chemkin import Chemkin
 
 test_imp_path = os.path.join(os.environ['PYBOX'], 'py_box\\mkm\\chemkin\\test_INP')
 

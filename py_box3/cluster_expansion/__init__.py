@@ -1,10 +1,10 @@
 import numpy as np
-from py_box import get_null, get_time
-from py_box.cluster_expansion.cluster import Cluster
-from py_box.cluster_expansion.clusters import Clusters
-from py_box.cluster_expansion.configuration import Configuration
-from py_box.cluster_expansion.configurations import Configurations
-from py_box.ase.In2O3 import run_In2O3_configuration
+from py_box3 import get_null, get_time
+from py_box3.cluster_expansion.cluster import Cluster
+from py_box3.cluster_expansion.clusters import Clusters
+from py_box3.cluster_expansion.configuration import Configuration
+from py_box3.cluster_expansion.configurations import Configurations
+from py_box3.ase.In2O3 import run_In2O3_configuration
 from warnings import warn
 
 try:

@@ -17,10 +17,10 @@ from ase.optimize import LBFGS
 from ase.calculators.vasp import Vasp
 from ase.constraints import FixAtoms
 from os.path import basename, exists
-from py_box.ase import run_testRun
-from py_box.ase.In2O3 import index_dict
-from py_box.ase.set_calc import print_vasp_param, calc_dict, handle_restart
-from py_box.cluster_expansion import run_cluster_expansion
+from py_box3.ase import run_testRun
+from py_box3.ase.In2O3 import index_dict
+from py_box3.ase.set_calc import print_vasp_param, calc_dict, handle_restart
+from py_box3.cluster_expansion import run_cluster_expansion
 
 testRun = False
 file_name_py = basename(__file__)

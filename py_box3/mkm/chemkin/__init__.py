@@ -5,9 +5,9 @@ Created on Wed Nov 23 14:57:39 2016
 @author: Jonathan Lym
 """
 
-from py_box.constants import T0, convert_unit
+from py_box3.constants import T0, convert_unit
 from ase.io import read
-from py_box.thermo.thermdat import thermdat, thermdats
+from py_box3.thermo.thermdat import thermdat, thermdats
 import numpy as np
 
 class Chemkin(object):

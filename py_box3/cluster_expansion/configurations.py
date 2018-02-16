@@ -1,5 +1,5 @@
-from py_box.cluster_expansion.configuration import Configuration, default_dict
-from py_box.cluster_expansion.In2O3 import get_sigma_from_sites
+from py_box3.cluster_expansion.configuration import Configuration, default_dict
+from py_box3.cluster_expansion.In2O3 import get_sigma_from_sites
 import numpy as np
 import os
 from copy import copy

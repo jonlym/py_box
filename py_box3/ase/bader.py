@@ -5,7 +5,7 @@ Created on Fri Mar 24 16:11:06 2017
 @author: Jonathan Lym
 """
 
-from py_box import any_alpha
+from py_box3 import any_alpha
 from ase.io import read
 from ase.io.bader import attach_charges
 import numpy as np

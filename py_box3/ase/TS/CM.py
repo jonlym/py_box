@@ -13,7 +13,7 @@ from ase.visualize import view
 from ase.neb import interpolate
 from os import chdir, getcwd, system, makedirs, walk
 from os.path import relpath, expanduser, exists, join
-from py_box.ase.TS import label_folder, compare_initial_final
+from py_box3.ase.TS import label_folder, compare_initial_final
 
 def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', queue = None, submit_jobs = True):
     """

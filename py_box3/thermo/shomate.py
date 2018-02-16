@@ -7,7 +7,7 @@ Created on Thu Dec 01 10:51:14 2016
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-import py_box.constants as c
+import py_box3.constants as c
 
 class Shomate(object):
     """
