@@ -4,7 +4,6 @@ Created on Mon Sep 26 16:38:29 2016
 
 @author: Jonathan Lym
 """
-
 from ase.calculators.vasp import Vasp
 
 calc_dict = {'ZnOCu': {'xc': "PBE",
