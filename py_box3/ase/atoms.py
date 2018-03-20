@@ -13,10 +13,10 @@ from math import cos, sin
 import copy
 import numpy as np
 import ase.units as units
-from py_box import any_alpha, get_unique_list
+from py_box3 import any_alpha, get_unique_list
 from ase import Atom
-from py_box.ase.gcn import atom_radii_dict
-from py_box.ase.site import Site
+from py_box3.ase.gcn import atom_radii_dict
+from py_box3.ase.site import Site
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import str
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,

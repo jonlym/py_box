@@ -1,4 +1,4 @@
-import py_box.cluster_expansion as CE
+import py_box3.cluster_expansion as CE
 from random import shuffle
 from copy import copy
 

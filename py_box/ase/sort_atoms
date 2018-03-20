@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import argparse
+import numpy as np
+from ase import Atom, Atoms
+from ase.io import read, write
+
+default_file = "POSCAR"
+
+parser = argparse.ArgumentParser(description = "Sorts the atoms based on their atom symbol and relative distance from the origin.")
+parser.add_argument("read_file", default = default_file, help = "Input file that will be rearranged.")
+parser.add_argument("write_file", default = '{}_out'.format(default_file), help = "Output file.")
+args = parser.parse_args()
+
+index_dict = {}
+
+atoms_in = read(args.read_file)
+
+#Build the atoms list
+for atom in atoms_in:
+	try:
+		index_dict[atom.symbol].append((atom.index, atom.x, atom.y, atom.z, ))
+	except KeyError:
+		index_dict[atom.symbol] = [(atom.index, atom.x, atom.y, atom.z)]
+
+#Relabeling the atoms
+i = 0
+
+#Import all information from input atoms object
+atoms_out = atoms_in.copy()
+del atoms_out[[range(len(atoms_in))]]
+
+#Recreates that atoms object with the correct indices
+for key, values in sorted(index_dict.iteritems()):
+	sorted_values = sorted(values, key = lambda x: (round(x[3], 0), round(x[2], 0), round(x[1], 0)))
+	for value in sorted_values:
+		atoms_out.append(Atom(symbol = key, position = np.array([value[1], value[2], value[3]])))
+
+write(args.write_file, atoms_out)

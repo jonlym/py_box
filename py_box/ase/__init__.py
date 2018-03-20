@@ -32,8 +32,10 @@ def run_testRun(atoms_obj):
 #            pprint(vars(atoms_obj[i]))
 #    else:
 #        pprint(vars(atoms_obj))
-    if os_name.lower() == 'linux':
+    try:
         view(atoms_obj)
+    except:
+        pass
         
 def print_magmom(atoms_obj):
     """

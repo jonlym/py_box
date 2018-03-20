@@ -1,5 +1,5 @@
 # coding=utf-8
-from py_box.cluster_expansion.cluster import Cluster
+from py_box3.cluster_expansion.cluster import Cluster
 import numpy as np
 from copy import copy
 from warnings import warn

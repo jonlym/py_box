@@ -1,4 +1,8 @@
-import numpy as np
+try:
+    import numpy as np
+except:
+    pass
+    
 
 class Site(object):
     def __init__(self, x = None, y = None, z = None, position = None, neighbors = None, info = None):

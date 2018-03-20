@@ -1,7 +1,7 @@
 from scipy.stats import variation
 import numpy as np
 import matplotlib.pyplot as plt
-import py_box.constants as c
+import py_box3.constants as c
 import warnings
 
 class Nasa(object):

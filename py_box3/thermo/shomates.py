@@ -1,6 +1,6 @@
 import numpy as np
-from py_box.thermo.shomate import Shomate
-from py_box import constants as c
+from py_box3.thermo.shomate import Shomate
+from py_box3 import constants as c
 
 class Shomates(object):
     """

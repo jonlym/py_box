@@ -8,7 +8,7 @@ Created on Sun May 07 17:00:00 2017
 import os, warnings
 import numpy as np
 from ase.geometry import find_mic
-from py_box import get_unique_list
+from py_box3 import get_unique_list
 try:
     import pandas as pd
 except:

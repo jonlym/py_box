@@ -11,9 +11,9 @@ import numpy as np
 import ase.thermochemistry
 import xlwt
 import matplotlib.pyplot as plt
-import py_box.constants as c
+import py_box3.constants as c
 import warnings
-from py_box.thermo.nasa import Nasa
+from py_box3.thermo.nasa import Nasa
 
 
 class thermdat(object):

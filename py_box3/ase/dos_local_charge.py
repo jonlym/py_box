@@ -1,5 +1,5 @@
 import numpy as np
-from py_box import any_alpha
+from py_box3 import any_alpha
 
 class dos_local_charge:
     """Stores the localized charge found in the OUTCAR file after a density of states run."""

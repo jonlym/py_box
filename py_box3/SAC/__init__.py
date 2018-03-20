@@ -1,6 +1,6 @@
 from ase.thermochemistry import IdealGasThermo
 import numpy as np
-from py_box import constants as c
+from py_box3 import constants as c
 
 def get_chemical_potential(atoms,
                            freq,

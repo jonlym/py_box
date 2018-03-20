@@ -39,6 +39,7 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
     cluster_file = open('%s/misc_info.txt' % home, 'r')
     content = cluster_file.read()
     cluster_file.close()
+    qase_options = ''
     if 'squidward' in content.lower():
         cluster = 'squidward'
         n_cores = 16
@@ -63,14 +64,13 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
         qase_options = '%s -w %s -p %s' % (qase_options, wall_time, version)
         if submit_jobs:
             qase_options = '%s -s' % qase_options
-        if queue is not None:
-            if queue is 'knl':
-                qase_options = '%s -q %s' % (qase_options, queue)
-                n_cores = 32
-                cluster = 'cori'
-            else:
-                qase_options = '%s -q %s' % (qase_options, queue)
-                n_cores = 24
+        if queue is 'knl':
+            qase_options = '%s -q %s' % (qase_options, queue)
+            n_cores = 32
+            cluster = 'cori'
+        else:
+            #qase_options = '%s -q %s' % (qase_options, queue)
+            n_cores = 24
 
     else:
         print 'Warning. None of the compatible cluster types found in misc_info.txt' 
@@ -88,7 +88,9 @@ def submit_CM(n_images = 6, nest = 1, wall_time = '12:00:00', version = 'v54', q
         print "Processing %i" % i
         folder = label_folder(i)
         chdir(folder)
-        system('%s %d %s%s.py %s' % (qase_start, n_cores, file_base, folder, qase_options))        
+        submit_line = '%s %d %s%s.py %s' % (qase_start, n_cores, file_base, folder, qase_options)
+        print submit_line
+        system(submit_line)        
         
         if 'squidward' in cluster:
             print 'Adding e-mail notification to file'
