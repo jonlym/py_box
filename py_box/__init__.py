@@ -8,6 +8,8 @@ Created on Wed Nov 23 21:10:42 2016
 import numpy as np
 from itertools import product, izip
 from datetime import datetime
+import pickle
+from matplotlib import pyplot as plt
 
 hex_to_bin_dict = {'0': '0000',
                    '1': '0001',
@@ -112,3 +114,14 @@ def get_n_blanks(n):
 def dict_product(dicts):
     return (dict(izip(dicts, x)) for x in product(*dicts.itervalues()))
 
+def saveplt(ax, filename):
+    with open(filename, 'wb') as f_ptr:
+        pickle.dump(ax, f_ptr)
+
+def loadplt(filename, show = False):
+    with open(filename, 'rb') as f_ptr:
+        ax = pickle.load(f_ptr)
+    if show:
+        plt.show()
+    else:
+        return ax

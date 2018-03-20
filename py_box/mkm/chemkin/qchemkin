@@ -10,10 +10,7 @@ def get_email():
   """
   return '{}@udel.edu'.format(getpass.getuser())
 
-#ckpath = '/mnt/files-ccei/project/common/chemkin/versions'
-#ckpath = '/home/project/common/chemkin/versions'
-#ckpath = '/home/vlachos/hezgi/chemkin/versions'
-ckpath = '/home/project/common/chemkin/versions'
+ckpath = '/opt/shared/home/vlachos/hezgi/chemkin/versions/'
 qchemkin_template = """#!/bin/bash
 #$ -cwd
 #$ -j y
@@ -36,7 +33,7 @@ __queue
 
 #Import packages for submission to cluster
 vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc
-groups
+
 #  Define the path to the binary. For testing, this will be the local directory,
 #+ but for production runs, this will be the location of the compiled binary
 #+ on the server/cluster.
