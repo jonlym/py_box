@@ -67,30 +67,3 @@ def get_parity(site):
         else:
             return site+6
 
-def flip_configs(configs):
-  flip_mat = np.array([
-    [0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0.],
-    [0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0.],
-    [0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.],
-    [0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.],
-    [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.],
-    [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1.],
-    [1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-    [0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-    [0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-    [0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0.],
-    [0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.],
-    [0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.]])
-  configs_flip = []
-  for config in configs:
-    config_flip = copy(config)
-
-    #Skip configurations that are the same
-    if np.array_equal(np.dot(flip_mat, config.sigma), config.sigma):
-      continue 
-
-    config_flip.sigma = np.dot(flip_mat, config.sigma)
-    config_flip.name = get_parity(config.name)
-    configs_flip.append(config_flip)
-  configs.extend(configs_flip)
-  return configs

@@ -9,7 +9,7 @@ Created on Wed Nov 23 21:10:42 2016
 import numpy as np
 from warnings import warn
 
-def R(units):
+def R(units: str):
     """
     Returns the universal molar gas constant, R.
     Supported unit options: 
@@ -49,7 +49,7 @@ def R(units):
     except KeyError:
         raise Exception('Invalid unit: {}'.format(units))
     
-def h(units, bar = False):
+def h(units: str, bar: bool = False):
     """
     Returns the Planck's constant, h. Use bar = True to return h/2π
     Supported unit options: 
@@ -73,7 +73,7 @@ def h(units, bar = False):
     else:
         return h_dict[units]
 
-def kb(units):
+def kb(units: str):
     """
     Returns the Boltzmann constant.
     Supported unit options: 
@@ -94,7 +94,7 @@ def kb(units):
     except KeyError:
         raise KeyError('Invalid unit: {}'.format(units))
 
-def c(units):
+def c(units: str):
     """
     Returns the speed of light.
     Supported unit options: 
@@ -110,7 +110,7 @@ def c(units):
     except KeyError:
         raise KeyError('Invalid unit: {}'.format(units))
 
-def m_e(units):
+def m_e(units: str):
     """
     Returns the mass of an electron.
     Supported unit options: 
@@ -128,7 +128,7 @@ def m_e(units):
     except KeyError:
         raise KeyError('Invalid unit: {}'.format(units))
 
-def m_p(units):
+def m_p(units: str):
     """
     Returns the mass of a proton.
     Supported unit options: 
@@ -145,7 +145,7 @@ def m_p(units):
     except KeyError:
         raise KeyError('Invalid unit: {}'.format(units))
 
-def P0(units):
+def P0(units: str):
     """
     Returns the reference pressure.
     Supported unit options: 
@@ -174,7 +174,7 @@ def P0(units):
     except KeyError:
         raise KeyError('Invalid unit: {}'.format(units))
 
-def T0(units):
+def T0(units: str):
     """
     Returns room temperature.
     Supported units:
@@ -198,7 +198,7 @@ def T0(units):
 Na = 6.02214086e23
 e = 1.6021766208e-19
 
-def convert_unit(num = 1., from_ = None, to = None):
+def convert_unit(num: float = 1., from_: str = None, to: str = None):
     """
     Converts num with units 'from_' to num with units 'to'.
     Supported Units:
@@ -252,7 +252,6 @@ def convert_unit(num = 1., from_ = None, to = None):
             |atm        | Atmospheres
             |bar        | Bars
             |mmHg       | Millimeters of Mercury
-            |psi        | Pounds per square inch
     """
     
     type_dict = {
@@ -294,8 +293,7 @@ def convert_unit(num = 1., from_ = None, to = None):
         'atm': 'pressure',
         'bar': 'pressure',
         'mmHg': 'pressure',
-        'torr': 'pressure',
-        'psi': 'pressure'
+        'torr': 'pressure'
     }
     
     unit_dict = {
@@ -337,8 +335,7 @@ def convert_unit(num = 1., from_ = None, to = None):
         'atm': 9.86923e-6,
         'bar': 1.e-5,
         'mmHg': 0.00750062,
-        'torr': 0.00750062,
-        'psi': 0.000145038
+        'torr': 0.00750062
     }
 
     #Check if the entry exists  

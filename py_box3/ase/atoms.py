@@ -16,6 +16,7 @@ import ase.units as units
 from py_box3 import any_alpha, get_unique_list
 from ase import Atom
 from py_box3.ase.gcn import atom_radii_dict
+from py_box3.ase.site import Site
 from ase.data import atomic_numbers, chemical_symbols, atomic_masses
 from ase.utils import str
 from ase.geometry import (wrap_positions, find_mic, cellpar_to_cell,
@@ -2201,22 +2202,3 @@ def default(data, dflt):
         return newdata
     else:
         return data
-
-class Site(object):
-    def __init__(self, x = None, y = None, z = None, position = None, neighbors = None, info = None):
-        if position is not None:
-            self.set_position(position)
-        else:
-            self.x = x
-            self.y = y
-            self.z = z
-        self.neighbors = neighbors
-        self.info = info
-
-    def set_position(self, position):
-        self.x = position[0]
-        self.y = position[1]
-        self.z = position[2]
-
-    def get_position(self):
-        return np.array([self.x, self.y, self.z])

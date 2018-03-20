@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 from platform import system
 from ase.visualize import view
 from ase.calculators.vasp import Vasp
-from pprint import pprint
 import copy
 
 def get_distance(position1, position2, vector = False):
@@ -28,11 +27,9 @@ def run_testRun(atoms):
     If running on Linux, prints the ASE Atoms object.
     """
     print('Test Run')
-    try:
-    	view(atoms)
-    except:
-    	pass
-    pprint(atoms)
+    os_name = system()
+    if os_name.lower() == 'linux':
+        view(atoms)
         
 def print_magmom(atoms):
     """

@@ -5,60 +5,25 @@ Created on Wed Nov 23 21:10:42 2016
 @author: Jon Lym
 """
 
-import itertools
 import numpy as np
 from datetime import datetime
-import pickle
-from matplotlib import pyplot as plt
 
-hex_to_bin_dict = {'0': '0000',
-                   '1': '0001',
-                   '2': '0010',
-                   '3': '0011',
-                   '4': '0100',
-                   '5': '0101',
-                   '6': '0110',
-                   '7': '0111',
-                   '8': '1000',
-                   '9': '1001',
-                   'a': '1010',
-                   'b': '1011',
-                   'c': '1100',
-                   'd': '1101',
-                   'e': '1110',
-                   'f': '1111'}
 
-def convert_hex_to_bin(hex_string, n = None):
-    #Add initial zeros
-    if n is None:
-        out = ''
-    else:
-        out = '0'*(n - 4*len(hex_string))
-
-    hex_string = hex_string.replace('0x', '').replace('L', '')
-    for val in hex_string:
-        out = '{}{}'.format(out, hex_to_bin_dict[val])
-    return out
-
-def basen_to_base10(num, n):
-    out = 0
-    length = len(num)
-    for i, val in enumerate(num):
-        out += int(val) * (n**(length - i - 1))
-    return out
-
-def base10_to_basen(num, n, width):
-    out = np.zeros(shape = (width, ))
-    if num == 0:
-        return out
+def base10_to_base3(n: int, width: int):
+    """
+    Converts base 10 numbers to base 3 width.
+    """
+    nums = np.zeros(shape = (width, ))
+    if n == 0:
+        return nums
     i = 0
-    while num:
-        num, r = divmod(num, n)
-        out[i] = r
+    while n:
+        n, r = divmod(n, 3)
+        nums[i] = r
         i += 1
-    return out[::-1]
+    return nums[::-1]
 
-def any_alpha(string):
+def any_alpha(string: str):
     """
     Returns True if any alphabetic characters are in the string. False otherwise.
     """
@@ -68,7 +33,7 @@ def any_alpha(string):
     else:
         return False
 
-def get_unique_list(data):
+def get_unique_list(data: list):
     """
     Given a list, returns a unique list.
     """
@@ -77,7 +42,7 @@ def get_unique_list(data):
         keys[item] = 1
     return list(keys.keys())
 
-def plot_parity(x, y, decimals = 2):
+def plot_parity(x: np.ndarray, y: np.ndarray, decimals: int = 2):
     """
     Plots a party plot given two vectors of data.
     """
@@ -99,7 +64,7 @@ def get_time():
     """
     return str(datetime.now())
 
-def get_null(mat, rtol = 1.e-5):
+def get_null(mat: np.ndarray, rtol: float=1.e-5):
     """
     Returns the nullspace of a 2D matrix, mat
     """
@@ -107,19 +72,13 @@ def get_null(mat, rtol = 1.e-5):
     rank = (s > rtol*s[0]).sum()
     return v[rank:].T.copy()
 
-def get_MSE(xs_data, xs_fit):
+def get_RMSE(xs_data: np.ndarray, xs_fit: np.ndarray):
     """
     Returns the root mean squared error given two vectors of equal lengths
     """
-    return np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)])
+    return np.sqrt(np.mean([(x_data-x_fit)**2 for x_data, x_fit in zip(xs_data, xs_fit)]))
 
-def get_RMSE(xs_data, xs_fit):
-    """
-    Returns the root mean squared error given two vectors of equal lengths
-    """
-    return np.sqrt(get_MSE(xs_data = xs_data, xs_fit = xs_fit))
-
-def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
+def spherical_to_xyz(r: float = 1., theta: float = 0., phi: float = 0., degrees: bool = True):
     """
     Converts spherical coordinates to Cartesian coordinates. Angles are in degrees by default. Set degrees to False
     to use radians
@@ -132,30 +91,5 @@ def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
     z = r * np.cos(phi)
     return np.array([x, y, z])
 
-def get_n_blanks(n):
+def get_n_blanks(n: int):
     return ' '*n
-
-def dict_products(dicts):
-    return (dict(zip(dicts, x)) for x in itertools.product(*dicts.values()))
-
-def interpolate(x_low, x_high, y_low, y_high, x):
-    if x == x_low:
-        return y_low
-    elif x == x_high:
-        return y_high
-
-    m = (y_high - y_low)/(x_high - x_low)
-    b = y_high - m * x_high
-    return m * x + b
-
-def saveplt(ax, filename):
-    with open(filename, 'wb') as f_ptr:
-        pickle.dump(ax, f_ptr)
-
-def loadplt(filename, show = False):
-    with open(filename, 'rb') as f_ptr:
-        ax = pickle.load(f_ptr)
-    if show:
-        plt.show()
-    else:
-        return ax
