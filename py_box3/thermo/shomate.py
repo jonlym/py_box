@@ -6,7 +6,6 @@ Created on Thu Dec 01 10:51:14 2016
 """
 import numpy as np
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
 from py_box3 import interpolate
 import py_box3.constants as c
 
@@ -127,6 +126,8 @@ class Shomate(object):
         Plots the heat capacity, enthalpy and entropy in the temperature range specified.
         The units for the plots can be specified by using R
         """
+        import matplotlib.pyplot as plt
+
         T = np.linspace(T_low, T_high)
         Cp = self.get_CpoR(T, phase = phase)
         H = self.get_HoRT(T, phase = phase)

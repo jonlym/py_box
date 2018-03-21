@@ -6,7 +6,6 @@ Created on Thu Dec 01 10:51:14 2016
 """
 import numpy as np
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
 import py_box.constants as c
 
 class Shomate(object):
@@ -125,6 +124,8 @@ def _shomate_Cp(t, A, B, C, D, E):
     
 def read_fund_csv(symbol, csv_path, print_graph = False):
     """Reads a csv file for data that will be fed into function fit_shomate_species."""
+    import matplotlib.pyplot as plt
+
     H0_S0_read = False
     T = []
     Cp = []

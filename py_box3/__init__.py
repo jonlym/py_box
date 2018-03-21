@@ -9,7 +9,6 @@ import itertools
 import numpy as np
 from datetime import datetime
 import pickle
-from matplotlib import pyplot as plt
 
 hex_to_bin_dict = {'0': '0000',
                    '1': '0001',
@@ -153,6 +152,8 @@ def saveplt(ax, filename):
         pickle.dump(ax, f_ptr)
 
 def loadplt(filename, show = False):
+    from matplotlib import pyplot as plt
+
     with open(filename, 'rb') as f_ptr:
         ax = pickle.load(f_ptr)
     if show:

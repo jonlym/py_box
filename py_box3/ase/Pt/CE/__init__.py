@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import networkx as nx
 
 z_O = 18.196
@@ -115,6 +114,8 @@ def get_small_graph(config, size = 4, a = 1, eps = None, periodic = True, dict_e
     return graph
 
 def draw_graph_node(config, size = 4, a = 1, eps = None):
+    import matplotlib.pyplot as plt
+
     big_graph = get_big_graph(size = size, a = a, eps = eps)
     graph = get_small_graph(config, size = size, a = a, eps = eps)
     graph_config = [int(j) for j in np.binary_repr(config, size**2)]

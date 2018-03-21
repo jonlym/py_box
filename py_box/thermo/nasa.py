@@ -1,6 +1,5 @@
 from scipy.stats import variation
 import numpy as np
-import matplotlib.pyplot as plt
 import py_box.constants as c
 import warnings
 
@@ -131,6 +130,8 @@ class Nasa(object):
         Plots the heat capacity, enthalpy and entropy in the temperature range specified.
         The units for the plots can be specified by using R
         """
+        import matplotlib.pyplot as plt
+
         if T_low == None:
             print "T_low not specified. Using self.T_low attribuate."
             T_low = self.T_low

@@ -4,7 +4,6 @@ Created on Thu Jun 08 07:06:52 2017
 
 @author: Jonathan Lym
 """
-import matplotlib.pyplot as plt
 from itertools import combinations, permutations
 from energydiagram import ED
 import numpy as np
