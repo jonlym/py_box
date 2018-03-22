@@ -403,6 +403,13 @@ def add_dimer(vasp_param):
     vasp_param[key] = value
   return vasp_param
 
+def add_plus_u(vasp_param, u_values = {}):
+  vasp_param['ldau'] = True
+  vasp_param['ldautype'] = 1
+  vasp_param['ldau_luj'] = u_values
+  return vasp_param
+
+
 def set_bader_calc(atoms_obj,
                    xc = "PBE",
                    kpts = (1,1,1), 
@@ -706,7 +713,7 @@ help_dict = {
     'istart': {0: 'Start job ''from scratch''. Initialize wavefunction according to the flag INIWAV',
                1: 'Continuation job. Read wavefunction from file WAVECAR.'},     # startjob: 0-new 1-cont 2-samecut
     'isym': {-1: 'Symmetry turned OFF',
-             0: 'Symmetry turned OFF. Assumes that φ_k = φ*_-k and reduces the sampling of the Brillouin zone respectively.',
+             0: 'Symmetry turned OFF. Assumes that phi_k = phi*_-k and reduces the sampling of the Brillouin zone respectively.',
              1: 'Symmetry turned ON.',
              2: 'Symmetry turned ON. Memory conserving symmetrisation of the charge density is used.',
              3: 'Symmetry turned ON. Charge density will be constructed by applying the relevant symmetry operations to the orbitals at the k-points in the irreducible part of the Brillouin zone.'},
