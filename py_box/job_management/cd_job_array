@@ -5,7 +5,7 @@ import os
 
 parser = argparse.ArgumentParser(description="Goes to the working directory of a job given the folderlist and index. N.B. Assumes non-zero indexing.")
 parser.add_argument("folder_file", help = "File that contains paths to jobs.")
-parser.add_argument("job_index", help = "Index of job that you would like to investigate. The first entry is index 1.")
+parser.add_argument("job_index", type = int, help = "Index of job that you would like to investigate. The first entry is index 1.")
 args = parser.parse_args()
 
 with open(args.folder_file, 'r') as f_ptr:

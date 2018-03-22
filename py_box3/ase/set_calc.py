@@ -799,7 +799,7 @@ def print_vasp_param(calc):
 	max_space = 20
 	type_params = [calc.input_params, calc.bool_params, calc.int_params, calc.dict_params, calc.exp_params, calc.float_params, calc.list_params, calc.special_params, calc.string_params]
 	for type_param in type_params:
-		for key, val in type_param.iteritems():
+		for key, val in type_param.items():
 			if val is not None:
 				#help_text = help_dict[key]
 				n_space = max_space - len(key) - len(str(val))
