@@ -4,6 +4,7 @@ Created on Mon Sep 26 16:38:29 2016
 
 @author: Jonathan Lym
 """
+from py_box3 import get_unique_list
 
 calc_dict = {
 	'ZnOCu': {
@@ -438,10 +439,17 @@ def add_dimer(vasp_param):
 		vasp_param[key] = value
 	return vasp_param
 
-def add_plus_u(vasp_param, u_values = {}):
+def add_plus_u(vasp_param, u_values = {}, atoms = None):
 	for key, value in calc_dict['+U'].items():
 		vasp_param[key] = value
-	vasp_param['ldauu'] = u_values
+	if atoms is not None and type(u_values) is dict:
+		u_values_list = []
+		elements = get_unique_list(atoms.get_chemical_symbols())
+		for element in elements:
+			u_values_list.append(u_values[element])
+	else:
+		u_values_list = list(u_values_list)
+	vasp_param['ldauu'] = u_values_list
 	return vasp_param
 
 def add_bader(vasp_param):
@@ -449,6 +457,61 @@ def add_bader(vasp_param):
 		vasp_param[key] = value
 	return vasp_param
 
+def print_vasp_param(calc):
+	"""
+	Prints the parameters of the vasp calculator that are not None will helpful text if available.
+	"""
+	print('-'*20)
+	print('VASP calculator parameters:')
+	max_space = 20
+	type_params = [calc.input_params, calc.bool_params, calc.int_params, calc.dict_params, calc.exp_params, calc.float_params, calc.list_params, calc.special_params, calc.string_params]
+	for type_param in type_params:
+		for key, val in type_param.items():
+			if val is not None:
+				#help_text = help_dict[key]
+				n_space = max_space - len(key) - len(str(val))
+				#Use a single space if parameter and value are too long
+				if n_space <= 0:
+					n_space = 1
+				#Checks for help entry in help_txt
+				try:
+					help_dict[key]
+				except KeyError:
+					help_txt = 'No help entry found for parameter %s' % key
+				else:
+					#Check if there is a nested dictionary
+					if type(help_dict[key]) is dict:
+						try:
+							help_txt = help_dict[key][val]
+						except KeyError:
+							help_txt = 'No help entry found for parameter %s, key entry %r' % (key, val)
+					else:
+						help_txt = help_dict[key]
+				#Account for the quotes when calculating the space to leave for the help text
+				if type(val) is str:
+					n_space -= 2					
+				print('%s: %r%s%s' % (key, val, ' '*n_space, help_txt))
+	print('-'*20)
+   
+def assign_magmom(atoms_obj, ispin = None):
+	#Reference: http://kitchingroup.cheme.cmu.edu/dft-book/dft.html#orgheadline8
+	magmom_dict = {'H': 1.,
+				   'O': 2.,
+				   'Fe': 2.22,
+				   'Co': 1.72,
+				   'Ni': 0.61}
+	magmoms = [0]*len(atoms_obj)		  
+	for i, atom in enumerate(atoms_obj):
+		if magmom_dict.get(atom.symbol) is not None:
+			magmoms[i] = magmom_dict.get(atom.symbol)
+	return magmoms
+
+def handle_restart(calc, atoms):
+	"""Uses the istart and ispin parameters in calc to determine whether magmom should be set. """
+	if calc.int_params['ispin'] == 2:
+		if calc.int_params['istart'] == 0:
+			magmom = [0] * len(atoms)
+			calc.set(magmom = magmom)
 #Help dictionary used for print_vasp_param
 help_dict = { 
 	#Boolean parameters
@@ -787,61 +850,3 @@ help_dict = {
 	'gamma': {True: 'K point will be placed at the gamma point.',
 			  False: 'K point not necessarily placed at the gamma point.'}				  
 }	
-
-
-
-def print_vasp_param(calc):
-	"""
-	Prints the parameters of the vasp calculator that are not None will helpful text if available.
-	"""
-	print('-'*20)
-	print('VASP calculator parameters:')
-	max_space = 20
-	type_params = [calc.input_params, calc.bool_params, calc.int_params, calc.dict_params, calc.exp_params, calc.float_params, calc.list_params, calc.special_params, calc.string_params]
-	for type_param in type_params:
-		for key, val in type_param.items():
-			if val is not None:
-				#help_text = help_dict[key]
-				n_space = max_space - len(key) - len(str(val))
-				#Use a single space if parameter and value are too long
-				if n_space <= 0:
-					n_space = 1
-				#Checks for help entry in help_txt
-				try:
-					help_dict[key]
-				except KeyError:
-					help_txt = 'No help entry found for parameter %s' % key
-				else:
-					#Check if there is a nested dictionary
-					if type(help_dict[key]) is dict:
-						try:
-							help_txt = help_dict[key][val]
-						except KeyError:
-							help_txt = 'No help entry found for parameter %s, key entry %r' % (key, val)
-					else:
-						help_txt = help_dict[key]
-				#Account for the quotes when calculating the space to leave for the help text
-				if type(val) is str:
-					n_space -= 2					
-				print('%s: %r%s%s' % (key, val, ' '*n_space, help_txt))
-	print('-'*20)
-   
-def assign_magmom(atoms_obj, ispin = None):
-	#Reference: http://kitchingroup.cheme.cmu.edu/dft-book/dft.html#orgheadline8
-	magmom_dict = {'H': 1.,
-				   'O': 2.,
-				   'Fe': 2.22,
-				   'Co': 1.72,
-				   'Ni': 0.61}
-	magmoms = [0]*len(atoms_obj)		  
-	for i, atom in enumerate(atoms_obj):
-		if magmom_dict.get(atom.symbol) is not None:
-			magmoms[i] = magmom_dict.get(atom.symbol)
-	return magmoms
-
-def handle_restart(calc, atoms):
-	"""Uses the istart and ispin parameters in calc to determine whether magmom should be set. """
-	if calc.int_params['ispin'] == 2:
-		if calc.int_params['istart'] == 0:
-			magmom = [0] * len(atoms)
-			calc.set(magmom = magmom)
