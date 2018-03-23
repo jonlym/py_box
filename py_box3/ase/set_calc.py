@@ -441,7 +441,7 @@ def add_dimer(vasp_param):
 def add_plus_u(vasp_param, u_values = {}):
 	for key, value in calc_dict['+U'].items():
 		vasp_param[key] = value
-	vasp_param['ldau_luj'] = u_values
+	vasp_param['ldauu'] = u_values
 	return vasp_param
 
 def add_bader(vasp_param):
