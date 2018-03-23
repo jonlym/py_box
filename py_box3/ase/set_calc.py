@@ -448,7 +448,7 @@ def add_plus_u(vasp_param, u_values = {}, atoms = None):
 		for element in elements:
 			u_values_list.append(u_values[element])
 	else:
-		u_values_list = list(u_values_list)
+		u_values_list = list(u_values)
 	vasp_param['ldauu'] = u_values_list
 	return vasp_param
 
