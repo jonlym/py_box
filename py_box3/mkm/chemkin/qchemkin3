@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import getpass
@@ -108,9 +108,9 @@ qs_path = os.path.join(abs_path, qs_name)
 #Process job path
 
 #Replacing fields in template script with options
-print 'Submitting job using qchemkin with the following options:'
-for key, val in vars(args).iteritems():
-    print '{}\t{}'.format(key, val)
+print('Submitting job using qchemkin with the following options:')
+for key, val in vars(args).items():
+    print('{}\t{}'.format(key, val))
     if 'version' in key:
         ckpath = os.path.join(ckpath, val)
         qchemkin_template = qchemkin_template.replace('__ckpath', ckpath)
@@ -128,4 +128,4 @@ if args.submit:
 elif args.local:
     os.system(qs_path)
 else:
-    print 'Don\'t forget to submit using qsub {}!'.format(qs_name)
+    print('Don\'t forget to submit using qsub {}!'.format(qs_name))
