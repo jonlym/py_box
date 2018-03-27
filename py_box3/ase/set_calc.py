@@ -391,7 +391,8 @@ calc_dict = {
 		},
 	'+U': {
 		'ldau': True,
-		'ldautype': 1,
+		'ldautype': 2,
+        'lmaxmix': 4,
 		},
 	'bader': {
 		'laechg': True,
@@ -419,7 +420,7 @@ calc_dict = {
 		},
 }
 
-def add_neb(vasp_param, atoms_first = None, atoms_last = None, efirst = None, elast = None):
+def add_neb(vasp_param, atoms_first = None, atoms_last = None, efirst = None, elast = None, **kwargs):
 	for key, value in calc_dict['neb'].items():
 		vasp_param[key] = value
 	if efirst is not None:
@@ -432,28 +433,42 @@ def add_neb(vasp_param, atoms_first = None, atoms_last = None, efirst = None, el
 	elif atoms_last is not None:
 		vasp_param['elast'] = atoms_last.get_potential_energy()
 
+	for key, value in kwargs.items():
+		vasp_param[key] = value
 	return vasp_param
 
-def add_dimer(vasp_param):
+def add_dimer(vasp_param, **kwargs):
 	for key, value in calc_dict['dimer'].items():
 		vasp_param[key] = value
+	for key, value in kwargs.items():
+		vasp_param[key] = value
 	return vasp_param
 
-def add_plus_u(vasp_param, u_values = {}, atoms = None):
+def add_plus_u(vasp_param, u_values, atoms = None, **kwargs):
 	for key, value in calc_dict['+U'].items():
 		vasp_param[key] = value
+	#Resets default values with whatever's fed to it
+	for key, value in kwargs.items():
+		vasp_param[key] = value
+
 	if atoms is not None and type(u_values) is dict:
 		u_values_list = []
 		elements = get_unique_list(atoms.get_chemical_symbols())
 		for element in elements:
-			u_values_list.append(u_values[element])
+			try:
+				u_values_list.append(u_values[element])
+			except KeyError:
+				#If the value was not specified, assumed to be zero
+				u_values_list.append(0.0)
 	else:
-		u_values_list = list(u_values_list)
+		u_values_list = list(u_values)
 	vasp_param['ldauu'] = u_values_list
 	return vasp_param
 
-def add_bader(vasp_param):
+def add_bader(vasp_param, **kwargs):
 	for key, value in calc_dict['bader'].items():
+		vasp_param[key] = value
+	for key, value in kwargs.items():
 		vasp_param[key] = value
 	return vasp_param
 

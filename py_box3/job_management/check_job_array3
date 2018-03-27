@@ -14,6 +14,7 @@ from os.path import isdir, exists
 parser = argparse.ArgumentParser(description = "Checks the paths in joblist.txt and folderlist.txt to ensure they exist for Job Array Submission.")
 parser.add_argument("job_file", nargs='?', default = './joblist.txt', help = "File that contains job names.")
 parser.add_argument("folder_file", nargs='?', default = './folderlist.txt', help = "File that contains paths to jobs.")
+parser.add_argument("-c", "--change", action = 'store_true', default = False, help = "Changes job array True entries to False")
 args = parser.parse_args()
 job_file = args.job_file
 folder_file = args.folder_file
@@ -32,19 +33,32 @@ with open(job_file, 'r') as job_ptr, open(folder_file, 'r') as folder_ptr:
             chdir(folder)
             job_exists = exists('{}.py'.format(job))
             if job_exists:
-                if 'testRun = True' in open('{}.py'.format(job), 'r').read():
-                    print 'Line {}  testRun = True for job {}.py at {}'.format(i+1, job, folder)
+                test_run_on = False
+                lines_out = []
+                with open('{}.py'.format(job), 'r') as f_ptr:
+                    for line in f_ptr:
+                        if 'testRun = True' in line:
+                            print('Line {}  testRun = True for job {}.py at {}'.format(i+1, job, folder))
+                            test_run_on = True
+                        
+                        if args.change:
+                            lines_out.append(line.replace('testRun = True', 'testRun = False'))
+                            
+                if test_run_on:
                     j += 1
+                    if args.change:
+                        with open('{}.py'.format(job), 'w') as f_ptr:
+                            f_ptr.write(''.join(lines_out))
             else:
-                print 'Line {}  Job {}.py does not exist at {}.'.format(i+1, job, folder)
+                print('Line {}  Job {}.py does not exist at {}.'.format(i+1, job, folder))
                 k += 1
         else:
-            print 'Line {}  Folder {} does not exist.'.format(i+1, folder)
+            print('Line {}  Folder {} does not exist.'.format(i+1, folder))
             l += 1
         chdir(home_dir)
-print '-'*10
-print 'Summary:'
-print '\tTotal # jobs: {}'.format(i+1)
-print '\ttestRun = True: {}'.format(j)
-print '\tInvalid Job: {}'.format(k)
-print '\tInvalid Folder: {}'.format(l)
+print('-'*10)
+print('Summary:')
+print('\tTotal # jobs: {}'.format(i+1))
+print('\ttestRun = True: {}'.format(j))
+print('\tInvalid Job: {}'.format(k))
+print('\tInvalid Folder: {}'.format(l))
