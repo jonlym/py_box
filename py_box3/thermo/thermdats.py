@@ -5,16 +5,18 @@ Created on Wed Nov 23 14:57:39 2016
 @author: Jonathan Lym
 """
 
-from scipy.stats import variation
 import re
 import numpy as np
 import ase.thermochemistry
 import xlwt
-import py_box3.constants as c
 import warnings
-from py_box3.thermo.nasa import Nasa
+from scipy.stats import variation
 
-class thermdats(object):
+from py_box3.thermo.nasa import Nasa
+from py_box3.thermo.thermdat import Thermdat
+import py_box3.constants as c
+
+class Thermdats(object):
     """
     An object that stores a list of thermdat objects.
     """    
@@ -469,7 +471,7 @@ class thermdats(object):
                                     a_high = np.array(a_high),
                                     verbose = verbose,
                                     symbol = symbol)
-                        thermdats.append(thermdat(symbol = symbol, 
+                        thermdats.append(Thermdat(symbol = symbol, 
                                                   CHON = CHON, 
                                                   is_gas = is_gas, 
                                                   nasa = nasa,
@@ -477,3 +479,38 @@ class thermdats(object):
                                                   verbose = verbose,
                                                   warn = warn))
         return cls(thermdats = thermdats)
+
+def _get_CHON_value(string, symbol, atom, verbose = True, warn = True):
+    """Returns the number of C, H, O or N in an atom based on the string inputted."""
+    #Looks for a pattern which starts with the atom type (e.g. C), has spaces
+    #and then ends with a digit    
+    pattern = '%s +\d+' % atom  
+    try:
+        buf = re.search(pattern, string).group(0)
+    except AttributeError:
+        if warn:
+            warnings.warn("Unable to find %s atom in species %s. Returning 0." % (atom, symbol))
+        return 0
+    buf = re.search('\d+', buf).group(0)
+    return int(float(buf))
+
+def _get_T_values(string, symbol, verbose = True):
+    """Returns T_low, T_mid and T_high given a string inputted."""
+    #Looks for three floating numbers separated by a space
+    pattern = "[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? +[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? +[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?"
+    try:
+        buf = re.search(pattern, string).group(0)
+    except AttributeError:
+        if verbose:
+            print(("Warning: Unable to find temperature limits in species %s. Returning 0s." % (symbol)))
+        return [0, 0, 0]
+    T_limits = re.split(" +", buf)
+    T_out = []
+    for T in T_limits:
+        T_out.append(float(T))
+    if len(T_out) < 3:
+        if verbose:
+            print(("Warning: Not all temperatures found for species %s. Returning 0s for unfound values." % symbol))
+        while len(T_out) < 3:
+            T_out.append(0)
+    return T_out

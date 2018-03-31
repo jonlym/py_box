@@ -190,7 +190,7 @@ class Nasa(object):
         """
         #If the Cp/R does not vary with temperature (occurs when no vibrational frequencies are listed)
         if (np.mean(CpoR) < 1e-6 and np.isnan(variation(CpoR))) or variation(CpoR) < 1e-3:
-           self.T_mid = T[len(T)/2]
+           self.T_mid = T[int(len(T)/2)]
            self.a_low = np.array(7*[0.])
            self.a_high = np.array(7*[0.])
         else:
@@ -231,8 +231,8 @@ class Nasa(object):
 
     def _fit_HoRT(self, HoRT0):
         T_mid = self.T_mid
-        a6_low = (HoRT0 - self._custom_HoRT(c.T0, self.a_low))*c.T0
-        a6_high = (HoRT0 - self._custom_HoRT(c.T0, self.a_high))*c.T0
+        a6_low = (HoRT0 - self._custom_HoRT(c.T0('K'), self.a_low))*c.T0('K')
+        a6_high = (HoRT0 - self._custom_HoRT(c.T0('K'), self.a_high))*c.T0('K')
 
         #Correcting for offset
         H_low_last_T = self._custom_HoRT(T_mid, self.a_low) + a6_low/T_mid
@@ -244,8 +244,8 @@ class Nasa(object):
 
     def _fit_SoR(self, SoR0):
         T_mid = self.T_mid
-        a7_low = SoR0 - self._custom_SoR(T = c.T0, a = self.a_low)
-        a7_high = SoR0 - self._custom_SoR(T = c.T0, a = self.a_high)
+        a7_low = SoR0 - self._custom_SoR(T = c.T0('K'), a = self.a_low)
+        a7_high = SoR0 - self._custom_SoR(T = c.T0('K'), a = self.a_high)
 
         #Correcting for offset
         S_low_last_T = self._custom_SoR(T_mid, self.a_low) + a7_low

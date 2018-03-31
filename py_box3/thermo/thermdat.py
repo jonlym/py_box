@@ -15,7 +15,7 @@ import warnings
 from py_box3.thermo.nasa import Nasa
 
 
-class thermdat(object):
+class Thermdat(object):
     """
     Class that holds data related to writing thermdat.
     Required parameters:
@@ -203,38 +203,3 @@ class thermdat(object):
             for i, T_val in enumerate(T):
                 CpoR[i] = self._get_single_CpoR(T_val)            
         return CpoR
-        
-def _get_CHON_value(string, symbol, atom, verbose = True, warn = True):
-    """Returns the number of C, H, O or N in an atom based on the string inputted."""
-    #Looks for a pattern which starts with the atom type (e.g. C), has spaces
-    #and then ends with a digit    
-    pattern = '%s +\d+' % atom  
-    try:
-        buf = re.search(pattern, string).group(0)
-    except AttributeError:
-        if warn:
-            warnings.warn("Unable to find %s atom in species %s. Returning 0." % (atom, symbol))
-        return 0
-    buf = re.search('\d+', buf).group(0)
-    return int(float(buf))
-
-def _get_T_values(string, symbol, verbose = True):
-    """Returns T_low, T_mid and T_high given a string inputted."""
-    #Looks for three floating numbers separated by a space
-    pattern = "[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? +[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? +[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?"
-    try:
-        buf = re.search(pattern, string).group(0)
-    except AttributeError:
-        if verbose:
-            print(("Warning: Unable to find temperature limits in species %s. Returning 0s." % (symbol)))
-        return [0, 0, 0]
-    T_limits = re.split(" +", buf)
-    T_out = []
-    for T in T_limits:
-        T_out.append(float(T))
-    if len(T_out) < 3:
-        if verbose:
-            print(("Warning: Not all temperatures found for species %s. Returning 0s for unfound values." % symbol))
-        while len(T_out) < 3:
-            T_out.append(0)
-    return T_out

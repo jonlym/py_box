@@ -7,7 +7,8 @@ Created on Wed Nov 23 14:57:39 2016
 
 from py_box3.constants import T0, convert_unit
 from ase.io import read
-from py_box3.thermo.thermdat import thermdat, thermdats
+from py_box3.thermo.thermdat import Thermdat
+from py_box3.thermo.thermdats import Thermdats
 import numpy as np
 
 class Chemkin(object):
@@ -281,7 +282,7 @@ def boolean_to_char(boolean):
     else:
         return 'F'
 
-def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
+def read_freq(freq_file_path, freq_cut_off = 0, verbose = True, warn = True):
     """
     Reads the csv file that has the frequencies of the species.
     The CSV file must be of the format:
@@ -289,7 +290,7 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
     """
     if verbose:
         print(("Reading from file: %s" % freq_file_path))
-    thermdats_obj = thermdats()
+    thermdats = Thermdats()
     freq_file = open(freq_file_path, 'r')
     with open(freq_file_path, 'r') as freq_file:
         for line in freq_file:
@@ -337,7 +338,7 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
                 vib_freq = vib_freq[vib_freq >= freq_cut_off]
                 if verbose:
                     print(("Importing %s" % symbol))
-                thermdats_obj.append(thermdat(symbol = symbol,
+                thermdats.append(Thermdat(symbol = symbol,
                                               is_gas = is_gas,
                                               CHON = CHON,
                                               H0 = H0,
@@ -347,12 +348,13 @@ def read_freq(freq_file_path, freq_cut_off = 0, verbose = True):
                                               spin = spin,
                                               atoms = atoms,                                            
                                               vib_freq = vib_freq,
-                                              verbose = verbose))
-    return thermdats_obj                                
+                                              verbose = verbose,
+                                              warn = warn))
+    return thermdats                               
 
-def read_ref(path, verbose = True):
+def read_ref(path, verbose = True, warn = True):
     #Read the reference files
-    species_ref = read_freq(path, verbose = verbose)
+    species_ref = read_freq(path, verbose = verbose, warn = warn)
     
     #Prepare the fundamental species
     e_list = ['C', 'H', 'O', 'N']
@@ -370,7 +372,7 @@ def read_ref(path, verbose = True):
     
     for i, species in enumerate(species_ref):
         #Calculate properties at T0
-        H0_dft[i] = species.IdealGasThermo.get_enthalpy(T0, verbose = False)
+        H0_dft[i] = species.IdealGasThermo.get_enthalpy(T0('K'), verbose = False)
         H0_exp[i] = species.H0*convert_unit(from_ ='kJ/mol', to = 'eV/molecule') #species.H0 from literature
 
         #Sets up the CHON matrix
