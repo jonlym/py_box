@@ -391,7 +391,8 @@ calc_dict = {
 		'potim': 0.35,
 		'npar': 2,
 		'lplane': True,
-		'gamma': True,		
+		'gamma': True,
+		'lorbit': 12,		
 	}
 	'neb': {
 		'images': 9,

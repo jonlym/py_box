@@ -8,6 +8,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from py_box3 import interpolate
 import py_box3.constants as c
+import json
 
 class Shomate(object):
     """
@@ -164,6 +165,12 @@ class Shomate(object):
             plt.ylabel('S (%s)' % units)
         plt.xlabel('T (K)')
 
+    def save_to_json(self, filename = None):
+        if filename is None:
+            filename = '{}.txt'.format(self.symbol)
+        with open(filename, 'w') as f_ptr:
+            json.dump(self, f_ptr)
+
     @classmethod
     def fit_shomate_species(cls, symbol, T, Cp, H0, S0, T_ref = c.T0('K'), elements = None):
         """Derives the shomate species from fitting the heat capacity (J/mol/K) and temperature (K) data and including the formation of enthalpy (kJ/mol) and entropy (J/mol/K)."""
@@ -171,10 +178,10 @@ class Shomate(object):
         T_high = max(T)
         t = np.array(T)/1000.
         [a, pcov] = curve_fit(_shomate_Cp, t, np.array(Cp))
-        a = list(a)
-        a6 = H0 - shomate_instance.get_HoRT(T_ref)*c.R('kJ/mol/K')*T_ref
-        a7 = S0 - shomate_instance.get_SoR(T_ref)*c.R('J/mol/K')
-        a.extend([a6, a7, 0.])
+        a = np.append(a, [0., 0., 0.])
+        a[5] = H0 - _get_HoRT(T = T_ref, a = a)*c.R('kJ/mol/K')*T_ref
+        a[6] = S0 - _get_SoR(T = T_ref, a = a)*c.R('J/mol/K')
+        a[7] = - _get_HoRT(T = c.T0('K'), a = a)*c.R('kJ/mol/K')*c.T0('K')
         return cls(symbol = symbol, T_low = T_low, T_high = T_high, a = np.array(a), elements = elements)
 
     @staticmethod
@@ -239,6 +246,17 @@ def generate_Cp_data(Ts, Cps, n = 100):
 
         Cps_out[i] = interpolate(x_low = low_T, x_high = high_T, y_low = low_Cp, y_high = high_Cp, x = T)
     return (Ts_out, Cps_out)
+
+def _get_HoRT(T, a, H_correction = False):
+    t = T/1000.
+    T_arr = np.array([t, t ** 2 / 2, t ** 3 / 3, t ** 4 / 4, -1/t, 1., 0., 1.])
+    return np.dot(T_arr, a)/(c.R('kJ/mol/K')*T)
+
+def _get_SoR(T, a):
+    t = T/1000.        
+    T_arr = np.array([np.log(t), t, t ** 2 / 2., t ** 3 / 3., -0.5 * ( 1 / t ) ** 2, 0., 1., 0.])
+    return np.dot(T_arr, a)/c.R('J/mol/K')
+
 
 
 class Phase(object):
