@@ -393,7 +393,7 @@ calc_dict = {
 		'lplane': True,
 		'gamma': True,
 		'lorbit': 12,		
-	}
+	},
 	'neb': {
 		'images': 9,
 		'lwave': True,
