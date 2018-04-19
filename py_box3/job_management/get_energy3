@@ -10,14 +10,19 @@ import os
 
 #Parse arguments
 parser = argparse.ArgumentParser(description = "Finds all the .out files in the folder specified and returns any lines starting with 'Energy:'")
-parser.add_argument("folder_in", help = "Folder that contains the .out file.")
+parser.add_argument("folders_in", nargs = '+',  help = "Folder(s) that contain(s) the .out file.")
 args = parser.parse_args()
-folder_in = args.folder_in
 
-for root, folders, files in os.walk(folder_in):
-    for file in files:
-        if '.out' in file:
-            with open(os.path.join(root, file), 'r') as f_ptr:
-                for line in f_ptr:
-                    if 'Energy: ' in line:
-                        print('{}\t{}'.format(os.path.join(root, file), line.replace('\n', '')))
+if type(args.folders_in) is str:
+    folders_in = [args.folders_in]
+else:
+    folders_in = args.folders_in
+
+for folder_in in folders_in:
+    for root, folders, files in os.walk(folder_in):
+        for file in files:
+            if '.out' in file:
+                with open(os.path.join(root, file), 'r') as f_ptr:
+                    for line in f_ptr:
+                        if 'Energy: ' in line:
+                            print('{}\t{}'.format(os.path.join(root, file), line.replace('\n', '')))

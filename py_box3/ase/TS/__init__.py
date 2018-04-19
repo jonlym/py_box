@@ -53,8 +53,8 @@ def move_atoms_by_cell(in_path, atoms_list, cell_dir_list, offset_list):
     """
     atoms_obj = read(in_path)
     for (i, cell_i, offset) in zip(atoms_list, cell_dir_list, offset_list):
-	cell_dir = offset*atoms_obj.get_cell()[abs(cell_i)]
-	print(("Moving atom %s %d by %s" % (atoms_obj[i].symbol, i, np.array_str(cell_dir))))
+        cell_dir = offset*atoms_obj.get_cell()[abs(cell_i)]
+        print(("Moving atom %s %d by %s" % (atoms_obj[i].symbol, i, np.array_str(cell_dir))))
         atoms_obj[i].position += cell_dir
     view(atoms_obj)
     print(("Overwrite %s (Y/N)?" % in_path))

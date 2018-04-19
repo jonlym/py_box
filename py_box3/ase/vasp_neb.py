@@ -24,7 +24,7 @@ import os
 import sys
 import re
 import time
-from general import Calculator
+from ase.calculators.general import Calculator
 from os.path import join, isfile, islink
 
 import numpy as np
@@ -294,23 +294,23 @@ class Vasp(Calculator):
 
     def set(self, **kwargs):
         for key in kwargs:
-            if self.float_params.has_key(key):
+            if key in self.float_params:
                 self.float_params[key] = kwargs[key]
-            elif self.exp_params.has_key(key):
+            elif key in self.exp_params:
                 self.exp_params[key] = kwargs[key]
-            elif self.string_params.has_key(key):
+            elif key in self.string_params:
                 self.string_params[key] = kwargs[key]
-            elif self.int_params.has_key(key):
+            elif key in self.int_params:
                 self.int_params[key] = kwargs[key]
-            elif self.bool_params.has_key(key):
+            elif key in self.bool_params:
                 self.bool_params[key] = kwargs[key]
-            elif self.list_params.has_key(key):
+            elif key in self.list_params:
                 self.list_params[key] = kwargs[key]
-            elif self.special_params.has_key(key):
+            elif key in self.special_params:
                 self.special_params[key] = kwargs[key]
-            elif self.dict_params.has_key(key):
+            elif key in self.dict_params:
                 self.dict_params[key] = kwargs[key]
-            elif self.input_params.has_key(key):
+            elif key in self.input_params:
                 self.input_params[key] = kwargs[key]
             else:
                 raise TypeError('Parameter not defined: ' + key)
