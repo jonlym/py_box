@@ -409,7 +409,8 @@ calc_dict = {
 		'ichain': 0,
 		'ispring': 1
 		},
-	'dimer':{'ediffg': -0.05,
+	'dimer':{
+		'ediffg': -0.05,
 		'iopt': 2,
 		'ibrion': 3,
 		'potim': 0,
