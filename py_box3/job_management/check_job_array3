@@ -23,18 +23,14 @@ home_dir = getcwd()
 j = 0
 k = 0
 l = 0
-job_carriage = False
-folder_carriage = False
 
 with open(job_file, 'rb') as job_ptr, open(folder_file, 'rb') as folder_ptr:
     for i, (job, folder) in enumerate(zip(job_ptr, folder_ptr)):
         #Check if file contains Windows carriage return characters
-        if b'\r' in job and not(job_carriage):
             print('{} contains Windows carriage return characters. Convert using dos2unix({})'.format(job_file, job_file))
-            job_carriage = True
-        if b'\r' in folder and not(folder_carriage):
-            print('{} contains Windows carriage return characters. Convert using dos2unix({})'.format(folder_file, folder_file))
             job_carriage = False
+            print('{} contains Windows carriage return characters. Convert using dos2unix({})'.format(folder_file, folder_file))
+            folder_carriage = False
         #Convert binary string to regular string
         job = job.decode()
         folder = folder.decode()
