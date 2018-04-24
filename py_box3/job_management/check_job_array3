@@ -23,12 +23,16 @@ home_dir = getcwd()
 j = 0
 k = 0
 l = 0
+correct_job_newline = True
+correct_folder_newline = True
 
 with open(job_file, 'rb') as job_ptr, open(folder_file, 'rb') as folder_ptr:
     for i, (job, folder) in enumerate(zip(job_ptr, folder_ptr)):
         #Check if file contains Windows carriage return characters
+        if b'\r' in job and correct_job_newline:
             print('{} contains Windows carriage return characters. Convert using dos2unix({})'.format(job_file, job_file))
             job_carriage = False
+        if b'\r' in folder and correct_folder_newline:
             print('{} contains Windows carriage return characters. Convert using dos2unix({})'.format(folder_file, folder_file))
             folder_carriage = False
         #Convert binary string to regular string
@@ -68,6 +72,8 @@ with open(job_file, 'rb') as job_ptr, open(folder_file, 'rb') as folder_ptr:
         chdir(home_dir)
 print('-'*10)
 print('Summary:')
+print('\t{} has correct newline character: {}'.format(job_file, correct_job_newline))
+print('\t{} has correct newline character: {}'.format(folder_file, correct_folder_newline))
 print('\tTotal # jobs: {}'.format(i+1))
 print('\ttestRun = True: {}'.format(j))
 print('\tInvalid Job: {}'.format(k))
