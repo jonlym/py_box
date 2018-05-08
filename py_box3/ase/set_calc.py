@@ -427,6 +427,10 @@ calc_dict = {
 		'lcharg': True,
 		'lwave': True,
 		},
+	'vib': {
+		'ediff': 1.e-8,
+		'prec': 'accurate',
+		},
 	'Pt': {
 		'xc': "PBE",
 		'kpts': (3,3,1),
@@ -495,6 +499,13 @@ def add_plus_u(vasp_param, u_values, atoms = None, **kwargs):
 
 def add_bader(vasp_param, **kwargs):
 	for key, value in calc_dict['bader'].items():
+		vasp_param[key] = value
+	for key, value in kwargs.items():
+		vasp_param[key] = value
+	return vasp_param
+
+def add_vib(vasp_param, **kwargs):
+	for key, value in calc_dict['vib'].items():
 		vasp_param[key] = value
 	for key, value in kwargs.items():
 		vasp_param[key] = value
