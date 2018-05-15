@@ -6,11 +6,22 @@ import warnings
 class Nasa(object):
     """
     Contains the NASA polynomials and corresponding temperature ranges for a species.
-    T_low - Low temperature (K)
-    T_mid - Middle temperature at which the knot occurs (K)
-    T_high - High temperature (K)
-    a_low - [7x1] Numpy array that holds the NASA coefficients used between T_low and T_mid.
-    a_high - [7x1] Numpy array that holds the NASA coefficients used between T_mid and T_high.
+    Information on NASA polynomials can be found here: http://combustion.berkeley.edu/gri_mech/data/nasa_plnm.html
+
+    Attributes
+    ----------
+        T_low - float
+            Lower temperature bound (K)
+        T_mid - float
+            Middle temperature where the transition between a_low and a_high occurs (K)
+        T_high - float
+            High temperature bound (K)
+        a_low - (7,) ndarray 
+            Holds the NASA coefficients used between T_low and T_mid.
+        a_high - (7,) ndarray
+            Holds the NASA coefficients used between T_mid and T_high.
+        verbose - boolean
+            Whether information should be printed as functions are called
     """
     def __init__(self, symbol = '', T_low = 0, T_mid= 0, T_high = 0, a_low = None, a_high = None, verbose = True):
         self.symbol = symbol
@@ -40,7 +51,17 @@ class Nasa(object):
             return False
 
     def _get_single_CpoR(self, T):
-        """Calculates the heat capacity at constant pressure (i.e. Cp/R) for a single temperature."""
+        """
+        Calculates the heat capacity at constant pressure (i.e. Cp/R) for a single temperature.
+        Parameters
+        ----------
+            T - float
+                Temperature (K)
+        Returns
+        -------
+            CpoR - float
+                Heat capacity divided by molar gas constant (i.e. Cp/R)
+        """
         T_arr = np.array([1., T, T ** 2, T ** 3, T ** 4, 0., 0.])
         if T < self.T_mid:
             if T < self.T_low:
@@ -53,7 +74,17 @@ class Nasa(object):
 
 
     def get_CpoR(self, T):
-        """Calculates the heat capacity at constant pressure (i.e. Cp/R) given a temperature or a list of temperatures."""
+        """
+        Calculates the heat capacity at constant pressure (i.e. Cp/R) given a temperature or a list of temperatures.
+        Parameters
+        ----------
+            T - float or (N,) ndarray
+                Temperature (K)
+        Returns
+        -------
+            CpoR - float or (N,) ndarray
+                Heat capacity divided by molar gas constant (i.e. Cp/R)
+        """
         try:
             T_val = iter(T)
         except TypeError:
@@ -67,7 +98,17 @@ class Nasa(object):
         return CpoR
 
     def _get_single_HoRT(self, T, verbose = True):
-        """Calculates the dimensionless enthalpy (i.e. H/RT) given a single temperature."""
+        """
+        Calculates the dimensionless enthalpy (i.e. H/RT) given a single temperature.
+        Parameters
+        ----------
+            T - float
+                Temperature (K)
+        Returns
+        -------
+            HoRT - float
+                Enthalpy divided by molar gas constant and temperature (i.e. H/RT)
+        """
         T_arr = np.array([1., T/2., T ** 2 / 3., T ** 3 / 4., T ** 4 / 5., 1. / T, 0.])
         if T < self.T_mid:
             if T < self.T_low:
@@ -79,7 +120,17 @@ class Nasa(object):
         return np.dot(T_arr, self.a_high)
 
     def get_HoRT(self, T):
-        """Calculates the dimensionless enthalpy at constant pressure (i.e. H/RT) given a temperature or a list of temperatures."""
+        """
+        Calculates the dimensionless enthalpy at constant pressure (i.e. H/RT) given a temperature or a list of temperatures.
+        Parameters
+        ----------
+            T - float or (N,) ndarray
+                Temperature (K)
+        Returns
+        -------
+            HoRT - float or (N,) ndarray
+                Enthalpy divided by molar gas constant and temperature (i.e. H/RT)
+        """
         try:
             T_val = iter(T)
         except TypeError:
@@ -94,7 +145,17 @@ class Nasa(object):
 
 
     def _get_single_SoR(self, T, verbose = True):
-        """Calculates the dimensionless entropy (i.e. S/R) given a temperature."""
+        """
+        Calculates the dimensionless entropy (i.e. S/R) given a temperature.
+        Parameters
+        ----------
+            T - float
+                Temperature (K)
+        Returns
+        -------
+            SoR - float
+                Entropy divided by molar gas constant (i.e. S/R)
+        """
         T_arr = np.array([np.log(T), T, T ** 2 / 2., T ** 3 / 3., T ** 4 / 4., 0., 1.])
         if T < self.T_mid:
             if T < self.T_low:
@@ -106,7 +167,17 @@ class Nasa(object):
             return np.dot(T_arr, self.a_high)
 
     def get_SoR(self, T):
-        """Calculates the dimensionless entropy at constant pressure (i.e. S/R) given a temperature or a list of temperatures."""
+        """
+        Calculates the dimensionless entropy at constant pressure (i.e. S/R) given a temperature or a list of temperatures.
+        Parameters
+        ----------
+            T - float
+                Temperature (K)
+        Returns
+        -------
+            SoR - float
+                Heat capacity divided by molar gas constant (i.e. S/R)
+        """
         try:
             T_val = iter(T)
         except TypeError:
@@ -120,7 +191,17 @@ class Nasa(object):
         return SoR
 
     def get_GoRT(self, T, verbose = True):
-        """Calculates the dimensionless enthalpy (i.e. G/RT) given a temperature."""
+        """
+        Calculates the dimensionless enthalpy (i.e. G/RT) given a temperature.
+        Parameters
+        ----------
+            T - float or (N,) ndarray
+                Temperature (K)
+        Returns
+        -------
+            GoRT - float or (N,) ndarray
+                Enthalpy divided by molar gas constant and temperature (i.e. G/RT)
+        """
         HoRT = self.get_HoRT(T)
         SoR = self.get_SoR(T)
         return HoRT-SoR
@@ -128,15 +209,21 @@ class Nasa(object):
     def plot_thermo(self, T_low = None, T_high = None, units = None):
         """
         Plots the heat capacity, enthalpy and entropy in the temperature range specified.
-        The units for the plots can be specified by using R
+        Parameters
+        ----------
+            T_low - float
+                Lower bound to plot temperature (K). If not specified then the T_low attribute for the species is used.
+            T_high - float
+                Higher bound to plot temperatures (K). If not specified then the T_high attribute for the species is used.
+            units - string
+                Controls the units used based on the molar gas constant (e.g. J/mol/K, kcal/mol/K, 'eV/K'). 
+                If not specified then dimensionless units are used.
         """
         import matplotlib.pyplot as plt
 
         if T_low == None:
-            print("T_low not specified. Using self.T_low attribuate.")
             T_low = self.T_low
         if T_high == None:
-            print("T_low not specified. Using self.T_high attribuate.")
             T_high = self.T_high
 
         T = np.linspace(T_low, T_high)
@@ -175,21 +262,39 @@ class Nasa(object):
             plt.ylabel('S (%s)' % units)
         plt.xlabel('T (K)')
 
-    def fit_NASA(self, T, CpoR, HoRT0, SoR0):
+    def fit_NASA(self, T, CpoR, HoRT0, SoR0, T0 = c.T0('K')):
         """
         Generate a NASA polynomial given dimensionless heat capacity as a function of temperature,
         dimensionless enthalpy of formation and dimensionless entropy of formation.
+        Parameters
+        ----------
+            T - (N,) ndarray
+                Temperatures (K) to fit the polynomial
+            CpoR - (N,) ndarray
+                Dimensionless heat capacities that correspond to T array
+            HoRT0 - float
+                Dimensionless enthalpy to be used as reference. Used to find a6. Value should correspond to T0
+            SoR0 - float
+                Dimensionless entropy to be used as reference. Used to find a7. Value should correspond to T0
+            T0 - float
+                Reference temperature used for fitting a6 and a7.
         """
-        self.fit_CpoR(T, CpoR)
-        self._fit_HoRT(HoRT0)
-        self._fit_SoR(SoR0)
+        self.fit_CpoR(T = T, CpoR = CpoR)
+        self._fit_HoRT(HoRT0 = HoRT0, T0 = T0)
+        self._fit_SoR(SoR0 = SoR0, T0 = T0)
 
     def fit_CpoR(self, T, CpoR):
         """
         Fits parameters a1 - a6 using dimensionless heat capacity and temperature.
+        Parameters
+        ----------
+            T - (N,) ndarray
+                Temperatures (K) to fit the polynomial
+            CpoR - (N,) ndarray
+                Dimensionless heat capacities that correspond to T array
         """
         #If the Cp/R does not vary with temperature (occurs when no vibrational frequencies are listed)
-        if (np.mean(CpoR) < 1e-6 and np.isnan(variation(CpoR))) or variation(CpoR) < 1e-3:
+        if (np.mean(CpoR) < 1e-6 and np.isnan(variation(CpoR))) or variation(CpoR) < 1e-3 or all(np.isnan(CpoR)):
            self.T_mid = T[int(len(T)/2)]
            self.a_low = np.array(7*[0.])
            self.a_high = np.array(7*[0.])
@@ -210,6 +315,25 @@ class Nasa(object):
             self.a_high = np.concatenate((a_high_rev[::-1], empty_arr))
 
     def _get_CpoR_R2(self, T, CpoR, i_mid):
+        """
+        Calculates the R2 polynomial regression value.
+        Parameters
+        ----------
+            T - (N,) ndarray
+                Temperatures (K) to fit the polynomial
+            CpoR - (N,) ndarray
+                Dimensionless heat capacities that correspond to T array
+            i_mid - int
+                Index that splits T and CpoR arrays into a lower and higher range
+        Returns
+        -------
+            R2 - float
+                R2 value resulting from NASA polynomial fit to T and CpoR
+            p_low - (5,) ndarray
+                Polynomial corresponding to lower range of data
+            p_high - (5,) ndarray
+                Polynomial corresponding to high range of data
+        """
         T_low = T[:i_mid]
         CpoR_low = CpoR[:i_mid]
         T_high = T[i_mid:]
@@ -229,10 +353,19 @@ class Nasa(object):
 
         return (R2, p_low, p_high)
 
-    def _fit_HoRT(self, HoRT0):
+    def _fit_HoRT(self, HoRT0, T0 = c.T0('K')):
+        """
+        Calculates the a6 parameter for the NASA polynomial.
+        Parameters
+        ----------
+            HoRT0 - float
+                Dimensionless enthalpy at reference temperature
+            T0 - float
+                Reference temperature (K)
+        """
         T_mid = self.T_mid
-        a6_low = (HoRT0 - self._custom_HoRT(c.T0('K'), self.a_low))*c.T0('K')
-        a6_high = (HoRT0 - self._custom_HoRT(c.T0('K'), self.a_high))*c.T0('K')
+        a6_low = (HoRT0 - self._custom_HoRT(T0, self.a_low))*T0
+        a6_high = (HoRT0 - self._custom_HoRT(T0, self.a_high))*T0
 
         #Correcting for offset
         H_low_last_T = self._custom_HoRT(T_mid, self.a_low) + a6_low/T_mid
@@ -242,11 +375,19 @@ class Nasa(object):
         self.a_low[5] = a6_low
         self.a_high[5] = T_mid * (a6_high/T_mid + H_offset)
 
-    def _fit_SoR(self, SoR0):
+    def _fit_SoR(self, SoR0, T0 = c.T0('K')):
+        """
+        Calculates the a7 parameter for the NASA polynomial.
+        Parameters
+        ----------
+            SoR0 - float
+                Dimensionless entropy at reference temperature
+            T0 - float
+                Reference temperature (K)
+        """
         T_mid = self.T_mid
-        a7_low = SoR0 - self._custom_SoR(T = c.T0('K'), a = self.a_low)
-        a7_high = SoR0 - self._custom_SoR(T = c.T0('K'), a = self.a_high)
-
+        a7_low = SoR0 - self._custom_SoR(T = T0, a = self.a_low)
+        a7_high = SoR0 - self._custom_SoR(T = T0, a = self.a_high)
         #Correcting for offset
         S_low_last_T = self._custom_SoR(T_mid, self.a_low) + a7_low
         S_high_first_T = self._custom_SoR(T_mid, self.a_high) + a7_high
@@ -257,14 +398,33 @@ class Nasa(object):
 
     def _custom_HoRT(self, T, a):
         """
-        Function that calculates the entropy excluding the formation term.
+        Calculates the dimensionless enthalpy ignoring the contribution from the a6 parameter.
+        Parameters
+        ----------
+            T - float
+                Temperature
+            a - (7,) ndarray
+                NASA coefficients
+        Returns
+        -------
+            HoRT - float
+                Dimensionless enthalpy at T ignoring the a6 parameter
         """
         T_arr = np.array([1., T/2., T**2/3., T**3/4., T**4/5., 0., 0.])
         return np.dot(a, T_arr)
 
     def _custom_SoR(self, T, a):
         """
-        Function that calculates the entropy excluding the formation term.
+        Calculates the dimensionless entropy ignoring the contribution from the a7 parameter.
+        Parameters
+        ----------
+            T - float
+                Temperature
+            a - (7,) ndarray
+                NASA coefficients
+        Returns
+            SoR - float
+                Dimensionless entropy at T ignoring the a7 parameter
         """
         T_arr = np.array([np.log(T), T, T**2/2., T**3/3., T**4/4., 0., 0.])
         return np.dot(a, T_arr)

@@ -18,51 +18,64 @@ from py_box3.thermo.nasa import Nasa
 class Thermdat(object):
     """
     Class that holds data related to writing thermdat.
-    Required parameters:
-    symbol - String that will be written on the first line for 
-             the species.
-    is_gas - Boolean that is True for gas species and False for surface species. 
-             This value will be written as G for True or S for False in the 
-             thermdat file.
-             Gas species will have an ase.thermochemistry.IdealGasThermdat 
-             object while surface species will have an ase.thermochemistry.
-             HarmonicThermo object. Each will have additional parameters
 
-    Optional parameters:
-    vib_freq - Numpy array that holds the vibrational frequencies in cm^-1.
-               If you've been given frequencies in Hz, divide by speed of 
-               light in cm/s (29979245800) before passing.
-    CHON - List that holds the number of C, H, O and N in that order
-    aux_element - String that contains the element name if not C, N, O or H.
-    nasa - NASA object that holds temperature ranges and NASA polynomials.
-    geometry - String only required for gas species. Options include:
+    Required Attributes
+    -------------------
+        symbol - string
+            Will be written on the first line for the species.
+        is_gas - boolean 
+            True for gas species and False for surface species. 
+            This value will be written as G for True or S for False in the 
+            thermdat file.
+            Gas species will have an ase.thermochemistry.IdealGasThermdat 
+            object while surface species will have an ase.thermochemistry.
+            HarmonicThermo object. Each will have additional parameters
+
+    Optional Attributes
+    -------------------
+        vib_freq - (N,) ndarray
+            Holds the vibrational frequencies in cm^-1.
+            If you've been given frequencies in Hz, divide by speed of 
+            light in cm/s (29979245800) before passing.
+        CHON - (4,) list
+            Holds the number of C, H, O and N in that order
+        aux_element - string
+            Holds the element name if not C, N, O or H.
+        nasa - NASA object 
+            Holds temperature ranges and NASA polynomials.
+        geometry - string 
+            Only required for gas species. Options include:
                 monatomic                   
                 linear
                 nonlinear
-    potentialenergy - Potential energy obtained from DFT in eV
-    symmetrynumber - Symmetry number required for gas species. Input can either
-                     be an integer or a string of the corresponding point group.
-                     Supported point groups:
-                     Point group    symmetry number
-                     C1             1
-                     Cs             1
-                     C2             2
-                     C2v            2
-                     C3v            3
-                     Cinfv          1
-                     D2h            4
-                     D3h            6
-                     D5h            10
-                     Dinfh          2
-                     D3d            6
-                     Td             12
-                     Oh             24
-                     See DOI for more details: 10.1007/s00214-007-0328-0
-    atoms - ASE atoms object only required for gas species
-    spin - Integer for the total electronic spin. 
-           0 for molecules in which all electrons are paired
-           0.5 for a free radical with a single unpaired electron
-           1.0 for a triplet with two unpaired electrons, such as O_2.
+        potentialenergy - float
+            Potential energy obtained from DFT in eV
+        symmetrynumber - int or string
+            Symmetry number required for gas species. Input can either
+            be an integer or a string of the corresponding point group.
+            Supported point groups:
+            Point group    symmetry number
+            C1             1
+            Cs             1
+            C2             2
+            C2v            2
+            C3v            3
+            Cinfv          1
+            D2h            4
+            D3h            6
+            D5h            10
+            Dinfh          2
+            D3d            6
+            Td             12
+            Oh             24
+            See DOI for more details: 10.1007/s00214-007-0328-0
+        atoms - ASE atoms object 
+            Only required for gas species to calculate rotational modes
+        spin - float
+            Holds the total electronic spin. 
+            0 for molecules in which all electrons are paired
+            0.5 for a free radical with a single unpaired electron
+            1.0 for a triplet with two unpaired electrons, such as O_2.
     """
     def __init__(self, 
                  symbol, 

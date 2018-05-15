@@ -1,49 +1,12 @@
+import collections
 import numpy as np
 from py_box3.thermo.shomate import Shomate
 from py_box3 import constants as c
 
-class Shomates(object):
+class Shomates(collections.UserList):
     """
     An object that stores a list of shomate objects.
-    """    
-    def __init__(self, shomates = [], verbose = True):
-        self._shomates = list(shomates)
-        self.verbose = verbose
-            
-    def append(self, shomate):
-        self._shomates.append(shomate)
-
-    def extend(self, shomates):
-        self._shomates.extend(shomates)
-
-    def index(self, symbol):
-        for i, shomate in enumerate(self):
-            if shomate.symbol == symbol:
-                return i
-
-    def remove(self, symbol):
-        for i, shomate in enumerate(self):
-            if shomate.symbol == symbol:
-                self._shomates.pop(i)
-
-    def __len__(self):
-        return len(self._shomates)
-    
-    def __setitem__(self, index, shomate):
-        self._shomates[index] = shomate
-
-    def __getitem__(self, index):
-        return self._shomates[index]
-
-    def _assign_verbose(self, verbose):
-        """
-        Function that allows verbose input to override the object's verbose for the duration of the calling function.
-        """
-        if verbose is None:
-            return self.verbose
-        else:
-            return verbose
-        
+    """            
     def print_symbols(self):
         """
         Prints a summary of the thermdat list.

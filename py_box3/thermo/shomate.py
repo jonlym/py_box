@@ -13,10 +13,21 @@ import json
 class Shomate(object):
     """
     Contains the Shomate polynomials and corresponding temperature ranges for a species.
-    symbol - string to identify the species the object belongs to.
-    T_low - Low temperature (K)
-    T_high - High temperature (K)
-    a - [8x1] Numpy array that holds the Shomate coefficients used between T_low and T_high.
+
+    Attributes:
+    -----------
+        symbol - string
+            Identify the species the object is describing
+        T_low - float
+            Low temperature (K)
+        T_high: float
+            High temperature (K)
+        phases - dict
+            Dictionary of phase objects. Provides higher flexibility for thermodynamics, 
+            such as piecewise Shomate polynomials at different temperatures or polymorphs.
+            The keys should represent characteristics about the phase (e.g. gamma).
+        elements - dict
+            Stoichiometric make up of species. Keys should be elements.
     """
     def __init__(self, symbol, T_low = 0, T_high = 0, a = None, phases = None, elements = None):
         self.symbol = symbol
@@ -40,7 +51,13 @@ class Shomate(object):
         return self.phases[phase].get_CpoR(T = T, verbose = verbose)
     
     def get_CpoR(self, T, verbose = True, phase = None):
-        """Calculates the heat capacity at constant pressure (i.e. Cp/R) given a temperature or a list of temperatures."""
+        """
+        Calculates the heat capacity at constant pressure (i.e. Cp/R) given a temperature or a list of temperatures.
+        The phase argument can be used to specify which phase to use.
+        Other phase options:
+            'stable' or None: Use the shomate polynomial that has the lowest Gibbs energy at T regardless of T_low and T_high
+            'temperature': Use the shomate polynomial that has the lowest Gibbs energy at T within T_low and T_high            
+        """
         try: 
             T_val = iter(T)
         except TypeError:
@@ -61,7 +78,13 @@ class Shomate(object):
         return self.phases[phase].get_HoRT(T = T, verbose = verbose, H_correction = H_correction)
 
     def get_HoRT(self, T, H_correction = False, verbose = True, phase = None):
-        """Calculates the dimensionless enthalpy at constant pressure (i.e. H/RT) given a temperature or a list of temperatures."""
+        """
+        Calculates the dimensionless enthalpy at constant pressure (i.e. H/RT) given a temperature or a list of temperatures.
+        The phase argument can be used to specify which phase to use.
+        Other phase options:
+            'stable' or None: Use the shomate polynomial that has the lowest Gibbs energy at T regardless of T_low and T_high
+            'temperature': Use the shomate polynomial that has the lowest Gibbs energy at T within T_low and T_high
+        """
         try: 
             T_val = iter(T)
         except:
@@ -83,8 +106,14 @@ class Shomate(object):
         return self.phases[phase].get_SoR(T = T, verbose = verbose)
 
     def get_SoR(self, T, verbose = True, phase = None):
-        """Calculates the dimensionless entropy at constant pressure (i.e. S/R) given a temperature or a list of temperatures."""
-        try: 
+        """
+        Calculates the dimensionless entropy at constant pressure (i.e. S/R) given a temperature or a list of temperatures.
+        The phase argument can be used to specify which phase to use.
+        Other phase options:
+            'stable' or None: Use the shomate polynomial that has the lowest Gibbs energy at T regardless of T_low and T_high
+            'temperature': Use the shomate polynomial that has the lowest Gibbs energy at T within T_low and T_high
+        """
+        try:
             T_val = iter(T)
         except:
             #Single value T
@@ -97,12 +126,19 @@ class Shomate(object):
         return SoR
 
     def get_GoRT(self, T, H_correction = False, verbose = True, phase = None):
-        """Calculates the dimensionless free energy (i.e. G/RT) given a temperature."""
+        """
+        Calculates the dimensionless free energy (i.e. G/RT) given a temperature.
+        The phase argument can be used to specify which phase to use.
+        Other phase options:
+            'stable' or None: Use the shomate polynomial that has the lowest Gibbs energy at T regardless of T_low and T_high
+            'temperature': Use the shomate polynomial that has the lowest Gibbs energy at T within T_low and T_high
+        """
         HoRT = self.get_HoRT(T = T, H_correction = H_correction, verbose = verbose, phase = phase)
         SoR = self.get_SoR(T = T, verbose = verbose, phase = phase)
         return HoRT-SoR
 
     def get_stable_phase(self, T):
+        """Use the phase that has the lowest Gibbs energy at T ignoring T_low and T_high"""
         min_phase = None
         min_GoRT = float("inf")
         for name, phase in self.phases.items():
@@ -113,6 +149,7 @@ class Shomate(object):
         return min_phase
 
     def get_T_phase(self, T):
+        """Use the phase that has the lowest Gibbs energy at T and within T_low and T_high"""
         min_phase = None
         min_GoRT = float("inf")
         for name, phase in self.phases.items():
@@ -165,11 +202,13 @@ class Shomate(object):
             plt.ylabel('S (%s)' % units)
         plt.xlabel('T (K)')
 
-    def save_to_json(self, filename = None):
-        if filename is None:
-            filename = '{}.txt'.format(self.symbol)
-        with open(filename, 'w') as f_ptr:
-            json.dump(self, f_ptr)
+    def get_json_string(self):
+        shomate_dict = self.__dict__
+        for key, phase in self.phases.items():
+            phase_dict = phase.__dict__
+            phase_dict['a'] = phase.a.tolist()
+            shomate_dict['phases'][key] = phase_dict
+        return json.dumps(shomate_dict)
 
     @classmethod
     def fit_shomate_species(cls, symbol, T, Cp, H0, S0, T_ref = c.T0('K'), elements = None):
