@@ -29,7 +29,7 @@ import numpy as np
 from ase.calculators.calculator import kpts2ndarray
 from ase.utils import basestring
 
-from ase.calculators.vasp.setups import setups_defaults
+from py_box3.ase.calculators.vasp.setups import setups_defaults
 
 # Parameters that can be set in INCAR. The values which are None
 # are not written and default parameters of VASP are used for them.
@@ -1407,7 +1407,7 @@ class GenerateVaspInput(object):
                             else:
                                 list.append(float(data[i]))
                             i += 1
-                        self.list_params['magmom'] = list
+                        self.list_float_params['magmom'] = list
                         list = np.array(list)
                         if self.atoms is not None:
                             self.atoms.set_initial_magnetic_moments(

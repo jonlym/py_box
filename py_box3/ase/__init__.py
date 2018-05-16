@@ -117,32 +117,6 @@ def check_bond_lengths(atoms, change_len = False, bond_warning = False, bond_len
     if bond_warning == False:
         print("All distances are farther than {}".format(bond_len))
 
-def read_potcar(calc, filename = 'POTCAR.spec'):
-    """
-    Parses the Materials Project POTCAR.spec file and assigns the relevant pseudopotentials
-    to the VASP calculator.
-
-    Parameters
-    ----------
-        calc - ASE VASP Object
-            Calculator that will be assigned the pseudopotentials
-        filename - string
-            Name of the POTCAR.spec file
-    """
-    with open(filename, 'r') as f_ptr:
-        setups = {}
-        for line in f_ptr:
-            #Skip if default pseudopotential
-            if '_' not in line:
-                continue
-
-            line = line.replace('\n', '')
-            i = line.find('_')
-            element = line[:i]
-            setup = line[i:]
-            setups[element] = setup
-    calc.set(setups = setups)
-
 DFT_E_gas = {
     'H2': -6.759196,
     'H2O': -14.219543,

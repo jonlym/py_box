@@ -518,9 +518,11 @@ def print_vasp_param(calc):
 	print('-'*20)
 	print('VASP calculator parameters:')
 	max_space = 20
-	type_params = [calc.input_params, calc.bool_params, calc.int_params, calc.dict_params, calc.exp_params, calc.float_params, calc.list_params, calc.special_params, calc.string_params]
-	for type_param in type_params:
-		for key, val in type_param.items():
+	for type_param_key, type_param_dict in calc.__dict__.items():
+		if 'param' not in type_param_key:
+			continue
+
+		for key, val in type_param_dict.items():
 			if val is not None:
 				#help_text = help_dict[key]
 				n_space = max_space - len(key) - len(str(val))
