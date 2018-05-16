@@ -566,6 +566,34 @@ def handle_restart(calc, atoms):
 		if calc.int_params['istart'] == 0:
 			magmom = [0] * len(atoms)
 			calc.set(magmom = magmom)
+
+def read_potcar(calc, filename = 'POTCAR.spec'):
+    """
+    Parses the Materials Project POTCAR.spec file and assigns the relevant pseudopotentials
+    to the VASP calculator.
+
+    Parameters
+    ----------
+        calc - ASE VASP Object
+            Calculator that will be assigned the pseudopotentials
+        filename - string
+            Name of the POTCAR.spec file
+    """
+    with open(filename, 'r') as f_ptr:
+        setups = {}
+        for line in f_ptr:
+            #Skip if default pseudopotential
+            if '_' not in line:
+                continue
+
+            line = line.replace('\n', '')
+            i = line.find('_')
+            element = line[:i]
+            setup = line[i:]
+            setups[element] = setup
+    calc.set(setups = setups)
+
+
 #Help dictionary used for print_vasp_param
 help_dict = { 
 	#Boolean parameters
