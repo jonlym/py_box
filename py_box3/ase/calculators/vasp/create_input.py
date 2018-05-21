@@ -1202,9 +1202,9 @@ class GenerateVaspInput(object):
                         list[-1][0] += 1
                     else:
                         list.append([1, val[n]])
-                    [incar.write('%i*%.4f ' % (mom[0], mom[1]))
-                     for mom in list]
-                    incar.write('\n')
+                [incar.write('%i*%.4f ' % (mom[0], mom[1]))
+                 for mom in list]
+                incar.write('\n')
             else:
                     incar.write(' %s = ' % key.upper())
                     [incar.write('%.4f ' % x) for x in val]
