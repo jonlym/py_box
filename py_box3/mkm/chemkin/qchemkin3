@@ -45,8 +45,8 @@ cluster_settings = {
             '#$ -o __name.stdout\n'
             '#$ -m beas\n'
             '#$ -M __email\n'
-            '__queue\n'),
-        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc\n',
+            '__queue'),
+        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc',
         'ck_path': '/home/project/common/chemkin/versions/',
         },
     'farber': {
@@ -57,8 +57,8 @@ cluster_settings = {
             '#$ -l h_cpu=36:00:00\n'
             '#$ -m beas\n'
             '#$ -M __email\n'
-            '__queue\n'),
-        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc\n',
+            '__queue'),
+        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc',
         'ck_path': '/home/project/common/chemkin/versions/',
         },
     'local': {
@@ -69,7 +69,6 @@ cluster_settings = {
 
 qchemkin_template = """#!/bin/bash
 __submission_header
-
 #    This scipt was created by qchemkin3. The script was designed
 #+ to run Chemkin in the login node or on the __cluster Cluster.
 #+ Initially written by Jonathan E. Sutton, Vlachos Research Group,
@@ -83,7 +82,7 @@ __valet_packages
 #    Define the path to the binary. For testing, this will be the local directory,
 #+ but for production runs, this will be the location of the compiled binary
 #+ on the server/cluster.
-CKPATH='__ckpath__version'
+CKPATH='__ck_path__version'
 
 #Convert all tabs to spaces in the input directory files
 cd INP.d
@@ -147,7 +146,7 @@ args.email = get_email()
 #Determine cluster
 cluster = os.environ['SGE_CLUSTER_NAME']
 if args.local:
-    cluster_settings['local']['ck_path'] = cluster_settings[cluster]['']
+    cluster_settings['local']['ck_path'] = cluster_settings[cluster]['ck_path']
     cluster = 'local'
 
 #Process job name
@@ -158,14 +157,17 @@ qs_name = '{}.qs'.format(args.name)
 qs_path = os.path.join(abs_path, qs_name)
 
 #Replacing fields in template with cluster settings
-for key, val in cluster_settings.items():
+for key, val in cluster_settings[cluster].items():
     qchemkin_template = update_field(field = '__{}'.format(key), value = val, text = qchemkin_template)
 
 #Replacing fields in template script with options
 print('Submitting job using qchemkin with the following options:')
 for key, val in vars(args).items():
     print('{}\t{}'.format(key, val))
-    qchemkin_template = update_field(field = '__{}'.format(key), value = val, text = qchemkin_template)
+    try:
+        qchemkin_template = update_field(field = '__{}'.format(key), value = val, text = qchemkin_template)
+    except TypeError:
+        pass
 
 #Writing script and changing permission to executable
 with open(qs_path, 'w') as script_ptr:
