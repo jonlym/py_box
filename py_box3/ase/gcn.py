@@ -60,11 +60,11 @@ class GCN(object):
         self.exceptions = exceptions
         self.atom_radii = {}
         if source_dict is not None:
-                self.import_atom_radii(source_dict)
+            self.import_atom_radii(source_dict)
 
         #If the exception and atom_radii dictionaries are not empty, find the coordination numbers
         if update and any(self.exceptions) and any(self.atom_radii) and bulk is not None:
-                self.calc_GCNs(update = update)
+            self.calc_GCNs(update = update)
 
     def import_atom_radii(self, source_dict):
         """
@@ -130,13 +130,13 @@ class GCN(object):
                     self.CNs[i % len(self.atoms)] += 1
                     neighbors.append(j % len(self.atoms))
                     periodic_neighbors.append(j)
-                    try:
-                        neighbors_direction[j % len(self.atoms)].append(self._find_direction(j))
-                    except:
-                        neighbors_direction[j % len(self.atoms)] = [self._find_direction(j)]
+                    # try:
+                    #     neighbors_direction[j % len(self.atoms)].append(self._find_direction(j))
+                    # except:
+                    #     neighbors_direction[j % len(self.atoms)] = [self._find_direction(j)]
             self.neighbors[i % len(self.atoms)] = get_unique_list(neighbors)
-            self._neighbors_direction[i % len(self.atoms)] = neighbors_direction
-            self.periodic_neighbors[i % len(self.atoms)].append(periodic_neighbors)
+            #self._neighbors_direction[i % len(self.atoms)] = neighbors_direction
+            #self.periodic_neighbors[i % len(self.atoms)].append(periodic_neighbors)
                 # for i, atom1 in enumerate(self.atoms):
                 #     neighbors = []
                 #     for j, atom2 in enumerate(self.atoms):

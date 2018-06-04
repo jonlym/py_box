@@ -1,54 +1,100 @@
 #!/usr/bin/env python3
-
+"""
+Submits a Chemkin job to the queueing system on Squidward or Farber.
+For more information on input parameters, type 'qchemkin3 --h' in the terminal.
+"""
 import argparse
 import getpass
 import os
 
-def get_email():
-  """
-  Returns the user's e-mail address.
-  """
-  return '{}@udel.edu'.format(getpass.getuser())
 
-ckpath = '/home/project/common/chemkin/versions/'
+def get_email():
+    """
+    Returns the user's e-mail address.
+    """
+    return '{}@udel.edu'.format(getpass.getuser())
+
+def update_field(field, value, text):
+    """
+    Replaces the field with value in a file
+
+    Arguments
+    -----------
+        field - string
+            String to look for in the file. Usually starting with '__'.
+            e.g. '__T'
+        value - float
+            Value to insert in field
+        text - string
+            Text to find the field
+    Returns
+    -------
+        updated_text - string
+            Text with the field replaced with the value
+    """
+    return text.replace(field, value)
+
+#Uses the SGE_CLUSTER_NAME environment variable to determine the default settings
+cluster_settings = {
+    'squidward': {
+        'submission_header': (
+            '#$ -cwd\n'
+            '#$ -j y\n'
+            '#$ -S /bin/bash\n'
+            '#$ -pe openmpi-mx __n_cores\n'
+            '#$ -o __name.stdout\n'
+            '#$ -m beas\n'
+            '#$ -M __email\n'
+            '__queue\n'),
+        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc\n',
+        'ck_path': '/home/project/common/chemkin/versions/',
+        },
+    'farber': {
+        'submission_header': (
+            '#$ -cwd\n'
+            '#$ -pe mpi __n_cores\n'
+            '#$ -l m_mem_free=2G\n'
+            '#$ -l h_cpu=36:00:00\n'
+            '#$ -m beas\n'
+            '#$ -M __email\n'
+            '__queue\n'),
+        'valet_packages': 'vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc\n',
+        'ck_path': '/home/project/common/chemkin/versions/',
+        },
+    'local': {
+        'submission_header': '',
+        'valet_packages': '',
+        },
+    }
+
 qchemkin_template = """#!/bin/bash
-#$ -cwd
-#$ -j y
-#$ -S /bin/bash
-#$ -pe openmpi-mx __n_cores
-#$ -o __name.stdout
-#$ -m beas
-#$ -M __email
-__queue
-#  This script is designed to copy input and output files into a unique
-#+ directory within the parent directory in order to facilitate 
-#+ keeping track of individual job runs. This should allow a user to
-#+ recreate a given run with a minimum amount of effort. The user may
-#+ optionally specify a name for the output directory as a command-line
-#+ argument, or the script will supply a default based on the current
-#+ date and time.
+__submission_header
+
+#    This scipt was created by qchemkin3. The script was designed
+#+ to run Chemkin in the login node or on the __cluster Cluster.
 #+ Initially written by Jonathan E. Sutton, Vlachos Research Group,
 #+ University of Delaware, 2012/08/23.
 #+ Last updated: 2013/11/26.
 
-#Import packages for submission to cluster
-vpkg_require openmpi/1.6.3-gcc libxc hdf5/1.8.11-gcc
+#    Import packages for submission to cluster. This section will be blank
+#+ if on the login node.
+__valet_packages
 
-#  Define the path to the binary. For testing, this will be the local directory,
+#    Define the path to the binary. For testing, this will be the local directory,
 #+ but for production runs, this will be the location of the compiled binary
 #+ on the server/cluster.
-CKPATH='__ckpath'
+CKPATH='__ckpath__version'
 
 #Convert all tabs to spaces in the input directory files
 cd INP.d
 for i in *; do
-  sed -i 's/	/  /g' "$i" #First whitespace character is a literal tab
+    sed -i 's/	/    /g' "$i" #First whitespace character is a literal tab
 done
 cd ..
 
 #Create the output directory if needed
 if [ ! -d "OUT.d" ]; then
-  mkdir "OUT.d"
+    mkdir "OUT.d"
 fi
 
 #Remove old linking files, etc. and redirect error messages to /dev/null
@@ -64,19 +110,19 @@ echo 'Preparing Chemkin binary linking files'
 echo 'Checking gas.inp'
 grep -q "NO ERRORS" OUT.d/gas.out
 if [ $? -ne 0 ]; then
-  echo 'There is an error in gas.inp, exiting'
-  exit
+    echo 'There is an error in gas.inp, exiting'
+    exit
 else
-  echo 'No errors found in gas.inp'
+    echo 'No errors found in gas.inp'
 fi
 
 echo 'Checking surf.inp'
 grep -q "NO ERRORS" OUT.d/surf.out
 if [ $? -ne 0 ]; then
-  echo 'There is an error in surf.inp, exiting'
-  exit
+    echo 'There is an error in surf.inp, exiting'
+    exit
 else
-  echo 'No errors found in surf.inp'
+    echo 'No errors found in surf.inp'
 fi
 
 echo 'Running model'
@@ -85,10 +131,10 @@ echo 'Done running model'
 """
 
 #Receive inputs
-parser = argparse.ArgumentParser(description='Submits a Chemkin job to the queueing system on Squidward')
+parser = argparse.ArgumentParser(description='Submits a Chemkin job to the queueing system on Squidward or Farber')
 parser.add_argument('name', nargs = '?', type = str, default = None, help = 'Name of job. Default is the name of the folder it is in.')
 parser.add_argument('path', nargs = '?', type = str, default = '.', help = 'Location in which INP.d file is located. Default is the current directory.')
-parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', help = 'Version of Chemkin to use. Available versions may be found at path {}. Default is 116.'.format(ckpath))
+parser.add_argument('-v', '--version', nargs = '?', type = str, default ='116', help = 'Version of Chemkin to use. Available versions may be found at path {}. Default is 116.'.format(cluster_settings[os.environ['SGE_CLUSTER_NAME']]))
 parser.add_argument('-s', '--submit', action = 'store_true', default = False, help = 'Submits job to queue without qsub command. Overrides the -l argument.')
 parser.add_argument('-l', '--local', action = 'store_true', default = False, help = 'Runs Chemkin on the head node.')
 parser.add_argument('-n', '--n_cores', nargs = '?', type = str, default = '1', help = 'Number of cores. Default is 1.')
@@ -98,6 +144,12 @@ parser.add_argument('-q', '--queue', nargs = '?', type = str, default = '', help
 args = parser.parse_args()
 args.email = get_email()
 
+#Determine cluster
+cluster = os.environ['SGE_CLUSTER_NAME']
+if args.local:
+    cluster_settings['local']['ck_path'] = cluster_settings[cluster]['']
+    cluster = 'local'
+
 #Process job name
 abs_path = os.path.abspath(args.path)
 if args.name is None:
@@ -105,17 +157,15 @@ if args.name is None:
 qs_name = '{}.qs'.format(args.name)
 qs_path = os.path.join(abs_path, qs_name)
 
-#Process job path
+#Replacing fields in template with cluster settings
+for key, val in cluster_settings.items():
+    qchemkin_template = update_field(field = '__{}'.format(key), value = val, text = qchemkin_template)
 
 #Replacing fields in template script with options
 print('Submitting job using qchemkin with the following options:')
 for key, val in vars(args).items():
     print('{}\t{}'.format(key, val))
-    if 'version' in key:
-        ckpath = os.path.join(ckpath, val)
-        qchemkin_template = qchemkin_template.replace('__ckpath', ckpath)
-    else:
-        qchemkin_template = qchemkin_template.replace('__{}'.format(key), str(val))
+    qchemkin_template = update_field(field = '__{}'.format(key), value = val, text = qchemkin_template)
 
 #Writing script and changing permission to executable
 with open(qs_path, 'w') as script_ptr:
