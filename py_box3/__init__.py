@@ -7,8 +7,9 @@ Created on Wed Nov 23 21:10:42 2016
 
 import itertools
 import numpy as np
-from datetime import datetime
+import re
 import pickle
+from datetime import datetime
 
 hex_to_bin_dict = {'0': '0000',
                    '1': '0001',
@@ -27,9 +28,23 @@ hex_to_bin_dict = {'0': '0000',
                    'e': '1110',
                    'f': '1111'}
 
+def convert_bin_to_hex(bit_string):
+    """
+    Converts a binary string to hexadecimal
+    
+    Parameters
+    ----------
+        bit_string - str
+            Bit string
+    Returns
+        hex_string - str
+            Hexadecimal string
+    """
+    return(hex(int(bit_string, 2)))
+
 def convert_hex_to_bin(hex_string, n = None):
     """
-    Converts hexidemial string to binary string
+    Converts hexadecimal string to binary string
 
     Parameters
     ----------
@@ -377,3 +392,28 @@ def loadplt(filename, show = False):
         plt.show()
     else:
         return ax
+
+def parse_formula(formula):
+    """
+    Parses chemical formula into its elments and returns it as a dictionary.
+
+    Parameters
+    ----------
+        formula - string
+            Chemical formula
+            e.g. Al2O3
+    Returns
+    -------
+        elements - dict
+            ELement composition of formula
+            e.g. {'Al': 2, 'O': 3}
+    """
+    elements_tuples = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
+    elements = {}
+    for (element, coefficient) in elements_tuples:
+        if coefficient == '':
+            elements[element] = 1
+        else:
+            elements[element] = int(coefficient)
+    return elements
+
