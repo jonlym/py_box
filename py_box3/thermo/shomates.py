@@ -6,7 +6,15 @@ from py_box3 import constants as c
 class Shomates(collections.UserList):
     """
     An object that stores a list of shomate objects.
-    """            
+    """
+
+    def index(self, symbol):
+        for i, shomate in enumerate(self):
+            if symbol == shomate.symbol:
+                return i
+        else:
+            return None
+
     def print_symbols(self):
         """
         Prints a summary of the thermdat list.

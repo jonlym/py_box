@@ -1,5 +1,5 @@
 import numpy as np
-from py_box3 import get_molecular_weight
+from py_box3 import any_alpha
 from py_box3 import constants as c
 
 class Reaction(object):
@@ -41,7 +41,7 @@ class Reaction(object):
 		for species, coefficient in self.stoichiometry.items():
 			if coefficient < 0 and thermos[species].is_gas:
 				#Calculate molecular weight
-				MW = get_molecular_weight(thermos[species].elements)
+				MW = c.get_molecular_weight(thermos[species].elements)
 				A = self.s * np.sqrt(c.R('J/mol/K')*T/(2*np.pi*MW))
 				return A
 
@@ -336,3 +336,56 @@ class Reaction(object):
 					balance[species] = coefficient_element * coefficient_species
 		if any(value != 0 for key, value in balance.items()):
 			raise ValueError('Equation not balanced.')
+
+def parse_reaction(reaction):
+	"""
+	Parses a reaction
+	Args
+		reaction - str
+			Balanced chemical reaction
+	Returns
+		dict
+			Reaction translated to dictionary where the keys are the species and the values is the stoichoimetric coefficient
+	"""
+	reaction_dict = {}
+	reaction_side = -1 #-1 for reactants, +1 for products
+	separated_reaction = reaction.split(' ')
+	for i, field in enumerate(separated_reaction):
+		if any_alpha(field):
+			if i == 0:
+				reaction_dict[field] = 1. * reaction_side
+			else:
+				try:
+					reaction_dict[field] = float(separated_reaction[i-1]) * reaction_side
+				except ValueError:
+					reaction_dict[field] = 1. * reaction_side
+		elif field == '->':
+			reaction_side = 1.
+	return reaction_dict
+
+def write_reaction(reaction_dict):
+	"""
+	Converts the reaction elements into its stoichiometric form
+	Args
+		reaction_dict - dict
+			Reaction as a dictionary where the keys are the species and the values are the stoichiometric coefficient
+	Returns
+		str
+			Chemical reaction as a string
+	"""
+	reaction = ''
+	#Add reactants
+	for specie, coefficient in reaction_dict.items():
+		if coefficient < 0.:
+			reaction = '{}{:.3f}{} + '.format(reaction, -coefficient, specie)
+	else:
+		reaction = reaction[:-2]
+
+	reaction = '{}-> '.format(reaction)
+
+	for specie, coefficient in reaction_dict.items():
+		if coefficient > 0.:
+			reaction = '{}{:.3f}{} + '.format(reaction, coefficient, specie)
+	else:
+		reaction = reaction[:-2]
+	return reaction

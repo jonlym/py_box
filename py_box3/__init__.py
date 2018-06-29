@@ -7,8 +7,9 @@ Created on Wed Nov 23 21:10:42 2016
 
 import itertools
 import numpy as np
-from datetime import datetime
+import re
 import pickle
+from datetime import datetime
 
 hex_to_bin_dict = {'0': '0000',
                    '1': '0001',
@@ -27,18 +28,34 @@ hex_to_bin_dict = {'0': '0000',
                    'e': '1110',
                    'f': '1111'}
 
+def convert_bin_to_hex(bit_string, padding = False):
+    """
+    Converts a binary string to hexadecimal
+    
+    Parameters    
+        bit_string - str
+            Bit string
+        padding - bool
+            Whether or not padding should be added
+    Returns        hex_string - str
+        Hexadecimal string
+    """
+    hex_string = hex(int(bit_string, 2))
+    if padding:
+        return '0x{}'.format(hex_string[2:].zfill(int(np.ceil(len(bit_string)/4))))
+    else:
+        return hex_string
+
 def convert_hex_to_bin(hex_string, n = None):
     """
-    Converts hexidemial string to binary string
+    Converts hexadecimal string to binary string
 
-    Parameters
-    ----------
+    Parameters    
         hex_string - string
             String of the hexidecimal number to convert. 
         n - int
             Length of binary string returned
-    Returns
-    -------
+    Returns    
         bin_string - string
             Binary string
     """    
@@ -57,14 +74,12 @@ def basen_to_base10(num, n):
     """
     Converts a number from base n to base 10.
 
-    Parameters
-    ----------
+    Parameters    
         num - int, string, list, or ndarray
             Base n number to convert
         n - int
             Base of number
-    Returns
-    -------
+    Returns    
         num_10 - int
             Base 10 representation of num_n
     """
@@ -81,8 +96,7 @@ def base10_to_basen(num, n, width = None):
     """
     Converts a number from base 10 to base n.
 
-    Parameters
-    ----------
+    Parameters    
         num - int
             Base 10 number to convert
         n - int
@@ -90,8 +104,7 @@ def base10_to_basen(num, n, width = None):
         width - int
             Width of the number returned
 
-    Returns
-    -------
+    Returns    
         num_n - (N,) ndarray
             Base n number
     """
@@ -110,12 +123,10 @@ def any_alpha(string):
     """
     Returns True if any alphabetic characters are in the string. False otherwise.
 
-    Parameters
-    ----------
+    Parameters    
         string - string
             String to test for alphabetic characters
-    Returns
-    -------
+    Returns    
         alpha_present - bool
             True if alphabetic characters are present. False otherwise
     """
@@ -129,12 +140,10 @@ def get_unique_list(data):
     """
     Given a list, returns a list without duplicates.
 
-    Parameters
-    ----------
+    Parameters    
         data - list
             Data with duplicates
-    Returns
-    -------
+    Returns    
         unique_data - list
             Data without duplicates
     """
@@ -147,8 +156,7 @@ def plot_parity(x, y, decimals = 2, min_val = None, max_val = None):
     """
     Plots a party plot given two vectors of data.
 
-    Parameters
-    ----------
+    Parameters    
         x - (N,) ndarray
             Array of values to plot on the x axis
         y - (N,) ndarray
@@ -159,8 +167,7 @@ def plot_parity(x, y, decimals = 2, min_val = None, max_val = None):
             Manually override lower limit for parity plot
         max_val - float
             Manually override upper limit for parity plot
-    Returns
-    -------
+    Returns    
         fig - matplotlib.figure.Figure object
         axes - matplotlib.axes.Axes object
     """
@@ -184,8 +191,7 @@ def get_time():
     Returns the time.
     Example: 2017-12-09 23:02:16.459000
 
-    Returns
-    -------
+    Returns    
         time - str
             Current time
     """
@@ -195,14 +201,12 @@ def get_null(mat, rtol = 1.e-5):
     """
     Returns the nullspace of a 2D matrix, mat
 
-    Parameters
-    ----------
+    Parameters    
         mat - (M, N) ndarray
             Matrix to find the nullspace
         rtol - float
             Tolerance
-    Returns
-    -------
+    Returns    
         null_space - (N - rank(mat)) ndarray
             Null space of mat
     """
@@ -214,12 +218,11 @@ def get_MSE(x, y):
     """
     Returns the root mean squared error given two vectors of equal lengths
     
-    Parameters
-    ----------
+    Parameters    
         x - (N,) ndarray
         y - (N,) ndarray
 
-    Returns
+    Returns        
         MSE - float
             Mean squared error
     """
@@ -230,12 +233,11 @@ def get_MSE(x, y):
 def get_RMSE(x, y):
     """
     Returns the root mean squared error given two vectors of equal lengths
-    Parameters
-    ----------
+    Parameters    
         x - (N,) ndarray
         y - (N,) ndarray
 
-    Returns
+    Returns        
         RMSE - float
             Root mean squared error
     """
@@ -246,8 +248,7 @@ def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
     Converts spherical coordinates to Cartesian coordinates. Angles are in degrees by default. Set degrees to False
     to use radians
 
-    Parameters
-    ----------
+    Parameters    
         r - float
             Radius
         theta - float
@@ -256,8 +257,7 @@ def spherical_to_xyz(r = 1., theta = 0., phi = 0., degrees = True):
             Polar angle (i.e. Angle between the z and the x-y plane)
         degrees - bool
             Whether to use degrees or not. True for degrees, False for radians
-    Returns
-    -------
+    Returns    
         xyz_coordinates - (3,) ndarray
             Cartesian (x, y, z) coordinates
     """
@@ -273,12 +273,10 @@ def get_n_blanks(n):
     """
     Returns a string made of n blanks
 
-    Parameters
-    ----------
+    Parameters    
         n - int
             Number of blank spaces
-    Returns
-    -------
+    Returns    
         blanks - str
             String with n blanks
     """
@@ -288,8 +286,7 @@ def dict_products(dicts):
     """
     Gives every combination over a dictionary that has values of some iteratable object
 
-    Parameters
-    ----------
+    Parameters    
         dicts - dict
             Dictionary that has values that are iteratable.
             e.g. dicts = {
@@ -297,7 +294,7 @@ def dict_products(dicts):
                     'even_number': [2, 4],
                     'letter': ('a', 'b', 'c'),
                     }
-    Returns
+    Returns        
         dict_combinations - tuple of dicts
             For the example above, will return:
                 (
@@ -315,8 +312,7 @@ def interpolate(x_low, x_high, y_low, y_high, x):
     """
     Linear interpolation
 
-    Parameters
-    ----------
+    Parameters    
         x_low - float
             Lower x value for interpolation
         x_high - float
@@ -327,8 +323,7 @@ def interpolate(x_low, x_high, y_low, y_high, x):
             Higher y value that corresponds to x_high for interpolation
         x - float
             Target x value
-    Returns
-    -------
+    Returns    
         y - float
             Target y value
     """
@@ -345,8 +340,7 @@ def saveplt(ax, filename):
     """
     Save matplotlib figure as pickle file
 
-    Parameters
-    ----------
+    Parameters    
         ax - matplotlib.axes.Axes object
             Matplotlib object to save
         filename - string
@@ -359,14 +353,12 @@ def loadplt(filename, show = False):
     """
     Save matplotlib figure as pickle file
 
-    Parameters
-    ----------
+    Parameters    
         filename - string
             Name of file to save the figure to
         show - boolean
             Whether or not to show the plot
-    Returns
-    -------
+    Returns    
         ax - matplotlib.axes.Axes object
     """
     from matplotlib import pyplot as plt
@@ -377,3 +369,25 @@ def loadplt(filename, show = False):
         plt.show()
     else:
         return ax
+
+def parse_formula(formula):
+    """
+    Parses chemical formula into its elments and returns it as a dictionary.
+
+    Parameters    
+        formula - string
+            Chemical formula
+            e.g. Al2O3
+    Returns    
+        elements - dict
+            ELement composition of formula
+            e.g. {'Al': 2, 'O': 3}
+    """
+    elements_tuples = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
+    elements = {}
+    for (element, coefficient) in elements_tuples:
+        if coefficient == '':
+            elements[element] = 1
+        else:
+            elements[element] = int(coefficient)
+    return elements

@@ -304,13 +304,13 @@ class Shomate(object):
 			T_high - float
 				Higher temperature bound
 			Cp_units - string
-				Heat capacity units. Supported units can be found in py_box3.constants.R (but the '/K' has to be omitted)
-				e.g. Use 'kJ/mol' to display heat capcity in kiloJoules per mol 
+				Heat capacity units. Supported units can be found in py_box3.constants.R
+				e.g. Use 'kJ/mol/K' to display heat capacity in kiloJoules per mol per Kelvin 
 			H_units - string
 				Enthalpy units. Supported units can be found in py_box3.constants.R
 			S_units - string
-				Entropy units. Supported units can be found in py_box3.constants.R (but the '/K' has to be omitted)
-				e.g. Use 'kJ/mol' to display entropy in kiloJoules per mol
+				Entropy units. Supported units can be found in py_box3.constants.R
+				e.g. Use 'kJ/mol/K' to display entropy in kiloJoules per mol per Kelvin 
 			G_units - string
 				Gibbs free energy units. Supported units can be found in py_box3.constants.R
 		Returns
@@ -335,27 +335,27 @@ class Shomate(object):
 
 		#Apply units
 		if Cp_units is not None:
-			Cp = Cp * c.R('{}/K'.format(Cp_units))
+			Cp = Cp * c.R(Cp_units)
 		if S_units is not None:
-			S = S * c.R('{}/K'.format(S_units))
+			S = S * c.R(S_units)
 		if H_units is not None:
-			H = H * c.R(H_units) * T
+			H = H * c.R('{}/K'.format(H_units)) * T
 		if G_units is not None:
-			G = G * c.R(G_units) * T
+			G = G * c.R('{}/K'.format(G_units)) * T
 
 		fig = plt.figure()
 		ax_Cp = plt.subplot(411)
 		plt.plot(T, Cp, 'r-')
-		if units is None:
+		if Cp_units is None:
 			plt.ylabel('Cp/R')
 		else:
-			plt.ylabel('Cp ({}})'.format(Cp_units))
+			plt.ylabel('Cp ({})'.format(Cp_units))
 		plt.xlabel('T (K)')
-		plt.title('Plots for {} using shomate polynomials.' % self.symbol)
+		plt.title('Plots for {} using shomate polynomials.'.format(self.symbol))
 
 		ax_H = plt.subplot(412)
 		plt.plot(T, H, 'g-')
-		if units is None:
+		if H_units is None:
 			plt.ylabel('H/RT')
 		else:
 			plt.ylabel('H ({})'.format(H_units))
@@ -364,7 +364,7 @@ class Shomate(object):
 		#Entropy graph
 		ax_S = plt.subplot(413)
 		plt.plot(T, S, 'b-')
-		if units is None:
+		if S_units is None:
 			plt.ylabel('S/R')
 		else:
 			plt.ylabel('S ({})'.format(S_units))
@@ -372,8 +372,8 @@ class Shomate(object):
 
 		ax_G = plt.subplot(414)
 		plt.plot(T, G, 'k-')
-		if units is None:
-			plt.ylabel('G/RR')
+		if G_units is None:
+			plt.ylabel('G/RT')
 		else:
 			plt.ylabel('G (%s)' % G_units)
 		plt.xlabel('T (K)')
