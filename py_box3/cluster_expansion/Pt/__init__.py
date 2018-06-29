@@ -174,14 +174,12 @@ def get_bit_string(graph, n):
 	Returns the bitstring representation of the graph.
 
 	Parameters
-	----------
 		graph - networkx.Graph object
 			The graph to encode. The node names should be ascending integers
 		n - int
 			Length of desired bitstring
 	Returns
-	-------
-		bit_string - str
+		str
 			The bitstring representation of the graph
 	"""
 
