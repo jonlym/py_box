@@ -11,22 +11,27 @@ from warnings import warn
 
 def R(units):
     """
-    Returns the universal molar gas constant, R.
-    Supported unit options: 
-    > J/mol/K
-    > kJ/mol/K
-    > L kPa/mol/K
-    > cm3 kPa/mol/K
-    > m3 Pa/mol/K
-    > cm3 MPa/mol/K
-    > m3 bar/mol/K
-    > L bar/mol/K
-    > L torr/mol/K
-    > cal/mol/K
-    > kcal/mol/K
-    > L atm/mol/K
-    > cm3 atm/mol/K
-    > eV/K (This option implies per molecule. i.e. Uses the value of kb)
+    Universal molar gas constant, R.
+    Parameters
+        units - str
+            Supported unit options: 
+            > J/mol/K
+            > kJ/mol/K
+            > L kPa/mol/K
+            > cm3 kPa/mol/K
+            > m3 Pa/mol/K
+            > cm3 MPa/mol/K
+            > m3 bar/mol/K
+            > L bar/mol/K
+            > L torr/mol/K
+            > cal/mol/K
+            > kcal/mol/K
+            > L atm/mol/K
+            > cm3 atm/mol/K
+            > eV/K (This option implies per molecule. i.e. Uses the value of kb)
+    Returns
+        float
+            Universal molar gas constant in appropriate units
     """
     R_dict = {
         'J/mol/K': 8.3144598,
@@ -51,11 +56,18 @@ def R(units):
     
 def h(units, bar = False):
     """
-    Returns the Planck's constant, h. Use bar = True to return h/2π
-    Supported unit options: 
-    > J s
-    > kJ s
-    > eV s
+    Planck's constant, h. 
+    Parameters
+        units - str
+            Supported unit options: 
+            > J s
+            > kJ s
+            > eV s
+        bar - bool
+            If true, returns h/2π       
+    Returns
+        float
+            Planck's constant in appropriate units
     """
     h_dict = {
         'J s': 6.626070040e-34,
@@ -75,12 +87,16 @@ def h(units, bar = False):
 
 def kb(units):
     """
-    Returns the Boltzmann constant.
-    Supported unit options: 
-    > J/K
-    > eV/K
-    > cal/K
-    
+    Boltzmann constant
+    Parameters
+        units - str
+            Supported unit options: 
+            > J/K
+            > eV/K
+            > cal/K
+    Returns
+        float
+            Boltzmann constant in appropriate units    
     """
     kb_dict = {
         'J/K': 1.38064852e-23,
@@ -96,10 +112,15 @@ def kb(units):
 
 def c(units):
     """
-    Returns the speed of light.
-    Supported unit options: 
-    > m/s
-    > cm/s    
+    Speed of light.
+    Parameters
+        units - str
+            Supported unit options: 
+            > m/s
+            > cm/s    
+    Returns
+        float
+            Speed of light in appropriate units
     """
     c_dict = {
         'm/s': 299792458.,
@@ -112,11 +133,16 @@ def c(units):
 
 def m_e(units):
     """
-    Returns the mass of an electron.
-    Supported unit options: 
-    > kg
-    > g
-    > amu   
+    Mass of an electron.
+    Parameters
+        units - str
+            Supported unit options: 
+            > kg
+            > g
+            > amu   
+    Returns
+        float
+            Mass of electron in appropriate units
     """
     m_e_dict = {
         'kg': 9.10938356e-31,
@@ -130,10 +156,15 @@ def m_e(units):
 
 def m_p(units):
     """
-    Returns the mass of a proton.
-    Supported unit options: 
-    > kg
-    > amu   
+    Mass of a proton
+    Parameters
+        units - str
+            Supported unit options: 
+            > kg
+            > amu   
+    Returns
+        float
+            Mass of proton in appropriate units
     """
     m_p_dict = {
         'kg': 1.6726219e-27,
@@ -147,16 +178,21 @@ def m_p(units):
 
 def P0(units):
     """
-    Returns the reference pressure.
-    Supported unit options: 
-    > bar
-    > atm
-    > Pa
-    > kPa
-    > MPa
-    > psi
-    > mmHg
-    > Torr
+    Reference pressure.
+    Parameters
+        units - str
+            Supported unit options: 
+            > bar
+            > atm
+            > Pa
+            > kPa
+            > MPa
+            > psi
+            > mmHg
+            > Torr
+    Returns
+        float
+            Reference pressure in appropriate units
     """
     P0_dict = {
         'bar': 1.01325,
@@ -176,12 +212,17 @@ def P0(units):
 
 def T0(units):
     """
-    Returns room temperature.
-    Supported units:
-    > K
-    > C
-    > R
-    > F
+    Room temperature.
+    Parameters
+        units - str
+            Supported units:
+            > K
+            > C
+            > R
+            > F
+    Returns
+        float
+            Room temperature in appropriate units
     """
     T0_dict = {
     'K': 298.15,
@@ -200,59 +241,71 @@ e = 1.6021766208e-19
 
 def convert_unit(num = 1., from_ = None, to = None):
     """
-    Converts num with units 'from_' to num with units 'to'.
-    Supported Units:
-    -----------------------------------    
-    Type    | Symbol    | Unit
-    -----------------------------------
-    Energy  |J          | Joules
-            |kJ         | KiloJoules
-            |eV         | Electron Volts
-            |cal        | Calories
-            |kcal       | Kilocalories
-            |L atm      | Litre atmospheres
-    -----------------------------------
-    Energy/ |J/mol      |Joules per mol
-    Amount  |kJ/mol     |KiloJoules per mol
-            |cal/mol    |Calories per mole
-            |kcal/mol   |Kilocalories per mole
-            |eV/molecule|eV per molecule
-    -----------------------------------
-    Time    |s          | Seconds 
-            |min        | Minutes
-            |hr         | Hours
-    -----------------------------------
-    Amount  |molecule   | Molecule
-            |mol        | Moles
-    -----------------------------------
-    Temp    |C          | Celcius
-            |K          | Kelvin
-    -----------------------------------
-    Length  |m          | Meter
-            |cm         | Centimeter
-            |nm         | Nanometer           
-            |A          | Anstroms
-    -----------------------------------
-    Area    |m2         | Meters Squared
-            |cm2        | Centimeter Squared
-            |A2         | Anstroms Squared
-    -----------------------------------
-    Volume  |m3         | Meters Cubed
-            |cm3        | Centimeters Cubed
-            |mL         | Milliliters
-            |L          | Liters
-    -----------------------------------
-    Mass    |kg         | Kilograms
-            |g          | Grams
-            |amu        | Atomic mass units
-    -----------------------------------
-    Pressure|Pa         | Pascals
-            |kPa        | KiloPascals
-            |MPa        | MegaPascals
-            |atm        | Atmospheres
-            |bar        | Bars
-            |mmHg       | Millimeters of Mercury
-            |psi        | Pounds per square inch
+    Converts units between two unit sets.
+    Parameters
+        num - float
+            Number to convert. This must be specified if converting
+            temperatures
+        from_ - str
+            Units that num is currently in
+        to - str
+            Units you would like num to be in
+
+        Supported Units:
+        -----------------------------------    
+        Type    | Symbol    | Unit
+        -----------------------------------
+        Energy  |J          | Joules
+                |kJ         | KiloJoules
+                |eV         | Electron Volts
+                |cal        | Calories
+                |kcal       | Kilocalories
+                |L atm      | Litre atmospheres
+        -----------------------------------
+        Energy/ |J/mol      |Joules per mol
+        Amount  |kJ/mol     |KiloJoules per mol
+                |cal/mol    |Calories per mole
+                |kcal/mol   |Kilocalories per mole
+                |eV/molecule|eV per molecule
+        -----------------------------------
+        Time    |s          | Seconds 
+                |min        | Minutes
+                |hr         | Hours
+        -----------------------------------
+        Amount  |molecule   | Molecule
+                |mol        | Moles
+        -----------------------------------
+        Temp    |C          | Celcius
+                |K          | Kelvin
+        -----------------------------------
+        Length  |m          | Meter
+                |cm         | Centimeter
+                |nm         | Nanometer           
+                |A          | Anstroms
+        -----------------------------------
+        Area    |m2         | Meters Squared
+                |cm2        | Centimeter Squared
+                |A2         | Anstroms Squared
+        -----------------------------------
+        Volume  |m3         | Meters Cubed
+                |cm3        | Centimeters Cubed
+                |mL         | Milliliters
+                |L          | Liters
+        -----------------------------------
+        Mass    |kg         | Kilograms
+                |g          | Grams
+                |amu        | Atomic mass units
+        -----------------------------------
+        Pressure|Pa         | Pascals
+                |kPa        | KiloPascals
+                |MPa        | MegaPascals
+                |atm        | Atmospheres
+                |bar        | Bars
+                |mmHg       | Millimeters of Mercury
+                |psi        | Pounds per square inch
+    Returns
+        float
+            num in the appropriate units
     """
     
     type_dict = {
@@ -359,17 +412,15 @@ def convert_unit(num = 1., from_ = None, to = None):
 
 def get_molecular_weight(elements):
     """
-    Calculate the molecular weight (in g/mol) given the elemental composition.
+    Molecular mass (in g/mol) given the elemental composition.
     Data taken from: https://en.wikipedia.org/wiki/Standard_atomic_weight
 
     Parameters
-    ----------
     elements - dict
         Elemental composition of species where the keys are the element symbol, atomic number, 
         or element name and the value is the stoichiometric coefficient.
 
     Returns
-    -------
     molecular_weight - float
         Molecular weight as float
     """
