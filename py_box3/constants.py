@@ -416,18 +416,55 @@ def get_molecular_weight(elements):
     Data taken from: https://en.wikipedia.org/wiki/Standard_atomic_weight
 
     Parameters
-    elements - dict
-        Elemental composition of species where the keys are the element symbol, atomic number, 
-        or element name and the value is the stoichiometric coefficient.
+        elements - dict
+            Elemental composition of species where the keys are the element symbol, atomic number, 
+            or element name and the value is the stoichiometric coefficient.
 
     Returns
-    molecular_weight - float
-        Molecular weight as float
+        molecular_weight - float
+            Molecular weight as float
     """
     molecular_weight = 0.
     for element, coefficient in elements.items():
         molecular_weight += atomic_weight[element] * coefficient
     return molecular_weight
+
+def parse_unit(unit):
+    """
+    Parses a unit and rewrites it in a standard notation.
+
+    Parameters
+        unit - str
+            Unit should contain a space between each dimension. e.g. J s
+            Indices are allowed but must directly follow the unit. e.g. m2, s-1
+            Prefixes are allowed but must directly follow the unit. e.g. kJ
+    Returns
+        dict
+            Standard unit form
+    """
+    unit_split = unit.split(' ')
+    unit_dict = {}
+    for unit in unit_split:
+        pass    
+
+prefixes = {
+    'Y': 1.e24,
+    'Z': 1.e21,
+    'E': 1.e18,
+    'P': 1.e15,
+    'T': 1.e12,
+    'G': 1.e9,
+    'M': 1.e6,
+    'k': 1.e3,
+    'm': 1.e-3,
+    'mu': 1.e-9,
+    'p': 1.e-12,
+    'f': 1.e-15,
+    'a': 1.e-18,
+    'z': 1.e-21,
+    'y': 1.e-24
+}
+
 
 #Dictionary with atomic weights of every element. Elements can be searched
 #by atomic number, element symbol or written name in lower case.
