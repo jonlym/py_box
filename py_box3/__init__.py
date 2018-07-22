@@ -111,13 +111,16 @@ def base10_to_basen(num, n, width = None):
             Base n number
     """
     num_n_rev = []
-    while num >= 0:
+    # print('Base 10: {}'.format(num))
+    while num > 0:
         num, r = divmod(num, n)
         num_n_rev.append(r)
+        # print('\tRemainder: {}'.format(r))
+        # print('\tNum: {}'.format(num))
 
     #Pad with zeros
     if width is not None:
-        num_n_rev = num_n_rev + [0] * (len(num_n_rev) - width)
+        num_n_rev = num_n_rev + [0] * (width - len(num_n_rev))
     num_n = np.array(num_n_rev)[::-1]
     return num_n
 

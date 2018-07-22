@@ -68,6 +68,10 @@ def dft_to_thermdat(
 
     print("Opening reference file: %s" % ref_path)
     (fund_energies, fund_CHON, rm_list) = read_ref(ref_path, verbose = verbose, warn = warn)
+    print('Fundamental energies:')
+    print(fund_energies)
+    print('Fund CHON')
+    print(fund_CHON)
 
     #Read the species to be processed
     print("Opening input file: %s" % input_path)
@@ -84,7 +88,9 @@ def dft_to_thermdat(
         print("Calculating DFT enthalpy of formation")
         if thermdat_dft.is_gas:
             H0 = thermdat_dft.IdealGasThermo.get_enthalpy(temperature = c.T0('K'), verbose = verbose)
+            thermo_parameters = thermdat_dft.IdealGasThermo.__dict__
         else:
+            thermo_parameters = thermdat_dft.HarmonicThermo.__dict__
             if np.sum(thermdat_dft.HarmonicThermo.vib_energies) == 0:
                 H0 = thermdat_dft.HarmonicThermo.potentialenergy
             else:
@@ -103,7 +109,11 @@ def dft_to_thermdat(
             else:
                 S0 = thermdat_dft.HarmonicThermo.get_entropy(temperature = c.T0('K'), verbose = verbose)
         SoR0 = S0/c.kb('eV/K')
-        
+        print('Species: {}'.format(thermdat_dft.symbol))
+        print('thermo parameters: {}'.format(thermo_parameters))
+        print('HoRT0 = {}'.format(HoRT0))
+        print('S/R0 = {}'.format(SoR0))
+        print('#')        
         print("Calculating NASA polynomials")
         thermdat_dft.nasa.fit_NASA(T_range, CpoR, HoRT0, SoR0)
 

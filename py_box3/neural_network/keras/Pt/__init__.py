@@ -120,13 +120,7 @@ def simple_get_fcc_sites(atoms, site_type, n_metal_layers, spacing = 2.302, meta
 	ads_positions = {}
 	for element in site_type.keys():
 		ads_positions[element] = [atom.position for atom in atoms if atom.symbol == element]
-	# print('N_positions:')
-	# for i, N_position in enumerate(N_positions):
-	# 	print('{}\t{}'.format(i, N_position))
 
-	# print('O_positions:')
-	# for i, O_position in enumerate(O_positions):
-	# 	print('{}\t{}'.format(i, O_position))
 	fcc_occupancies = []
 	fcc_positions = []
 	fcc_periodic_positions = []
@@ -141,27 +135,33 @@ def simple_get_fcc_sites(atoms, site_type, n_metal_layers, spacing = 2.302, meta
 
 			#Check periodic images for site occupancy
 			periodic_positions = get_periodic_positions(atoms = atoms, position = fcc_position, n_dimensions = n_dimensions)
-			fcc_periodic_positions.append(periodic_positions)
+			#fcc_periodic_positions.append(periodic_positions)
 
 			ads_distances = {}
 			for periodic_position in periodic_positions:
+				occupancy_found = False
 				for element, position in ads_positions.items():
 					ads_distances[element] = np.array([np.linalg.norm(position - periodic_position, ord = 2) for position in ads_positions[element]])
 
 				for element, distances in ads_distances.items():
 					if np.any(distances <= tol[element]):
 						fcc_occupancies.append(site_type[element])
+						occupancy_found = True
 						break
-				else:
-					fcc_occupancies.append(0)
-	return (fcc_positions, fcc_occupancies, fcc_periodic_positions)
+
+				if occupancy_found:
+					break
+			else:
+				fcc_occupancies.append(-1)
+
+	return (fcc_positions, fcc_occupancies)
 
 
 def get_periodic_positions(position, atoms = None, cell = None, n_dimensions = 3):
 	if atoms is not None:
 		cell = atoms.get_cell()
 	offsets = np.array([base10_to_basen(num = i, n = 3, width = n_dimensions)-1 for i in range(3**n_dimensions)])
-	
+
 	periodic_positions = []
 	for offset in offsets:
 		periodic_position = np.dot(cell.T, offset) + position

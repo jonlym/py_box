@@ -445,7 +445,9 @@ def parse_unit(unit):
     unit_split = unit.split(' ')
     unit_dict = {}
     for unit in unit_split:
-        pass    
+
+
+        pass
 
 prefixes = {
     'Y': 1.e24,
@@ -464,6 +466,19 @@ prefixes = {
     'z': 1.e-21,
     'y': 1.e-24
 }
+
+common_units = (
+    'C', 'F', 'K', #Temperature
+    'l', 'L', 'gal', 'fl', 'pt', #Volume
+    'm', 'in', 'ft', 'yd', #Distance
+    'g', 'lb', 'amu', #Mass
+    's', 'min', 'h', 'day', 'week', 'yr', #Time
+    'Hz', #Frequency
+    'atm', 'bar', 'Pa', 'psi', 'psia', 'psig', 'torr', 'mmHg', #Pressure
+    'J', 'cal', 'btu', #Energy,
+    'N', #Force
+    'W', #Power
+    )
 
 
 #Dictionary with atomic weights of every element. Elements can be searched
