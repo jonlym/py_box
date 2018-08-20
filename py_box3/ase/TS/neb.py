@@ -9,7 +9,7 @@ import numpy as np
 import re
 from ase.io import read, write
 from ase.visualize import view
-from ase.neb import interpolate
+from ase.neb import interpolate as ase_interpolate
 from shutil import copy, copytree
 from os import chdir, getcwd, system, makedirs, walk
 from os.path import relpath, expanduser, exists, join, isfile
@@ -183,10 +183,10 @@ def interpolate(initial_atoms, final_atoms, n_images):
 		images : list of ase.Atoms
 			Interpolated images (the 0th index is the initial image and the -1th index is the final image)
 	"""
-	initial_copy = initial.copy()
+	initial_copy = initial_atoms.copy()
 	images = [initial_copy]
 	for i in range(n_images):
 		images.append(initial_copy.copy())
-	images.append(final)
-	interpolate(images)
+	images.append(final_atoms)
+	ase_interpolate(images)
 	return images
