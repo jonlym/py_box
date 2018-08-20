@@ -87,7 +87,7 @@ def get_perpendicular_bisectors(position1, position2, a):
 	"""
 	mid_point = np.mean(np.vstack([position1, position2]), axis = 0)
 	v_old = position1 - position2
-	if math.isclose(v_old[1], 0.):
+	if np.isclose(v_old[1], 0.):
 		v_new = np.array([0., np.sqrt(3)/2 * a])
 	else:
 		v_new = np.array([0., 0.])
@@ -142,7 +142,7 @@ def connect_new_edges(new_node, graph, new_layer, a):
 			continue
 		#New node is only connected to close-by nodes
 		distance = get_distance(position, node[1]['position'])
-		if not math.isclose(a, distance):
+		if not np.isclose(a, distance):
 			continue
 		#If criteria met, add edge
 		graph.add_edge(new_node, node[0])

@@ -407,7 +407,8 @@ calc_dict = {
 		'lclimb': False,
 		'ediffg': -0.15,
 		'ichain': 0,
-		'ispring': 1
+		'ispring': 1,
+		'neb': True
 		},
 	'dimer':{
 		'ediffg': -0.05,

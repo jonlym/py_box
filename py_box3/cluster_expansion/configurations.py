@@ -7,6 +7,7 @@ from ase.io import read
 from warnings import warn
 import platform
 from itertools import permutations
+from py_box3.ase import DFT_E_gas
 try:
     import networkx as nx
 except:
@@ -266,4 +267,5 @@ def convert_CE_to_DFT(n, n_max, E, E_min, E_max):
     return E + (1. - float(n)/float(n_max)) * E_min + float(n)/float(n_max) * E_max
 
 def convert_DFT_to_CE(n, n_max, E, E_min, E_max):
-    return E - (1. - float(n)/float(n_max)) * E_min - float(n)/float(n_max) * E_max    
+    #return E - (1. - float(n)/float(n_max)) * E_min - float(n)/float(n_max) * E_max    
+    return (E - E_min + n*(DFT_E_gas['H2O'] - DFT_E_gas['H2']))/n_max    
