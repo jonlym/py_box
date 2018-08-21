@@ -374,7 +374,7 @@ class Vasp(Calculator):
                 else:
                     if atom.symbol == symbol:
                         self.sort.append(m)
-        self.resort = range(len(self.sort))
+        self.resort = list(range(len(self.sort)))
         for n in range(len(self.resort)):
             self.resort[self.sort[n]] = n
         self.atoms_sorted = atoms[self.sort]
@@ -546,8 +546,8 @@ class Vasp(Calculator):
             atoms = ase.io.read('CONTCAR', format='vasp')[self.resort]
         else:
             atoms = ase.io.read('CONTCAR', format='vasp')
-            self.sort = range(len(atoms))
-            self.resort = range(len(atoms))
+            self.sort = list(range(len(atoms)))
+            self.resort = list(range(len(atoms)))
         self.atoms = atoms.copy()
         self.read_incar()
         self.read_outcar()
@@ -714,7 +714,7 @@ class Vasp(Calculator):
             or not self.converged):
             return True
         if 'magmom' in quantities:
-            return not hasattr(self, 'magnetic_moment')
+            return 'magnetic_moment' not in self
         return False
 
     def get_number_of_bands(self):
@@ -758,7 +758,7 @@ class Vasp(Calculator):
         return self.get_ibz_kpoints()
 
     def get_spin_polarized(self):
-        if not hasattr(self, 'spinpol'):
+        if 'spinpol' not in self:
             self.spinpol = self.atoms.get_initial_magnetic_moments().any()
         return self.spinpol
 
@@ -814,7 +814,7 @@ class Vasp(Calculator):
                 if key in ('dipol', 'eint', 'ropt', 'rwigs'):
                     [incar.write('%.4f ' % x) for x in val]
                 elif key in ('ldauu', 'ldauj', 'ldaul') and \
-                    not self.dict_keys.has('ldau_luj'):
+                    'ldau_luj' not in self.dict_keys:
                     [incar.write('%.4f ' % x) for x in val]
                 elif key in ('ferwe', 'ferdo'):
                     [incar.write('%.1f ' % x) for x in val]
@@ -1619,8 +1619,8 @@ class xdat2traj:
         else:
             self.calc = calc
         if not sort:
-            if not hasattr(self.calc, 'sort'):
-                self.calc.sort = range(len(self.atoms))
+            if 'sort' not in self.calc:
+                self.calc.sort = list(range(len(self.atoms)))
         else:
             self.calc.sort = sort
         self.calc.resort = range(len(self.calc.sort))
