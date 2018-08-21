@@ -358,7 +358,7 @@ class Vasp(Calculator):
             if m in special_setups:
                 pass
             else:
-                if not symbols.has_key(symbol):
+                if symbol not in symbols:
                     symbols[symbol] = 1
                 else:
                     symbols[symbol] += 1
@@ -515,10 +515,10 @@ class Vasp(Calculator):
             pass
         elif isinstance(p['txt'], str):
             sys.stderr = open(p['txt'], 'w')
-        if os.environ.has_key('VASP_COMMAND'):
+        if 'VASP_COMMAND' in os.environ:
             vasp = os.environ['VASP_COMMAND']
             exitcode = os.system('%s > %s' % (vasp, self.out))
-        elif os.environ.has_key('VASP_SCRIPT'):
+        elif 'VASP_SCRIPT' in os.environ:
             vasp = os.environ['VASP_SCRIPT']
             locals={}
             execfile(vasp, {}, locals)
