@@ -155,7 +155,8 @@ int_keys = [
     'snl',        # Maximum dimentionality of the Lanczos matrix
     'lbfgsmem',   # Steps saved for inverse Hessian for IOPT = 1 (LBFGS)
     'fnmin',      # Max iter. before adjusting dt and alpha for IOPT = 7 (FIRE) 
-    'ispring'     # Created by Jon Lym
+    'ispring',    # Created by Jon Lym
+    'ivdw',       # Requested by Praneet Batchu
 ]
 
 bool_keys = [
