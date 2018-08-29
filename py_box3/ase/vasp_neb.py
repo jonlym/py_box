@@ -184,6 +184,7 @@ bool_keys = [
     'lvhar',      # write Hartree potential to LOCPOT (vasp 5.x)
     'lvtot',      # create WAVECAR/CHGCAR/LOCPOT
     'lwave',      #
+    'reciprocal',
 #The next keywords pertain to the VTST add-ons from Graeme Henkelman's group at UT Austin
     'lclimb',     # Turn on CI-NEB
     'ltangentold', # Old central difference tangent
