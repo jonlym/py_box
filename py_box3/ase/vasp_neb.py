@@ -99,6 +99,7 @@ string_keys = [
     'system',     # name of System
     'tebeg',      #
     'teend',      # temperature during run
+    'pp',         #Pseudopotentials. Requested by Max Cohen
 ]
 
 int_keys = [
