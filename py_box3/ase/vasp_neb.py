@@ -194,7 +194,8 @@ bool_keys = [
     'llineopt',   # Use force based line minimizer for translation (IOPT = 1)
 # This keyword is just for me :)
     'neb',
-    'ltangent'    # Added by Jon Lym. Adds ltangent value to INCAR
+    'ltangent',    # Added by Jon Lym. Adds ltangent value to INCAR
+    'lscalapack'   # Added by Jon Lym. Fixes memory issue with Caviness
 ]
 
 list_keys = [
