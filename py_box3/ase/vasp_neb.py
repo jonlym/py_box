@@ -184,7 +184,7 @@ bool_keys = [
     'lvhar',      # write Hartree potential to LOCPOT (vasp 5.x)
     'lvtot',      # create WAVECAR/CHGCAR/LOCPOT
     'lwave',      #
-    'reciprocal',
+    'reciprocal', 
 #The next keywords pertain to the VTST add-ons from Graeme Henkelman's group at UT Austin
     'lclimb',     # Turn on CI-NEB
     'ltangentold', # Old central difference tangent
@@ -471,10 +471,13 @@ class Vasp(Calculator):
             atoms_sorted = ase.io.read('01/CONTCAR', format='vasp')
         else:
             atoms_sorted = ase.io.read('CONTCAR', format='vasp')
-        if self.int_params['ibrion']>-1 and self.int_params['nsw']>0:
-            # Update atomic positions and unit cell with the ones read from CONTCAR.
-            atoms.positions = atoms_sorted[self.resort].positions
-            atoms.cell = atoms_sorted.cell
+        
+        if (self.int_params['ibrion'] is not None and
+                self.int_params['nsw'] is not None):
+            if self.int_params['ibrion']>-1 and self.int_params['nsw']>0:
+                # Update atomic positions and unit cell with the ones read from CONTCAR.
+                atoms.positions = atoms_sorted[self.resort].positions
+                atoms.cell = atoms_sorted.cell
         self.converged = self.read_convergence()
         self.set_results(atoms)
 
