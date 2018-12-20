@@ -125,6 +125,22 @@ DFT_E_gas = {
 
 }
 
+def insert_atom(atoms, atom, index):
+    """
+    Inserts an atom into the atoms object and shifts all the indices.
+    """
+    atoms_out = atoms.copy()
+    del atoms_out[list(range(len(atoms_out)))]
+    offset = 0
+    for i in range(len(atoms)+1):
+        if i == index:
+            atoms_out.append(atom)
+            offset = 1
+        else:
+            atoms_out.append(atoms[i+offset])
+    return atoms_out
+
+
 # def insert_atom(atoms, atom, index):
 #     """
 #     Inserts an atom into the atoms object and shifts all the indices.
