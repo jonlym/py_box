@@ -137,7 +137,7 @@ def insert_atom(atoms, atom, index):
             atoms_out.append(atom)
             offset = 1
         else:
-            atoms_out.append(atoms[i+offset])
+            atoms_out.append(atoms[i-offset])
     return atoms_out
 
 
